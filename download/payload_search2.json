@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.reddit.com/r/nextjs/comments/1g9ihih/what_is_the_best_headless_cms_we_can_use",
+    "name": "What is the best headless CMS we can use? : r/nextjs - Reddit",
+    "snippet": "both payload and directus are great choices. payload 3 is the next.js cms. directus is the best no-code headless platform.",
+    "host_name": "www.reddit.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://payloadcms.com",
+    "name": "Payload: The Next.js Headless CMS and App Framework",
+    "snippet": "Built with TypeScript and React, Payload is an open-source headless CMS and application framework. Build anything.",
+    "host_name": "payloadcms.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://focusreactive.com/payload-cms-overview",
+    "name": "Payload CMS: Scalable Headless CMS for Developers",
+    "snippet": "Discover how Payload CMS combines the power of headless content management with developer-focused features for project flexibility and control.",
+    "host_name": "focusreactive.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.cosmicjs.com/blog/payload-cms-vs-cosmic-which-headless-cms-is-right-for-you",
+    "name": "Payload CMS vs Cosmic: Which Headless CMS Is Right for You?",
+    "snippet": "Both Payload CMS and Cosmic are TypeScript-first headless CMS platforms. The key difference: Payload is self-hosted, Cosmic is fully managed and AI-native.",
+    "host_name": "www.cosmicjs.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.buildwithsimon.com/blog/payload/payload-cms-vs-wordpress-2025",
+    "name": "Payload CMS vs WordPress: Which Should You Choose in 2025?",
+    "snippet": "Payload CMS vs WordPress: Honest comparison covering costs, performance, flexibility, and which CMS is right for your 2025 web project.\nPayload CMS is a headless CMS that only manages content. It provides your content through an API, and a separate frontend (usually Next.js or ...",
+    "host_name": "www.buildwithsimon.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.digitalapplied.com/blog/headless-cms-2026-sanity-contentful-payload-comparison",
+    "name": "Headless CMS 2026: Sanity vs Contentful vs Payload - Digital Applied",
+    "snippet": "Which headless CMS is best for a Next.js project in 2026? Is Payload CMS really free? How does Sanity GROQ compare to Contentful GraphQL?",
+    "host_name": "www.digitalapplied.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://shakuro.com/blog/payload-vs-other-cms",
+    "name": "Payload CMS vs Other Platforms: Modern CMS Comparison - Shakuro",
+    "snippet": "Learn how Payload CMS compares to WordPress, Drupal, and popular headless solutions, based on real-world experience and expert insights from a ...",
+    "host_name": "shakuro.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.useryze.com/blog-quirks-conversions/payload-cms-v3-the-ultimate-headless-cms-for-nextjs",
+    "name": "Payload CMS v3 – The Ultimate Headless CMS for Next.js - Useryze",
+    "snippet": "Discover how Payload CMS v3 powers modern DTC ecommerce and business workflows using Next.js, AWS Amplify, and custom components.",
+    "host_name": "www.useryze.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://spreecommerce.org/payload-cms-spree-ecommerce",
+    "name": "Payload CMS Ecommerce with Spree Commerce",
+    "snippet": "Build a full-stack Next.js commerce site with Payload CMS and Spree Commerce. Zero platform fees, typed REST APIs, and complete ownership.",
+    "host_name": "spreecommerce.org",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=gHyJldg8NwQ",
+    "name": "Payload CMS vs Strapi in 2025: Which Saves Small  - YouTube",
+    "snippet": "Need guidance with your tech project? Book a free consult: https://tally.so/r/3Xyr4d Comparing Payload CMS vs Strapi head-to-head for small ...",
+    "host_name": "www.youtube.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://payloadcms.com/docs/rich-text/overview",
+    "name": "Rich Text Editor | Documentation - Payload CMS",
+    "snippet": "This documentation is about our new editor, based on Lexical (Meta's rich text editor). The previous default editor, based on Slate, has been deprecated and ...",
+    "host_name": "payloadcms.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/PayloadCMS/comments/1ouhctz/can_you_use_the_lexical_editor_on_the_frontend",
+    "name": "Can you use the Lexical Editor on the frontend without the admin",
+    "snippet": "The Payload lexical editor is a plug-in for the CMS, so you won't be able to use it on the FE in its current state. Since it's built off the ...",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/payloadcms/payload/discussions/14520",
+    "name": "Lexical Editor BlockFeature cannot handle 'payload-config' #14520",
+    "snippet": "If I enable BlockFeature in the lexical editor then add a custom jsx converter to RichText which import the payload-config , I get an error: ./ ...",
+    "host_name": "github.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=OurpR8G6Ec0",
+    "name": "Exploring Payload 2.0: Postgres, Lexical RTE, Live Preview, and So",
+    "snippet": "If you like what we're up to, give us a Star: https://github.com/payloadcms/payload.",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://payloadcms.com/docs/rich-text/converters",
+    "name": "Lexical Converters | Documentation - Payload CMS",
+    "snippet": "Some converters require access to the Lexical editor config, which defines available features and behaviors. Payload provides multiple ways to obtain the editor ...",
+    "host_name": "payloadcms.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/78409406/payload-cms-lexical-editor-image-block-insertion-into-lexical-editor",
+    "name": "Payload CMS + Lexical Editor: image block insertion into lexical editor",
+    "snippet": "I have a quite complex task - I need to migrate content from another CMS into Payload 3.0. Content: posts, works, articles with rich texts, ...",
+    "host_name": "stackoverflow.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://payloadcms.com/docs/rich-text/migration",
+    "name": "Lexical Migration | Documentation - Payload CMS",
+    "snippet": "In the Admin Panel: Preview how your content will look in the Lexical editor; In your API: All read operations (REST, GraphQL, Local API) return converted ...",
+    "host_name": "payloadcms.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://payloaddirectory.dev",
+    "name": "Payload CMS Plugin Directory — Discover Community & Official",
+    "snippet": "Browse and discover 160+ Payload CMS plugins. Filter by version (v1, v2, v3), sort by stars, forks, or recent updates. Find official and community plugins ...",
+    "host_name": "payloaddirectory.dev",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=WAR17haLBww",
+    "name": "Implementing Payload CMS's Rich Text Component in  - YouTube",
+    "snippet": "Learn to build full-stack apps with Payload — https://nlvcodes.com/courses/payload-essentials LIVE CODING WITH PAYLOAD CMS & NEXTJS Reminder ...",
+    "host_name": "www.youtube.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.npmjs.com/package/@nhayhoc/payloadcms-lexical-ext",
+    "name": "@nhayhoc/payloadcms-lexical-ext - NPM",
+    "snippet": "This plugin adds new features to the Payload CMS lexical editor. You can use any of the features on its own or all of them togehter.",
+    "host_name": "www.npmjs.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

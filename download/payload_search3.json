@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://payloadcms.com/docs/configuration/i18n",
+    "name": "I18n | Documentation - Payload CMS",
+    "snippet": "With I18n, editors can navigate the interface and read API error messages in their preferred language. This is similar to Localization, but instead of managing ...",
+    "host_name": "payloadcms.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://payloadcms.com/docs/access-control/overview",
+    "name": "Access Control | Documentation - Payload CMS",
+    "snippet": "Payload makes it simple to define and manage Access Control. By declaring roles, you can set permissions and restrict what your users can interact with.",
+    "host_name": "payloadcms.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://payloadcms.com/docs/admin/overview",
+    "name": "The Admin Panel | Documentation - Payload CMS",
+    "snippet": "Payload dynamically generates a beautiful, fully type-safe Admin Panel to manage your users and data. It is highly performant, even with 100+ fields.",
+    "host_name": "payloadcms.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=cgEgEaDgwUo",
+    "name": "Stop Giving EVERYONE Admin: RBAC in Payload CMS - YouTube",
+    "snippet": "Really looking forward to your next video on using Payload auth for users without dashboard access. Thanks again! 1 ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/payloadcms/payload/blob/main/packages/payload/src/config/types.ts",
+    "name": "payload/packages/payload/src/config/types.ts at main - GitHub",
+    "snippet": "Payload is the open-source, fullstack Next.js framework, giving you instant backend superpowers. Get a full TypeScript backend and admin panel instantly.",
+    "host_name": "github.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://payloadcms.com/docs/configuration/localization",
+    "name": "Localization | Documentation - Payload CMS",
+    "snippet": "Add and maintain as many locales as you need by adding Localization to your Payload Config, set options for default locale, fallbacks, fields and more.",
+    "host_name": "payloadcms.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=3wghWsfTK4o",
+    "name": "#payloadcms Version 3.50.0 - What is New? - YouTube",
+    "snippet": "In this video, I walk you through all the exciting new features in Payload CMS version 3.50.0! This is part of our new experimental series ...",
+    "host_name": "www.youtube.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://execudea.com/blog/payload-cms-complete-guide-to-nodejs-based-headless-cms",
+    "name": "Payload CMS Complete Guide to Node.js-Based Headless CMS",
+    "snippet": "Localization ... Security is paramount in modern applications, and Payload provides enterprise-grade authentication and authorization features.",
+    "host_name": "execudea.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/79659995/payload-cms-ui-fields-with-i18n-does-not-accept-translate-function",
+    "name": "Payload CMS UI fields with i18n, does not accept translate function",
+    "snippet": "I think translate(...) returns a function (not a string), and Payload CMS field configs expect label to be string or Record<string, string> (for i18n), not a ...",
+    "host_name": "stackoverflow.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/nextjs/comments/1p6ewci/i_need_your_opinion_payload_cms_vs_storyblok",
+    "name": "Payload CMS vs Storyblok — which one would you choose? : r/nextjs",
+    "snippet": "Dynamic Zones and components for building pages. Easy-to-implement collections. A flexible API (REST with qs, or GraphQL) ; Needing to transfer ...",
+    "host_name": "www.reddit.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

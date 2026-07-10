@@ -1,0 +1,258 @@
+{
+  "blocks": [
+    {
+      "id": "block-hero",
+      "type": "hero",
+      "data": {
+        "title": "India's trusted FMCG<br>contract manufacturer",
+        "subtitle": "Khakhra · Makhana · Bhakhri · Extruder products — manufactured at scale for brands, distributors & private labels",
+        "buttonText": "Enquire for bulk / private label",
+        "buttonLink": "/contact",
+        "backgroundImage": "",
+        "height": "large",
+        "alignment": "center",
+        "showSecondaryCta": true,
+        "secondaryCtaText": "View our facility",
+        "secondaryCtaLink": "/manufacturing"
+      }
+    },
+    {
+      "id": "block-trust",
+      "type": "trust-bar",
+      "data": {
+        "stats": [
+          { "value": 15, "suffix": "+", "label": "Years in manufacturing" },
+          { "value": 5000, "suffix": "+", "label": "MT annual capacity" },
+          { "value": 80, "suffix": "+", "label": "SKUs across categories" },
+          { "value": 12, "suffix": "+", "label": "States served" },
+          { "value": 100, "suffix": "%", "label": "Own manufacturing" }
+        ]
+      }
+    },
+    {
+      "id": "block-audience",
+      "type": "audience-cards",
+      "data": {
+        "label": "Who we serve",
+        "heading": "We manufacture for",
+        "description": "From first batch to full-scale production — across business types",
+        "cards": [
+          {
+            "title": "B2B brands",
+            "description": "Bulk supply of finished goods under your brand",
+            "cta": "Enquire now",
+            "link": "/contact"
+          },
+          {
+            "title": "Private label",
+            "description": "Custom packaging, your branding, our recipe",
+            "cta": "Get details",
+            "link": "/contact"
+          },
+          {
+            "title": "Distributors",
+            "description": "Trade pricing, consistent supply, multi-SKU range",
+            "cta": "Partner with us",
+            "link": "/contact"
+          },
+          {
+            "title": "Institutional buyers",
+            "description": "Canteens, airlines, hospitality, govt procurement",
+            "cta": "Send requirement",
+            "link": "/contact"
+          }
+        ]
+      }
+    },
+    {
+      "id": "block-capabilities",
+      "type": "capabilities",
+      "data": {
+        "heading": "Why partner with us",
+        "items": [
+          "Own factory & machinery",
+          "FSSAI & ISO certified",
+          "5 production lines",
+          "Custom packaging ready",
+          "Hygiene-first processes",
+          "On-time delivery"
+        ],
+        "image": "",
+        "ctaText": "View full capabilities →",
+        "ctaLink": "/manufacturing"
+      }
+    },
+    {
+      "id": "block-products",
+      "type": "product-categories",
+      "data": {
+        "description": "Manufactured in-house · available for bulk, private label & contract production",
+        "categories": [
+          { "name": "Khakhra", "variants": "12+ variants" },
+          { "name": "Bhakhri", "variants": "8+ variants" },
+          { "name": "Makhana", "variants": "10+ variants" },
+          { "name": "Extruder products", "variants": "6+ variants" },
+          { "name": "Digestive", "variants": "4+ variants" }
+        ],
+        "ctaText": "View all products & packaging →",
+        "ctaLink": "/catalogue"
+      }
+    },
+    {
+      "id": "block-factory-reel",
+      "type": "factory-reel",
+      "data": {
+        "heading": "See our facility in action",
+        "description": "Factory floor · machinery · warehouse · loading trucks · staff · hygiene systems",
+        "videoUrl": "",
+        "ctaText": "Watch full factory tour",
+        "ctaLink": "/manufacturing"
+      }
+    },
+    {
+      "id": "block-certifications",
+      "type": "certifications",
+      "data": {
+        "heading": "Certified. Compliant. Trusted.",
+        "items": ["FSSAI", "ISO", "BIS", "HACCP", "GMP"],
+        "ctaText": "View all certifications →",
+        "ctaLink": "/manufacturing"
+      }
+    },
+    {
+      "id": "block-lead-capture",
+      "type": "lead-capture",
+      "data": {
+        "heading": "Looking for a manufacturing partner?",
+        "description": "Tell us your requirement — we'll get back within 24 hours",
+        "submitText": "Submit enquiry — we'll call you back",
+        "disclaimer": "Data goes directly to CRM · sales team alerted instantly · no spam",
+        "messageField": true,
+        "fields": [
+          {
+            "name": "name",
+            "label": "Your name",
+            "type": "text",
+            "required": true,
+            "placeholder": "Your name *"
+          },
+          {
+            "name": "company",
+            "label": "Company name",
+            "type": "text",
+            "required": true,
+            "placeholder": "Company name *"
+          },
+          {
+            "name": "phone",
+            "label": "Phone number",
+            "type": "tel",
+            "required": true,
+            "placeholder": "Phone number *"
+          },
+          {
+            "name": "email",
+            "label": "Email address",
+            "type": "email",
+            "required": false,
+            "placeholder": "Email address"
+          },
+          {
+            "name": "requirement",
+            "label": "Requirement type",
+            "type": "select",
+            "required": false,
+            "placeholder": "Requirement type",
+            "options": [
+              "Bulk order",
+              "Private label",
+              "Distribution",
+              "Investment",
+              "Other"
+            ]
+          },
+          {
+            "name": "city",
+            "label": "City / state",
+            "type": "text",
+            "required": false,
+            "placeholder": "City / state"
+          }
+        ]
+      }
+    },
+    {
+      "id": "block-leadership",
+      "type": "leadership",
+      "data": {
+        "heading": "Meet the leadership",
+        "ctaText": "Read full story →",
+        "ctaLink": "/about-us",
+        "members": [
+          {
+            "name": "Director name",
+            "role": "Co-founder & Director",
+            "bio": "20+ yrs FMCG distribution background.",
+            "image": ""
+          },
+          {
+            "name": "Director name",
+            "role": "Co-founder & Director",
+            "bio": "Operations & manufacturing lead.",
+            "image": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "block-testimonials",
+      "type": "partner-logos",
+      "data": {
+        "heading": "Trusted by brands across India",
+        "logos": ["", "", "", "", ""],
+        "testimonials": [
+          {
+            "quote": "\"Consistent quality, on-time delivery. Best manufacturing partner we've worked with.\"",
+            "author": "Brand name, City"
+          },
+          {
+            "quote": "\"Private label setup was smooth, packaging was exactly what we needed for retail.\"",
+            "author": "Distributor name, State"
+          },
+          {
+            "quote": "\"Scale, hygiene standards and response time — all top class. Highly recommended.\"",
+            "author": "Company name, State"
+          }
+        ]
+      }
+    },
+    {
+      "id": "block-sticky-cta",
+      "type": "sticky-cta",
+      "data": {
+        "visible": true,
+        "text": "Ready to manufacture at scale?",
+        "buttons": [
+          {
+            "text": "Get bulk quote",
+            "type": "primary",
+            "action": "enquiry",
+            "link": "/contact"
+          },
+          {
+            "text": "WhatsApp us",
+            "type": "whatsapp",
+            "action": "whatsapp",
+            "link": "https://wa.me/91XXXXXXXXXX"
+          },
+          {
+            "text": "+91 XXXXX XXXXX",
+            "type": "phone",
+            "action": "phone",
+            "link": "tel:+91XXXXXXXXXX"
+          }
+        ]
+      }
+    }
+  ]
+}

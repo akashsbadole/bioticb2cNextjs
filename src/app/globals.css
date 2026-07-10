@@ -1,0 +1,305 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-poppins: var(--font-poppins);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.5rem;
+  --background: #FFFFFF;
+  --foreground: #333333;
+  --card: #FFFFFF;
+  --card-foreground: #333333;
+  --popover: #FFFFFF;
+  --popover-foreground: #333333;
+  --primary: #3d6f08;
+  --primary-foreground: #FFFFFF;
+  --secondary: #8bc34a;
+  --secondary-foreground: #FFFFFF;
+  --muted: #f8f6f3;
+  --muted-foreground: #666666;
+  --accent: #fa881e;
+  --accent-foreground: #FFFFFF;
+  --destructive: #FF6B6B;
+  --border: #dddddd;
+  --input: #dddddd;
+  --ring: #3d6f08;
+  --chart-1: #3d6f08;
+  --chart-2: #8bc34a;
+  --chart-3: #001524;
+  --chart-4: #f8f6f3;
+  --chart-5: #333333;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #333333;
+  --sidebar-primary: #3d6f08;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #f8f6f3;
+  --sidebar-accent-foreground: #333333;
+  --sidebar-border: #dddddd;
+  --sidebar-ring: #3d6f08;
+
+  /* NutVatika brand colors (Astra WordPress theme) */
+  --brand-primary: #3d6f08;
+  --brand-primary-hover: #20340b;
+  --brand-secondary: #8bc34a;
+  --brand-secondary-hover: #6a9739;
+  --brand-accent: #fa881e;
+  --brand-accent-hover: #e67600;
+  --brand-text: #333333;
+  --brand-text-dark: #111111;
+  --brand-text-light: #666666;
+  --brand-bg: #FFFFFF;
+  --brand-bg-section: #f8f6f3;
+  --brand-border: #dddddd;
+  --brand-dark: #001524;
+  --brand-green-dark: #016129;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-poppins), sans-serif;
+  }
+
+  /* Heading typography - NutVatika (Astra theme) */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-poppins), sans-serif;
+    color: var(--brand-text-dark);
+    font-weight: 700;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    line-height: 1.4em;
+  }
+
+  h2 {
+    font-size: 2rem;
+    line-height: 1.3em;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    line-height: 1.3em;
+  }
+
+  h4 {
+    font-size: 1.25rem;
+    line-height: 1.2em;
+  }
+
+  h5 {
+    font-size: 1.125rem;
+    line-height: 1.2em;
+  }
+
+  h6 {
+    font-size: 1rem;
+    line-height: 1.25em;
+  }
+
+  p, span, li, td, th {
+    font-family: var(--font-poppins), sans-serif;
+    color: var(--brand-text);
+  }
+}
+
+@layer components {
+  /* Section spacing */
+  .section-padding {
+    padding: 5rem 0;
+  }
+
+  .container-custom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Button styles - matching NutVatika (Astra theme) */
+  .btn-primary {
+    background-color: var(--brand-primary);
+    color: #FFFFFF;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--brand-primary-hover);
+    color: #ffffff;
+  }
+
+  .btn-secondary {
+    background-color: var(--brand-secondary);
+    color: #FFFFFF;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--brand-secondary-hover);
+  }
+
+  .btn-accent {
+    background-color: var(--brand-accent);
+    color: #FFFFFF;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-accent:hover {
+    background-color: var(--brand-accent-hover);
+  }
+
+  .btn-outline {
+    border: 2px solid var(--brand-primary);
+    color: var(--brand-primary);
+    background: transparent;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .btn-outline:hover {
+    background-color: var(--brand-primary);
+    color: #FFFFFF;
+  }
+
+  /* Card styles */
+  .card {
+    background-color: var(--brand-bg);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Link styles */
+  .link {
+    color: var(--brand-primary);
+    transition: color 0.3s ease;
+  }
+
+  .link:hover {
+    color: var(--brand-primary-hover);
+  }
+
+  /* Section backgrounds */
+  .bg-section {
+    background-color: var(--brand-bg-section);
+  }
+
+  .bg-dark {
+    background-color: var(--brand-dark);
+    color: #FFFFFF;
+  }
+
+  .bg-brand-gradient {
+    background: linear-gradient(170deg, #001524 0%, #016129 50%, #0d5318 100%);
+    color: #FFFFFF;
+  }
+
+  .text-brand-gradient {
+    background: linear-gradient(170deg, #0d5318 15%, #29b815 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-primary {
+    background-color: var(--brand-primary);
+    color: #FFFFFF;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* button{
+  background-color: rgb(38, 57, 237) !important;
+  color: #FFFFFF !important;
+} */

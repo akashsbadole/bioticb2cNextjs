@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://payloadcms.com/docs/fields/overview",
+    "name": "Fields Overview | Documentation - Payload CMS",
+    "snippet": "Fields are the building blocks of Payload, find out how to add or remove a field, change field type, add hooks, define Access Control and Validation.",
+    "host_name": "payloadcms.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/payloadcms/payload/discussions/7064",
+    "name": "Conditionally-Available Block Types · payloadcms payload - GitHub",
+    "snippet": "I need a way to designate any given Block as only being visible to certain Users. How that's implemented, I don't really care; setting available blocks as a ...",
+    "host_name": "github.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://payloadcms.com/docs/fields/blocks",
+    "name": "Blocks Field | Documentation - Payload CMS",
+    "snippet": "The Blocks Field is one of the most flexible tools in Payload. It stores an array of objects, where each object is a “block” with its own schema.",
+    "host_name": "payloadcms.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=yJFbOzPD0oA",
+    "name": "Payload CMS - Build A Custom Dynamic Select Component",
+    "snippet": "Payload CMS - Custom Dynamic Select Component (Car Make & Model Example) In this video, I demonstrate how to create a custom parent-child ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.logrocket.com/using-payload-cms-build-blog",
+    "name": "Using Payload CMS to build a blog",
+    "snippet": "Let's explore the benefits of Payload CMS and how to use it to create a powerful and flexible blog management system.",
+    "host_name": "blog.logrocket.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/PayloadCMS/comments/1mn7p4u/seeing_which_media_is_in_use",
+    "name": "Seeing which Media is in use? : r/PayloadCMS - Reddit",
+    "snippet": "Is there a way to see which Media item is in use? For example: Which page has a block with this image Which global has a field with this ...",
+    "host_name": "www.reddit.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://payloadcms.com/docs/fields/relationship",
+    "name": "Relationship Field | Documentation - Payload CMS",
+    "snippet": "The Relationship field provides the ability to relate documents together. Learn how to use Relationship fields, see examples and options.",
+    "host_name": "payloadcms.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=qSkSKlw_fW8",
+    "name": "A Hands-On Payload CMS Blocks Tutorial (Beginner's Guide)",
+    "snippet": "payloadcms This step-by-step tutorial demonstrates how to leverage Payload CMS's core features – Layouts, Blocks, Fields, and Forms – to ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dev.to/aaronksaunders/video-payload-cms-custom-array-field-component-9aj",
+    "name": "[Video] Payload CMS Custom Array Field Component",
+    "snippet": "This video walks you through building a dynamic tag input where users can add, remove, and manage tags directly within the Payload admin panel.",
+    "host_name": "dev.to",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/playlist?list=PLu4ZqvNbx29u9-YMa7UZ3USlLHg221ZPF",
+    "name": "PayloadCMS Fields - YouTube",
+    "snippet": "This playlist contains the tutorial videos of fields only. This is a part of the PayloadCMS playlist, which has more comprehensive examples and tutorials.",
+    "host_name": "www.youtube.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

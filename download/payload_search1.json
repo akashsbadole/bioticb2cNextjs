@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://payloadcms.com",
+    "name": "Payload: The Next.js Headless CMS and App Framework",
+    "snippet": "Built with TypeScript and React, Payload is an open-source headless CMS and application framework. Build anything.",
+    "host_name": "payloadcms.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/nextjs/comments/1g9ihih/what_is_the_best_headless_cms_we_can_use",
+    "name": "What is the best headless CMS we can use? : r/nextjs - Reddit",
+    "snippet": "I researched a bit and options that pooes out the most were Payload. Directus, Sanity and Strapi. Please suggest me which one is the best to make use of.",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://focusreactive.com/payload-cms-overview",
+    "name": "Payload CMS: Scalable Headless CMS for Developers",
+    "snippet": "Payload CMS Features. 1. Custom Fields and Content Modeling. Payload CMS ships with around 20 field types out of the box: text, richText, number, date, select ...",
+    "host_name": "focusreactive.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.linkedin.com/pulse/payload-cms-developer-first-headless-you-should-using-biswas-ivskc",
+    "name": "The Developer-First Headless CMS You Should Be Using in 2025",
+    "snippet": "What is Payload CMS? · A fully customizable React-based admin panel that matches your data structure · Automatic database schemas with migrations ...",
+    "host_name": "www.linkedin.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.jekyllpad.com/blog/best-headless-cms",
+    "name": "The 12 Best Headless CMS Platforms of 2025: A Complete Guide",
+    "snippet": "Discover the best headless CMS for your project in 2025. We review 12 top platforms for developers, marketers, and creators with honest pros ...",
+    "host_name": "www.jekyllpad.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.digitalapplied.com/blog/headless-cms-2026-sanity-contentful-payload-comparison",
+    "name": "Headless CMS 2026: Sanity vs Contentful vs Payload - Digital Applied",
+    "snippet": "Payload CMS is the open-source TypeScript-native challenger: 100% open-source with zero vendor lock-in, code-first configuration, ...",
+    "host_name": "www.digitalapplied.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@yrogovich/how-payload-3-0-is-changing-the-headless-cms-game-in-2025-c6b8ce193518",
+    "name": "How Payload 3.0 is Changing the Headless CMS Game in 2025",
+    "snippet": "1. What is Payload? · 2. Problems of the WordPress and Strapi? · 3. Let's take a first look at Payload CMS · 4. What Other Nice Features Come Out ...",
+    "host_name": "medium.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.cosmicjs.com/blog/payload-cms-vs-cosmic-which-headless-cms-is-right-for-you",
+    "name": "Payload CMS vs Cosmic: Which Headless CMS Is Right for You?",
+    "snippet": "It provides a hosted content API, a collaborative dashboard, a TypeScript SDK, and a complete suite of AI agents, all without any infrastructure to manage.",
+    "host_name": "www.cosmicjs.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://makersden.io/blog/is-payloadcms-with-astros-the-killer-marketing-site-combo-of-2025",
+    "name": "PayloadCMS + AstroJS, the killer marketing site combo of 2025?",
+    "snippet": "PayloadCMS is an open-source headless CMS and app framework built with Node.js , TypeScript , and React . It gives you full control over data ...",
+    "host_name": "makersden.io",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://execudea.com/blog/payload-cms-complete-guide-to-nodejs-based-headless-cms",
+    "name": "Payload CMS Complete Guide to Node.js-Based Headless CMS",
+    "snippet": "Master Payload CMS with our complete 2025 guide. From setup to advanced features, learn how this headless CMS revolutionizes content ...",
+    "host_name": "execudea.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

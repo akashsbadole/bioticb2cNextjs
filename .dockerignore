@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+*.md
+.env
+.env.*
+!.env.example
+db/*.db
+db/*.db-journal
+uploads/*
+!uploads/.gitkeep
+*.log

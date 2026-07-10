@@ -1,0 +1,87 @@
+{
+  "_description": "Paste this JSON into a product's 'blocks' field via the admin Page Builder tab or API. Each block maps to one section on the product page. IDs auto-generate when using the builder UI.",
+  "blocks": [
+    {
+      "type": "product-hero",
+      "data": {
+        "title": "Product Name",
+        "subtitle": "Bulk Manufacturer · Private Label Ready",
+        "description": "Premium quality product manufactured in-house at our Gujarat facility. Supplied in bulk, retail-ready packs, or fully private labelled under your brand."
+      }
+    },
+    {
+      "type": "product-content-split",
+      "data": {
+        "image": "/uploads/products/placeholder.jpg",
+        "heading": "Sourced direct. Made in-house. Built for bulk.",
+        "paragraph": "Our product is sourced directly from trusted growers and processed entirely within our own facility — no intermediaries between source and final pack. Every batch follows the same controlled process, start to finish.",
+        "bullets": [
+          "Direct sourcing, no middlemen — traceable farm-to-factory supply chain",
+          "In-house processing on dedicated production lines",
+          "FSSAI certified, hygienic packaging in batch-tracked lots",
+          "Customisable for private label — your branding, our recipe"
+        ]
+      }
+    },
+    {
+      "type": "product-cards",
+      "data": {
+        "title": "Our range",
+        "productIds": [],
+        "maxCards": 8,
+        "columns": 4
+      }
+    },
+    {
+      "type": "product-cta",
+      "data": {
+        "heading": "Looking for bulk supply or private label?",
+        "description": "Share your requirement and get pricing, samples and lead-time details within 24 hours. Minimum order quantities, pack size options and custom formulation — we handle it all.",
+        "showBulkCta": true,
+        "bulkCtaText": "Enquire for Bulk Order →",
+        "bulkCtaLink": "/contact",
+        "showPrivateLabelCta": true,
+        "privateLabelCtaText": "Start Private Label →",
+        "privateLabelCtaLink": "/contact",
+        "backgroundColor": "dark"
+      }
+    },
+    {
+      "type": "product-process",
+      "data": {
+        "title": "From raw material to dispatch",
+        "subtitle": "Every batch follows the same controlled process, start to finish",
+        "steps": [
+          {
+            "title": "Raw material intake",
+            "description": "Sourced direct from trusted growers. Quality checks at intake — moisture, grade and visual inspection."
+          },
+          {
+            "title": "Grading & cleaning",
+            "description": "Sorted by size and quality. Multi-stage cleaning removes impurities, dust and off-grade material."
+          },
+          {
+            "title": "Processing",
+            "description": "Controlled heat and time on automated production lines. Consistent texture, colour and taste across every batch."
+          },
+          {
+            "title": "Quality check",
+            "description": "Batch-level inspection at 30-minute intervals. Colour, weight, seal integrity and taste verified."
+          },
+          {
+            "title": "Packing & dispatch",
+            "description": "Sealed, labelled and batch-coded. Climate-appropriate loading for pan-India dispatch."
+          }
+        ]
+      }
+    },
+    {
+      "type": "product-infographic",
+      "data": {
+        "image": "/uploads/products/infographic-placeholder.jpg",
+        "caption": "From source to shelf — the complete journey",
+        "altText": "Product infographic showing the journey from raw material to finished product"
+      }
+    }
+  ]
+}
