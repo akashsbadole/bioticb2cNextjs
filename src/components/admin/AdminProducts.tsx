@@ -236,7 +236,7 @@ export function AdminProducts() {
 
   // Collapsible sections
   const [seoOpen, setSeoOpen] = useState(false);
-  const [b2bOpen, setB2bOpen] = useState(false);
+  const [inquiryOpen, setInquiryOpen] = useState(false);
 
   // Delete dialog state
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -411,7 +411,7 @@ export function AdminProducts() {
     setEditingProduct(null);
     setForm(emptyForm);
     setSeoOpen(false);
-    setB2bOpen(false);
+    setInquiryOpen(false);
     setFormOpen(true);
   };
 
@@ -458,7 +458,7 @@ export function AdminProducts() {
       relatedProductIds: product.relatedProductIds || "",
     });
     setSeoOpen(!!(product.metaTitle || product.metaDescription));
-    setB2bOpen(!!product.whatsappNumber);
+    setInquiryOpen(!!product.whatsappNumber);
     setEditTab("general");
     setProductBlocks(normalizePageBlocks(product.blocks || "[]"));
     setFormOpen(true);
@@ -1254,7 +1254,7 @@ export function AdminProducts() {
                 </div>
 
                 {/* Inquiry Settings (Collapsible) */}
-                <Collapsible open={b2bOpen} onOpenChange={setB2bOpen}>
+                <Collapsible open={inquiryOpen} onOpenChange={setInquiryOpen}>
                   <CollapsibleTrigger asChild>
                     <Button
                       type="button"

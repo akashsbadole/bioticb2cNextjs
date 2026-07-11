@@ -13,51 +13,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ suggestions: [] });
     }
 
-    // Try trigram similarity first, fallback to ILIKE
-    let suggestions;
-    try {
-      if (storeId) {
-        suggestions = await db.$queryRawUnsafe(
-          `SELECT DISTINCT name, similarity(name, $1) as sim
-           FROM "Product"
-           WHERE "isActive" = true
-           AND "deletedAt" IS NULL
-           AND "storeId" = $3
-           AND name % $1
-           ORDER BY sim DESC
-           LIMIT $2`,
-          q, limit, storeId
-        );
-      } else {
-        suggestions = await db.$queryRawUnsafe(
-          `SELECT DISTINCT name, similarity(name, $1) as sim
-           FROM "Product"
-           WHERE "isActive" = true
-           AND "deletedAt" IS NULL
-           AND name % $1
-           ORDER BY sim DESC
-           LIMIT $2`,
-          q, limit
-        );
-      }
-    } catch {
-      // Fallback: use ILIKE
-      const storeFilter = storeId ? { storeId } : {};
-      suggestions = await db.product.findMany({
-        where: {
-          isActive: true,
-          deletedAt: null,
-          ...storeFilter,
-          name: { contains: q },
-        },
-        select: { name: true },
-        take: limit,
-        orderBy: { name: 'asc' },
-      });
-    }
+    const storeFilter = storeId ? { storeId } : {};
+    const results = await db.product.findMany({
+      where: {
+        isActive: true,
+        deletedAt: null,
+        ...storeFilter,
+        name: { contains: q },
+      },
+      select: { name: true },
+      take: limit,
+      orderBy: { name: 'asc' },
+    });
 
     return NextResponse.json({
-      suggestions: suggestions.map((s: any) => s.name),
+      suggestions: results.map((r) => r.name),
     });
   } catch (error) {
     console.error('Search suggestions error:', error);

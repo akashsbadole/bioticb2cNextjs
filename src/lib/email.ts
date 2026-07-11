@@ -140,3 +140,64 @@ export async function sendEnquiryNotification(enquiry: {
 }) {
   return sendEnquiryNotificationToAdmin(enquiry);
 }
+
+// Order confirmation to customer
+export async function sendOrderConfirmation(order: {
+  id: string;
+  customerName: string;
+  customerEmail: string;
+  totalAmount: number;
+  paymentMethod: string;
+  items: Array<{ name: string; quantity: number; price: number }>;
+}) {
+  const getSetting = await getSiteSettings();
+  const siteName = getSetting('site_name') || 'Store';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+  let content = `<h2 style="margin-top:0">Order Confirmed!</h2>`;
+  content += `<p>Dear ${order.customerName},</p>`;
+  content += `<p>Thank you for your order. We'll send you a notification when it ships.</p>`;
+  content += `<div class="field-label">Order ID</div><div class="field-value">${order.id.slice(0, 8)}</div>`;
+  content += `<div class="field-label">Payment Method</div><div class="field-value">${order.paymentMethod}</div>`;
+  content += `<div class="field-label">Total Paid</div><div class="field-value">${order.totalAmount.toFixed(2)}</div>`;
+  content += `<h3 style="margin-top:24px">Items</h3>`;
+  for (const item of order.items) {
+    content += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e5e7eb"><span>${item.name} x ${item.quantity}</span><span>${(item.price * item.quantity).toFixed(2)}</span></div>`;
+  }
+  content += `<div style="margin-top:24px;text-align:center"><a href="${siteUrl}/invoice/${order.id}" class="btn">View Invoice</a></div>`;
+
+  return sendEmail(
+    order.customerEmail,
+    `Order Confirmation - ${siteName}`,
+    emailWrapper(siteName, content)
+  );
+}
+
+// Tracking update notification
+export async function sendTrackingUpdate(order: {
+  id: string;
+  customerName: string;
+  customerEmail: string;
+  trackingNumber: string;
+}) {
+  const getSetting = await getSiteSettings();
+  const siteName = getSetting('site_name') || 'Store';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+  const content = `
+    <h2 style="margin-top:0">Your Order Has Shipped!</h2>
+    <p>Dear ${order.customerName},</p>
+    <p>Your order <strong>#${order.id.slice(0, 8)}</strong> is on its way!</p>
+    <div class="field-label">Tracking Number</div>
+    <div class="field-value" style="font-family:monospace">${order.trackingNumber}</div>
+    <div style="margin-top:24px;text-align:center">
+      <a href="${siteUrl}/invoice/${order.id}" class="btn">View Invoice</a>
+    </div>
+  `;
+
+  return sendEmail(
+    order.customerEmail,
+    `Your order has shipped - ${siteName}`,
+    emailWrapper(siteName, content)
+  );
+}

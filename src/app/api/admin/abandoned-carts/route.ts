@@ -10,10 +10,9 @@ export async function GET(request: NextRequest) {
     if (!auth.success) return auth.response;
 
     const storeId = getStoreId(request);
-    const carts = await findAbandonedCarts();
-    const filtered = storeId ? carts.filter((c) => c.storeId === storeId) : carts;
+    const carts = await findAbandonedCarts({ storeId });
 
-    return NextResponse.json({ carts: filtered });
+    return NextResponse.json({ carts });
   } catch (error) {
     console.error('Abandoned carts error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

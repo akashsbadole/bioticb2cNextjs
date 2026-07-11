@@ -216,7 +216,6 @@ export function AdminDashboard({
 
   // Sync activeTab prop changes
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentTab(activeTab);
   }, [activeTab]);
   const [mobileOpen, setMobileOpen] = useState(false);

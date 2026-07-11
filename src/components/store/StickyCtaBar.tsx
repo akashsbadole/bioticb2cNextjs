@@ -31,7 +31,7 @@ export function StickyCtaBar({ onNavigate, settings }: StickyCtaBarProps) {
       <div className="h-[60px]" aria-hidden="true" />
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-gray-900 px-4 py-3 text-white shadow-lg">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
-          <span className="text-sm font-medium">Ready to manufacture at scale?</span>
+          <span className="text-sm font-medium">Craving something delicious?</span>
           <div className="flex flex-wrap gap-2">
             <Button
               size="sm"

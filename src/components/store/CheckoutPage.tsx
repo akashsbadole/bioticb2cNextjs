@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatPrice } from "@/lib/pricing";
 import { Loader2, ArrowLeft, ShieldCheck, MapPin, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -30,6 +37,11 @@ export function CheckoutPage() {
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("payu");
+
+  const [shippingMethods, setShippingMethods] = useState<any[]>([]);
+  const [selectedShippingId, setSelectedShippingId] = useState<string>("");
+  const [shippingLoading, setShippingLoading] = useState(false);
 
   const subtotal = cart.items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -37,56 +49,100 @@ export function CheckoutPage() {
   );
 
   const discount = appliedCoupon
-    ? appliedCoupon.discountType === 'percentage'
+    ? appliedCoupon.discountType === "percentage"
       ? (subtotal * appliedCoupon.discountValue) / 100
       : Math.min(appliedCoupon.discountValue, subtotal)
     : 0;
 
-  const total = subtotal - discount;
+  const gstRate = parseFloat(settings?.tax_rate_gst || "0");
+  const shippingFixed = parseFloat(settings?.shipping_fixed_cost || "0");
+  const freeShippingThreshold = parseFloat(
+    settings?.shipping_free_threshold || "0"
+  );
+
+  const taxableAmount = subtotal - discount;
+  const taxAmount = taxableAmount * (gstRate / 100);
+
+  const shippingAmount = shippingMethods.find((m) => m.id === selectedShippingId)?.rate
+    ?? shippingFixed;
+
+  const total = (subtotal - discount) + taxAmount + shippingAmount;
+
+  // Fetch shipping methods on mount / cart change
+  useEffect(() => {
+    if (cart.items.length === 0) return;
+    setShippingLoading(true);
+    const controller = new AbortController();
+    fetch("/api/shipping/calculate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: cart.items.map((i) => ({
+          productId: i.productId,
+          quantity: i.quantity,
+        })),
+      }),
+      signal: controller.signal,
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) {
+          setShippingMethods(data.methods || []);
+          if (data.methods?.length > 0) {
+            setSelectedShippingId(data.methods[0].id);
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => setShippingLoading(false));
+    return () => controller.abort();
+  }, [cart.items]);
 
   const fetchAddresses = async () => {
     try {
-        const res = await fetch("/api/account/addresses", {
-            headers: { 'Authorization': `Bearer ${auth.token}` }
-        });
-        if (res.ok) {
-            const data = await res.json();
-            setAddresses(data.addresses || []);
-            const def = data.addresses.find((a: any) => a.isDefault);
-            if (def) {
-                setSelectedAddressId(def.id);
-                setFormData(prev => ({
-                    ...prev,
-                    name: def.name,
-                    email: auth.user?.email || '',
-                    phone: def.phone,
-                    address: def.address,
-                    city: def.city,
-                    state: def.state,
-                    zipCode: def.pincode,
-                }));
-            }
+      const res = await fetch("/api/account/addresses", {
+        headers: { Authorization: `Bearer ${auth.token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAddresses(data.addresses || []);
+        const def = data.addresses.find((a: any) => a.isDefault);
+        if (def) {
+          setSelectedAddressId(def.id);
+          setFormData((prev) => ({
+            ...prev,
+            name: def.name,
+            email: auth.user?.email || "",
+            phone: def.phone,
+            address: def.address,
+            city: def.city,
+            state: def.state,
+            zipCode: def.pincode,
+          }));
         }
-    } catch { /* ignore */ }
+      }
+    } catch {
+      /* ignore */
+    }
   };
 
   useEffect(() => {
     if (auth.user) {
-        fetchAddresses();
+      fetchAddresses();
     }
   }, [auth.user]);
 
   const handleSelectAddress = (addr: any) => {
     setSelectedAddressId(addr.id);
     setFormData({
-        name: addr.name,
-        email: auth.user?.email || '',
-        phone: addr.phone,
-        address: addr.address,
-        city: addr.city,
-        state: addr.state,
-        zipCode: addr.pincode,
-        notes: formData.notes
+      name: addr.name,
+      email: auth.user?.email || "",
+      phone: addr.phone,
+      address: addr.address,
+      city: addr.city,
+      state: addr.state,
+      zipCode: addr.pincode,
+      notes: formData.notes,
     });
   };
 
@@ -121,6 +177,8 @@ export function CheckoutPage() {
     e.preventDefault();
     setLoading(true);
 
+    const selectedMethod = shippingMethods.find((m) => m.id === selectedShippingId);
+
     try {
       const response = await fetch("/api/orders", {
         method: "POST",
@@ -128,22 +186,22 @@ export function CheckoutPage() {
         body: JSON.stringify({
           items: cart.items,
           customer: formData,
-          paymentMethod: "payu",
+          paymentMethod,
           couponCode: appliedCoupon?.code,
+          shippingMethod: selectedMethod?.name,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
         if (data.paymentUrl && data.paymentParams) {
-          // Create a hidden form and submit it to PayU
-          const form = document.createElement('form');
-          form.method = 'POST';
+          const form = document.createElement("form");
+          form.method = "POST";
           form.action = data.paymentUrl;
 
           Object.entries(data.paymentParams).forEach(([key, value]) => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
+            const input = document.createElement("input");
+            input.type = "hidden";
             input.name = key;
             input.value = String(value);
             form.appendChild(input);
@@ -197,22 +255,25 @@ export function CheckoutPage() {
               </h2>
               <div className="grid sm:grid-cols-2 gap-3">
                 {addresses.map((addr) => (
-                    <div
-                        key={addr.id}
-                        className={`p-4 border rounded-xl cursor-pointer transition-all ${selectedAddressId === addr.id ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:border-primary/50'}`}
-                        onClick={() => handleSelectAddress(addr)}
-                    >
-                        <p className="font-bold text-sm">{addr.label}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{addr.name}</p>
-                        <p className="text-xs text-muted-foreground line-clamp-1">{addr.address}</p>
-                    </div>
+                  <div
+                    key={addr.id}
+                    className={`p-4 border rounded-xl cursor-pointer transition-all ${selectedAddressId === addr.id ? "border-primary bg-primary/5 ring-1 ring-primary" : "hover:border-primary/50"}`}
+                    onClick={() => handleSelectAddress(addr)}
+                  >
+                    <p className="font-bold text-sm">{addr.label}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{addr.name}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-1">{addr.address}</p>
+                  </div>
                 ))}
                 <div
-                    className="p-4 border border-dashed rounded-xl flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground cursor-pointer"
-                    onClick={() => { setSelectedAddressId(null); setFormData({ ...formData, address: '', city: '', state: '', zipCode: '' }); }}
+                  className="p-4 border border-dashed rounded-xl flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground cursor-pointer"
+                  onClick={() => {
+                    setSelectedAddressId(null);
+                    setFormData({ ...formData, address: "", city: "", state: "", zipCode: "" });
+                  }}
                 >
-                    <Plus className="h-4 w-4" />
-                    <span className="text-sm font-medium">Use New Address</span>
+                  <Plus className="h-4 w-4" />
+                  <span className="text-sm font-medium">Use New Address</span>
                 </div>
               </div>
             </div>
@@ -304,6 +365,19 @@ export function CheckoutPage() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="paymentMethod">Payment Method</Label>
+              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select payment method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="payu">PayU Online</SelectItem>
+                  <SelectItem value="cod">Cash on Delivery</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="notes">Order Notes (Optional)</Label>
               <Textarea
                 id="notes"
@@ -327,9 +401,7 @@ export function CheckoutPage() {
                   Processing...
                 </>
               ) : (
-                <>
-                  Pay {formatPrice(total, currency)} Now
-                </>
+                <>Pay {formatPrice(total, currency)}</>
               )}
             </Button>
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
@@ -380,6 +452,48 @@ export function CheckoutPage() {
                 </div>
               ))}
             </div>
+
+            {/* Shipping method selector */}
+            {shippingMethods.length > 0 && (
+              <div className="space-y-2 border-t pt-4 mb-4">
+                <span className="text-xs uppercase text-muted-foreground font-bold flex items-center gap-1">
+                  Shipping Method
+                  {shippingLoading && <Loader2 className="h-3 w-3 animate-spin" />}
+                </span>
+                {shippingMethods.map((method) => (
+                  <label
+                    key={method.id}
+                    className={`flex items-center gap-2 p-2 border rounded cursor-pointer text-sm transition-all ${
+                      selectedShippingId === method.id
+                        ? "border-primary bg-primary/5"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="shipping"
+                      checked={selectedShippingId === method.id}
+                      onChange={() => setSelectedShippingId(method.id)}
+                      className="accent-primary"
+                    />
+                    <span className="font-medium">{method.name}</span>
+                    {method.deliveryEta && (
+                      <span className="text-xs text-muted-foreground ml-1">
+                        ({method.deliveryEta})
+                      </span>
+                    )}
+                    <span className="ml-auto font-medium">
+                      {method.free ? (
+                        <span className="text-emerald-600">Free</span>
+                      ) : (
+                        formatPrice(method.rate, currency)
+                      )}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+
             <Separator className="my-4" />
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
@@ -394,7 +508,17 @@ export function CheckoutPage() {
               )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Shipping</span>
-                <span className="text-emerald-600 font-medium">Free</span>
+                <span>
+                  {shippingAmount === 0 ? (
+                    <span className="text-emerald-600 font-medium">Free</span>
+                  ) : (
+                    formatPrice(shippingAmount, currency)
+                  )}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Tax</span>
+                <span>{formatPrice(taxAmount, currency)}</span>
               </div>
               <div className="flex justify-between text-base font-bold pt-2 border-t">
                 <span>Total</span>

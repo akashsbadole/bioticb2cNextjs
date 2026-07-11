@@ -42,7 +42,7 @@ const categoryInfo: Record<
   extruder: {
     name: "Extruder",
     tags: ["10+ shapes"],
-    desc: "High-speed extrusion for puffed and shaped snacks. Custom shapes and textures achievable for private label clients.",
+    desc: "High-speed extrusion for puffed and shaped snacks. Custom shapes and textures for every brand.",
     variants: "10+ shapes",
   },
   digestive: {
@@ -145,26 +145,25 @@ export function ProductsPage({
         <div className="absolute inset-0 bg-black/40" />
         <div className="relative container mx-auto max-w-5xl text-center">
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
-            Manufactured in-house.
+            Quality snacks,
             <br />
-            Available at scale.
+            delivered to your door.
           </h1>
           <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed mb-8">
-            5 product categories · 80+ SKUs · bulk, private label & branded
-            formats — all from our own factory
+            Explore our range of delicious snacks, perfect for every occasion
           </p>
           <div className="flex gap-4 justify-center">
             <button
-              onClick={() => onNavigate("contact")}
+              onClick={() => onNavigate("catalogue")}
               className="bg-primary text-primary-foreground text-sm font-medium rounded-full px-6 py-2.5 hover:bg-primary/90 transition-colors"
             >
-              Enquire for bulk / private label
+              Shop now
             </button>
             <button
-              onClick={() => onNavigate("catalogue")}
+              onClick={() => onNavigate("contact")}
               className="bg-white/10 text-gray-300 text-sm font-medium rounded-full px-6 py-2.5 hover:bg-white/20 transition-colors"
             >
-              Download catalogue
+              Contact us
             </button>
           </div>
         </div>
@@ -310,29 +309,29 @@ export function ProductsPage({
       <section className="bg-muted/40 py-12 px-4">
         <div className="container mx-auto max-w-5xl">
           <h2 className="text-xl font-bold mb-2">
-            Packaging built for retail & trade
+            Snacks for every occasion
           </h2>
           <p className="text-sm text-muted-foreground mb-8">
-            Available in three formats — choose what works for your business
+            Choose the perfect pack size for your home
           </p>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                title: "Purva Bites branded",
-                desc: "Ready-branded packs for distributors, modern trade and institutional buyers",
-                tag: "Distributor friendly",
+                title: "Regular Packs",
+                desc: "Our classic snacks in convenient retail packs",
+                tag: "Everyday value",
                 highlight: false,
               },
               {
-                title: "Your brand / private label",
-                desc: "Send your artwork — we print, pack and ship under your brand identity. No minimums disclosed publicly.",
-                tag: "Private label",
+                title: "Family Packs",
+                desc: "Bigger packs for families and gatherings",
+                tag: "Value size",
                 highlight: true,
               },
               {
-                title: "Bulk / institutional",
-                desc: "5kg, 10kg, 25kg formats for canteens, hotels, airlines and govt procurement",
-                tag: "Bulk format",
+                title: "Gift & Combo Packs",
+                desc: "Perfect for gifting and special occasions",
+                tag: "Premium gifting",
                 highlight: false,
               },
             ].map((item) => (

@@ -22,7 +22,7 @@ export interface AbandonedCart {
 
 export type CartWithUser = AbandonedCart;
 
-export async function findAbandonedCarts(opts: { onlyUnsent?: boolean } = {}) {
+export async function findAbandonedCarts(opts: { onlyUnsent?: boolean; storeId?: string | null } = {}) {
   const threshold = new Date();
   threshold.setHours(threshold.getHours() - ABANDONED_THRESHOLD_HOURS);
 
@@ -31,6 +31,7 @@ export async function findAbandonedCarts(opts: { onlyUnsent?: boolean } = {}) {
     items: { some: {} },
   };
   if (opts.onlyUnsent) where.reminderSentAt = null;
+  if (opts.storeId) where.storeId = opts.storeId;
 
   const carts = await db.cart.findMany({
     where,

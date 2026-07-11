@@ -37,7 +37,7 @@ const routeFromPath = (path: string, navigate: (page: string, data?: unknown) =>
   if (path === "/" || path === "") return;
   const segments = path.split("/").filter(Boolean);
   if (segments[0] === "product" && segments[1]) {
-    navigate("category", segments[1]);
+    navigate("product-page", segments[1]);
   } else if (segments[0] === "catalogue") {
     if (segments[1]) navigate("category", segments[1]);
     else navigate("catalogue");

@@ -10,10 +10,6 @@ const securityHeaders = [
     value: 'max-age=63072000; includeSubDomains; preload'
   },
   {
-    key: 'X-Frame-Options',
-    value: 'ALLOW-FROM https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com'
-  },
-  {
     key: 'X-Content-Type-Options',
     value: 'nosniff'
   },

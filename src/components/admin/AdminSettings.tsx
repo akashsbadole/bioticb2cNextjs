@@ -851,7 +851,6 @@ function AuthorProfiles() {
   }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchUsers();
   }, []);
 
@@ -966,7 +965,6 @@ function AuthorRow({
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setBio(user.bio || '');
     setDirty(false);
   }, [user.bio]);

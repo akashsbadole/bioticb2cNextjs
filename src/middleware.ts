@@ -153,6 +153,14 @@ export default auth(async (req) => {
       );
     }
 
+    // Reject state-changing API requests with body > 5 MB
+    if (!SAFE_METHODS.has(req.method)) {
+      const contentLength = req.headers.get("content-length");
+      if (contentLength && parseInt(contentLength, 10) > 5 * 1024 * 1024) {
+        return NextResponse.json({ error: "Request entity too large" }, { status: 413 });
+      }
+    }
+
     // Enforce same-origin for state-changing API requests (CSRF defense).
     if (!SAFE_METHODS.has(req.method)) {
       if (!isSameOrigin(req)) {

@@ -5,6 +5,7 @@ import { createNotification } from '@/lib/notifications';
 import { enquirySchema } from '@/lib/validations';
 import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { isHoneypotFilled } from '@/lib/honeypot';
 
 // Max 10 enquiry submissions per hour per IP (POST only)
 const ENQUIRY_RATE_LIMIT = { maxRequests: 10, windowMs: 60 * 60 * 1000, prefix: 'enquiries-post' };
@@ -79,6 +80,11 @@ export async function POST(request: NextRequest) {
     const rateLimitResponse = checkRateLimit(request, ENQUIRY_RATE_LIMIT);
     if (rateLimitResponse) return rateLimitResponse;
     const body = await request.json();
+
+    // Honeypot check — silently reject bots
+    if (isHoneypotFilled(body)) {
+      return NextResponse.json({ enquiry: {} }, { status: 201 });
+    }
 
     const result = enquirySchema.safeParse(body);
     if (!result.success) {

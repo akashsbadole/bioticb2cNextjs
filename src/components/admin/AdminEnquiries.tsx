@@ -99,13 +99,11 @@ const statusColors: Record<string, string> = {
 const typeColors: Record<string, string> = {
   product: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
   contact: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
-  rfq: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
 };
 
 const typeLabels: Record<string, string> = {
   product: 'General',
   contact: 'Contact',
-  rfq: 'RFQ',
 };
 
 const PAGE_SIZE = 20;
@@ -318,7 +316,7 @@ export function AdminEnquiries() {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Search by name, email, subject, or company..."
+          placeholder="Search by name, email, subject, or message..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-9"
@@ -429,11 +427,6 @@ export function AdminEnquiries() {
                       <div>
                         <p className="font-medium">
                           {enq.name}
-                          {enq.companyName && (
-                            <span className="text-xs text-muted-foreground block">
-                              {enq.companyName}
-                            </span>
-                          )}
                         </p>
                         <p className="text-xs text-muted-foreground sm:hidden">
                           {enq.email}
@@ -451,7 +444,6 @@ export function AdminEnquiries() {
                         variant="secondary"
                         className={typeColors[enq.type] || ''}
                       >
-                        {enq.type === 'rfq' && <Hash className="mr-1 h-3 w-3" />}
                         {typeLabels[enq.type] || enq.type}
                       </Badge>
                     </TableCell>

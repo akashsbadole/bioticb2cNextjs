@@ -40,6 +40,7 @@ model Store {
   Order         Order[]
   Cart          Cart[]
   Coupon        Coupon[]
+  ShippingRate  ShippingRate[]
   Review        Review[]
   Wishlist      Wishlist[]
   Popup         Popup[]
@@ -117,6 +118,7 @@ model Product {
   whatsappNumber    String?
   isDigital         Boolean          @default(false)
   downloadUrl       String?
+  taxRate           Float?
   isFeatured        Boolean          @default(false)
   isBestSeller      Boolean          @default(false)
   videoUrl          String?
@@ -323,6 +325,24 @@ model Coupon {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   Store          Store?    @relation(fields: [storeId], references: [id])
+
+  @@index([storeId])
+}
+
+model ShippingRate {
+  id          String   @id @default(cuid())
+  storeId     String?
+  name        String
+  minSubtotal Float    @default(0)
+  maxSubtotal Float?
+  rate        Float
+  freeAbove   Float?
+  deliveryEta String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Store       Store?   @relation(fields: [storeId], references: [id])
 
   @@index([storeId])
 }

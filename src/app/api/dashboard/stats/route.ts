@@ -48,11 +48,12 @@ export async function GET(request: NextRequest) {
 
     // --- Product Stats ---
     const productWhere = storeId ? { storeId } : {};
-    const [totalProducts, activeProducts, featuredProducts, totalCategories] = await Promise.all([
+    const [totalProducts, activeProducts, featuredProducts, totalCategories, lowStockCount] = await Promise.all([
       db.product.count({ where: productWhere }),
       db.product.count({ where: { isActive: true, ...productWhere } }),
       db.product.count({ where: { isFeatured: true, ...productWhere } }),
       db.category.count({ where: productWhere }),
+      db.product.count({ where: { stock: { lte: 5 }, ...productWhere } }),
     ]);
 
     const productStats = {
@@ -60,6 +61,7 @@ export async function GET(request: NextRequest) {
       active: activeProducts,
       featured: featuredProducts,
       categories: totalCategories,
+      lowStock: lowStockCount,
     };
 
     // --- Recent Activity: last 10 activity log entries ---

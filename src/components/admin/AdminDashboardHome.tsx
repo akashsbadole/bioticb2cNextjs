@@ -7,12 +7,21 @@ import {
   FolderOpen,
   MessageSquare,
   ImageIcon,
+  FileText,
+  Settings,
+  LogOut,
+  Menu,
+  ChevronRight,
+  TrendingUp,
+  ShoppingCart,
+  Mail,
+  Search,
+  KeyRound,
+  BookOpen,
+  Megaphone,
+  AlertTriangle,
   BarChart3,
   Star,
-  Search,
-  Clock,
-  Eye,
-  AlertTriangle,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { adminFetch } from '@/lib/admin-fetch';
@@ -34,7 +43,6 @@ interface EnquiryRow {
   name: string;
   email: string;
   subject: string;
-  type: string;
   status: string;
   createdAt: string;
   Product?: { id: string; name: string } | null;
@@ -46,6 +54,7 @@ interface DashboardStats {
     active: number;
     featured: number;
     categories: number;
+    lowStock: number;
   };
   enquiryStats: {
     thisWeek: number;
@@ -113,6 +122,7 @@ export function AdminDashboardHome({ onNavigate }: { onNavigate?: (tab: string) 
         { label: 'Categories', value: stats.productStats.categories, icon: FolderOpen, color: 'text-violet-600', bg: 'bg-violet-50 dark:bg-violet-950/40' },
         { label: 'New Enquiries', value: stats.enquiryStats.newCount, icon: MessageSquare, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-950/40' },
         { label: 'Total Enquiries', value: stats.enquiryStats.total, icon: Star, color: 'text-rose-600', bg: 'bg-rose-50 dark:bg-rose-950/40' },
+        ...(stats.productStats.lowStock > 0 ? [{ label: 'Low Stock', value: stats.productStats.lowStock, icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50 dark:bg-red-950/40' }] : []),
       ]
     : [];
 
@@ -277,7 +287,88 @@ export function AdminDashboardHome({ onNavigate }: { onNavigate?: (tab: string) 
             </div>
           </CardContent>
         </Card>
+
+        {/* Low Stock Alerts */}
+        {stats?.productStats.lowStock ? (
+          <Card className="border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-950/20">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-base flex items-center gap-2 text-red-700 dark:text-red-400">
+                <AlertTriangle className="h-4 w-4" />
+                Low Stock Alert
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-red-600"
+                onClick={() => onNavigate?.('products')}
+              >
+                View All
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-red-600 dark:text-red-400 mb-4">
+                {stats.productStats.lowStock} product{stats.productStats.lowStock !== 1 ? 's' : ''} running low on stock
+              </p>
+              <LowStockList />
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-emerald-600" />
+                Stock Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">All products are well stocked</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
+    </div>
+  );
+}
+
+function LowStockList() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-low-stock'],
+    queryFn: async () => {
+      const res = await adminFetch('/api/products?all=true&stockStatus=out_of_stock&limit=10');
+      if (!res.ok) throw new Error('Failed');
+      return res.json();
+    },
+  });
+
+  const products = data?.products || [];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-10 w-full" />
+        ))}
+      </div>
+    );
+  }
+
+  if (products.length === 0) {
+    return <p className="text-sm text-muted-foreground">No out-of-stock products found</p>;
+  }
+
+  return (
+    <div className="space-y-2">
+      {products.map((product: any) => (
+        <div key={product.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
+          <div>
+            <p className="text-sm font-medium">{product.name}</p>
+            <p className="text-xs text-muted-foreground">SKU: {product.sku || 'N/A'}</p>
+          </div>
+          <Badge variant="destructive" className="text-xs">
+            {product.stock === 0 ? 'Out of stock' : `${product.stock} left`}
+          </Badge>
+        </div>
+      ))}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { getStoreId } from '@/lib/store-db';
+import { sendTrackingUpdate } from '@/lib/email';
 
 export async function PUT(
   request: NextRequest,
@@ -27,6 +28,16 @@ export async function PUT(
         trackingNumber: trackingNumber !== undefined ? trackingNumber : undefined,
       },
     });
+
+    // Send tracking update email when tracking is newly set
+    if (trackingNumber && order.customerEmail) {
+      sendTrackingUpdate({
+        id: order.id,
+        customerName: order.customerName || 'Customer',
+        customerEmail: order.customerEmail,
+        trackingNumber: trackingNumber,
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ order });
   } catch (error) {

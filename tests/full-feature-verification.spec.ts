@@ -58,57 +58,43 @@ test.describe('Full Feature Verification', () => {
     await expect(page.getByText(footerLabel).first()).toBeVisible({ timeout: 10000 });
   });
 
-  test('B2B Flow: Registration and Tiered Pricing', async ({ page, request }) => {
+  test('B2C Flow: Customer Registration and Order', async ({ page, request }) => {
     if (!authToken) return;
-    const buyerEmail = `buyer-${Date.now()}@test.com`;
+    const customerEmail = `customer-${Date.now()}@test.com`;
 
-    // 1. Register
+    // 1. Register as customer
     await page.goto('/register');
-    await page.getByLabel('Full Name').fill('B2B Tester');
-    await page.getByLabel('Business Email').fill(buyerEmail);
+    await page.getByLabel('Full Name').fill('B2C Tester');
+    await page.getByLabel('Email').fill(customerEmail);
     await page.locator('#reg-password').fill('password123');
     await page.locator('#reg-confirm').fill('password123');
-    await page.getByLabel('Company Name').fill('Test Corp');
-    await page.getByLabel('Tax ID').fill('TAX-123');
-    await page.getByLabel('Business Address').fill('123 Test St');
     await page.getByRole('button', { name: /Create Account/i }).click();
 
-    await expect(page.getByText(/Pending/i).first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/verify your email/i).first()).toBeVisible({ timeout: 15000 });
 
-    // 2. Admin approves and sets tier
+    // 2. Admin approves customer
     const usersRes = await request.get('/api/users', {
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
     const { users } = await usersRes.json();
-    const newUser = users.find((u: any) => u.email === buyerEmail);
+    const newUser = users.find((u: any) => u.email === customerEmail);
 
     await request.put(`/api/users/${newUser.id}`, {
-      data: { isVerified: true, tier: 'silver' },
+      data: { isVerified: true },
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
 
-    // 3. Enable tiered pricing
-    await request.put('/api/store/settings', {
-      data: { settings: { b2b_enable_tiered_pricing: 'true', b2b_discount_silver: '0.5' } },
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    });
-
-    // 4. Login as Buyer
-    await page.goto('/admin');
-    await page.locator('input[type="email"]').fill(buyerEmail);
+    // 3. Login as customer
+    await page.goto('/login');
+    await page.locator('input[type="email"]').fill(customerEmail);
     await page.locator('input[type="password"]').fill('password123');
     await page.getByRole('button', { name: /Sign In/i }).click();
 
-    // We expect the user to be logged in to their portal or similar
     await page.wait_for_timeout(2000);
 
-    // Check product price
-    // Note: We need a product that actually exists and has a price. Seeding should have created some.
+    // 4. Browse catalogue
     await page.goto('/catalogue');
-    const firstProduct = page.locator('a[href*="/product/"]').first();
-    await firstProduct.click();
-
-    await expect(page.getByText(/tier/i).first()).toBeVisible({ timeout: 20000 });
+    await expect(page.locator('body')).toContainText('Catalogue', { timeout: 15000 });
   });
 
   test('CMS Page and Manual Seeding', async ({ page, request }) => {

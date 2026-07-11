@@ -354,7 +354,7 @@ export function AdminCategoryFields({
               <Label htmlFor="cat-cta-heading">Heading</Label>
               <Input
                 id="cat-cta-heading"
-                placeholder="Looking for bulk supply or private label?"
+                placeholder="Looking for more information or have a question?"
                 value={values.ctaHeading}
                 onChange={(e) => update("ctaHeading", e.target.value)}
               />
@@ -363,7 +363,7 @@ export function AdminCategoryFields({
               <Label htmlFor="cat-cta-desc">Description</Label>
               <Textarea
                 id="cat-cta-desc"
-                placeholder="Share your requirement and get pricing..."
+                placeholder="Share your question and we'll get back to you..."
                 value={values.ctaDescription}
                 onChange={(e) => update("ctaDescription", e.target.value)}
                 rows={2}

@@ -1,15 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
 import { generatePayUHash, PAYU_CONFIG } from '@/lib/payments/payu';
 import { requireAuth } from '@/lib/admin-auth';
+import { sendOrderConfirmation } from '@/lib/email';
+import { createNotification } from '@/lib/notifications';
+import { checkRateLimit } from '@/lib/rate-limit';
+
+const ORDER_RATE_LIMIT = { maxRequests: 10, windowMs: 60 * 60 * 1000, prefix: 'order-create' };
+
+const orderSchema = z.object({
+  items: z.array(z.object({
+    productId: z.string().min(1),
+    variantId: z.string().optional(),
+    quantity: z.number().int().min(1).max(999),
+  })).min(1),
+  customer: z.object({
+    name: z.string().min(1).max(100),
+    email: z.string().email(),
+    phone: z.string().optional(),
+    address: z.string().min(1),
+    city: z.string().min(1),
+    state: z.string().min(1),
+    zipCode: z.string().min(1),
+    notes: z.string().max(2000).optional(),
+  }),
+  paymentMethod: z.enum(['payu', 'cod']),
+  couponCode: z.string().optional(),
+  shippingMethod: z.string().optional(),
+});
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimitResponse = checkRateLimit(request, ORDER_RATE_LIMIT);
+    if (rateLimitResponse) return rateLimitResponse;
+
     const auth = await requireAuth(request).catch(() => ({ success: false } as const));
     const storeId = getStoreId(request);
+
     const body = await request.json();
-    const { items, customer, paymentMethod, couponCode } = body;
+    const parsed = orderSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
+    }
+
+    const { items, customer, paymentMethod, couponCode, shippingMethod } = parsed.data;
 
     // Validate request
     if (!items || items.length === 0) {
@@ -52,7 +91,7 @@ export async function POST(request: NextRequest) {
         };
     });
 
-    // Fetch store settings for GST and Shipping
+    // Fetch store settings for GST and Shipping (fallback)
     const settings = await db.siteSetting.findMany({
         where: { storeId: storeId ? storeId : null }
     });
@@ -83,8 +122,48 @@ export async function POST(request: NextRequest) {
         }
     }
 
-    const taxAmount = (calculatedSubtotal - discount) * (gstRate / 100);
-    const shippingAmount = isAllDigital ? 0 : ((calculatedSubtotal - discount) >= freeShippingThreshold && freeShippingThreshold > 0 ? 0 : shippingFixed);
+    // Per‑product tax computation (uses product.taxRate if set, else global gstRate)
+    let taxAmount = 0;
+    for (const od of orderItemsData as any[]) {
+        const dbProduct = dbProducts.find(p => p.id === od.productId);
+        const effectiveRate = dbProduct?.taxRate ?? gstRate;
+        const proportion = calculatedSubtotal > 0 ? od.total / calculatedSubtotal : 0;
+        const itemDiscount = discount * proportion;
+        taxAmount += (od.total - itemDiscount) * (effectiveRate / 100);
+    }
+
+    // Shipping: use ShippingRate table if shippingMethod provided, else flat fallback
+    let shippingAmount: number;
+    if (isAllDigital) {
+        shippingAmount = 0;
+    } else if (shippingMethod) {
+        const matchedRate = await db.shippingRate.findFirst({
+            where: {
+                storeId: storeId || null,
+                name: shippingMethod,
+                isActive: true,
+                minSubtotal: { lte: calculatedSubtotal - discount },
+                OR: [
+                    { maxSubtotal: null },
+                    { maxSubtotal: { gte: calculatedSubtotal - discount } },
+                ],
+            },
+        });
+        if (matchedRate) {
+            shippingAmount =
+                matchedRate.freeAbove != null && (calculatedSubtotal - discount) >= matchedRate.freeAbove
+                    ? 0
+                    : matchedRate.rate;
+        } else {
+            shippingAmount = shippingFixed;
+        }
+    } else {
+        shippingAmount =
+            (calculatedSubtotal - discount) >= freeShippingThreshold && freeShippingThreshold > 0
+                ? 0
+                : shippingFixed;
+    }
+
     const calculatedTotal = (calculatedSubtotal - discount) + taxAmount + shippingAmount;
 
     // Create order in transaction
@@ -145,9 +224,9 @@ export async function POST(request: NextRequest) {
          txnid: order.id,
          amount: order.totalAmount.toFixed(2),
          productinfo: `Order ${order.id}`,
-         firstname: customer.name,
-         email: customer.email,
-         phone: customer.phone,
+          firstname: customer.name,
+          email: customer.email,
+          phone: customer.phone || '',
          surl: `${baseUrl}/api/payments/payu/callback`,
          furl: `${baseUrl}/api/payments/payu/callback`,
          salt: payuSalt,
@@ -155,19 +234,43 @@ export async function POST(request: NextRequest) {
 
        const hash = generatePayUHash(paymentData);
 
-       return NextResponse.json({
-         orderId: order.id,
-         paymentUrl: isProd ? PAYU_CONFIG.PROD_URL : PAYU_CONFIG.TEST_URL,
-         paymentParams: {
-           ...paymentData,
-           hash,
-           salt: undefined, // Don't send salt to client
-         }
-       });
-    }
+        return NextResponse.json({
+          orderId: order.id,
+          paymentUrl: isProd ? PAYU_CONFIG.PROD_URL : PAYU_CONFIG.TEST_URL,
+          paymentParams: {
+            ...paymentData,
+            hash,
+            salt: undefined, // Don't send salt to client
+          }
+        });
+     }
 
-    return NextResponse.json({ orderId: order.id });
-  } catch (error) {
+     try {
+       await sendOrderConfirmation({
+         id: order.id,
+         customerName: customer.name,
+         customerEmail: customer.email,
+         totalAmount: order.totalAmount,
+         paymentMethod: paymentMethod || 'cod',
+         items: orderItemsData,
+       });
+     } catch {
+       // Don't fail order creation if email fails
+     }
+
+     try {
+       await createNotification({
+         title: 'New Order',
+         message: `Order ${order.id.slice(0, 8)} received`,
+         type: 'success',
+         link: 'orders',
+       });
+     } catch {
+       // ignore notification failures
+     }
+
+     return NextResponse.json({ orderId: order.id });
+   } catch (error) {
     console.error('Create order error:', error);
     return NextResponse.json(
       { error: 'Failed to create order' },

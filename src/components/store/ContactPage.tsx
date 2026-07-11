@@ -52,7 +52,7 @@ export function ContactPage({
 }: ContactPageProps) {
   useSeo("contact", {
     title: "Contact Us | Purva Bites",
-    description: "Looking for bulk supply, private label manufacturing or a distribution partnership? Share your requirement and we'll respond within 24 hours.",
+    description: "Get in touch with Purva Bites. Send us your enquiry for orders, partnerships, or any questions.",
   });
 
   const [selectedType, setSelectedType] = useState<string>("bulk");

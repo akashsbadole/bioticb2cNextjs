@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { verifyPayUHash } from '@/lib/payments/payu';
+import { sendOrderConfirmation } from '@/lib/email';
+import { createNotification } from '@/lib/notifications';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,34 +24,62 @@ export async function POST(request: NextRequest) {
     const status = data.status; // success or failure
 
     if (status === 'success') {
-      await db.$transaction(async (tx) => {
-        // 1. Update Order Status
-        const order = await tx.order.update({
-            where: { id: orderId },
-            data: {
-                paymentStatus: 'paid',
-                paymentId: data.mihpayid,
-            },
-            include: { items: true }
+      const order = await db.$transaction(async (tx) => {
+        const updated = await tx.order.update({
+          where: { id: orderId },
+          data: {
+            paymentStatus: 'paid',
+            paymentId: data.mihpayid,
+          },
+          include: { items: true }
         });
 
-        // 2. Decrement Stock
-        for (const item of order.items) {
-            if (item.variantId) {
-                await tx.productVariant.update({
-                    where: { id: item.variantId },
-                    data: { stock: { decrement: item.quantity } }
-                });
-            } else {
-                await tx.product.update({
-                    where: { id: item.productId },
-                    data: {
-                        stock: { decrement: item.quantity }
-                    }
-                });
-            }
+        for (const item of updated.items) {
+          if (item.variantId) {
+            await tx.productVariant.update({
+              where: { id: item.variantId },
+              data: { stock: { decrement: item.quantity } }
+            });
+          } else {
+            await tx.product.update({
+              where: { id: item.productId },
+              data: {
+                stock: { decrement: item.quantity }
+              }
+            });
+          }
         }
+
+        return updated;
       });
+
+      try {
+        await sendOrderConfirmation({
+          id: order.id,
+          customerName: order.customerName || 'Customer',
+          customerEmail: order.customerEmail || '',
+          totalAmount: order.totalAmount,
+          paymentMethod: order.paymentMethod || 'payu',
+          items: order.items.map((item) => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        });
+      } catch {
+        // Don't fail the callback if email fails
+      }
+
+      try {
+        await createNotification({
+          title: 'New Order',
+          message: `Order ${order.id.slice(0, 8)} received`,
+          type: 'success',
+          link: 'orders',
+        });
+      } catch {
+        // ignore notification failures
+      }
 
       return NextResponse.redirect(new URL(`/order-success/${orderId}`, request.url));
     } else {

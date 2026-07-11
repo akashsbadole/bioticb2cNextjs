@@ -12,6 +12,7 @@ import {
   Truck,
   XCircle,
   MoreVertical,
+  FileText,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -55,7 +56,8 @@ interface Order {
   returnStatus?: string;
   refundAmount?: number;
   shippingAddress: string;
-  paymentId: string;
+  paymentId?: string | null;
+  trackingNumber?: string | null;
   createdAt: string;
   items: Array<{
     id: string;
@@ -162,6 +164,7 @@ export function AdminOrders() {
               <TableHead>Date</TableHead>
               <TableHead>Total</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Tracking</TableHead>
               <TableHead>Payment</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -169,11 +172,11 @@ export function AdminOrders() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-10">Loading orders...</TableCell>
+                <TableCell colSpan={8} className="text-center py-10">Loading orders...</TableCell>
               </TableRow>
             ) : filteredOrders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-10">No orders found</TableCell>
+                <TableCell colSpan={8} className="text-center py-10">No orders found</TableCell>
               </TableRow>
             ) : (
               filteredOrders.map((order) => (
@@ -192,6 +195,13 @@ export function AdminOrders() {
                     {formatPrice(order.totalAmount, currency)}
                   </TableCell>
                   <TableCell>{getStatusBadge(order.status)}</TableCell>
+                  <TableCell>
+                    {order.trackingNumber ? (
+                      <span className="text-xs font-mono text-purple-600">{order.trackingNumber}</span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
                         <Badge variant={order.paymentStatus === 'paid' ? 'outline' : 'secondary'} className={order.paymentStatus === 'paid' ? 'text-emerald-600 border-emerald-200 bg-emerald-50' : ''}>
@@ -232,6 +242,9 @@ export function AdminOrders() {
                             if (track !== null) updateMutation.mutate({ id: order.id, data: { trackingNumber: track } });
                         }}>
                             Add Tracking
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => window.open(`/api/orders/${order.id}/invoice`, '_blank')}>
+                            <FileText className="mr-2 h-4 w-4" /> Download Invoice
                         </DropdownMenuItem>
                         <Separator />
                         <DropdownMenuItem onClick={() => {
@@ -291,6 +304,13 @@ export function AdminOrders() {
                   <p className="text-sm">Date: {format(new Date(selectedOrder.createdAt), "PPP")}</p>
                   <p className="text-sm">Payment: {selectedOrder.paymentStatus.toUpperCase()}</p>
                   <p className="text-sm">TXN ID: {selectedOrder.paymentId || 'N/A'}</p>
+                  <p className="text-sm">Tracking: {selectedOrder.trackingNumber || 'N/A'}</p>
+                  {selectedOrder.trackingNumber && (
+                    <p className="text-sm mt-2">
+                      <span className="text-xs uppercase text-muted-foreground block">Tracking:</span>
+                      <span className="text-emerald-600 font-medium">{selectedOrder.trackingNumber}</span>
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -324,10 +344,15 @@ export function AdminOrders() {
               </div>
             </div>
           )}
-          <DialogFooter className="hide-print">
-            <Button variant="outline" onClick={handlePrint}>Print Invoice</Button>
-            <Button onClick={() => setViewDialogOpen(false)}>Close</Button>
-          </DialogFooter>
+            <DialogFooter className="hide-print">
+                {selectedOrder && (
+                    <Button variant="outline" onClick={() => window.open(`/invoice/${selectedOrder.id}`, '_blank')}>
+                        <FileText className="mr-2 h-3 w-3" /> View Invoice
+                    </Button>
+                )}
+                <Button variant="outline" onClick={handlePrint}>Print Invoice</Button>
+                <Button onClick={() => setViewDialogOpen(false)}>Close</Button>
+            </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

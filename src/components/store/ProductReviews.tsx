@@ -58,7 +58,6 @@ export function ProductReviews({ productId }: { productId: string }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: auth.user.id,
           rating,
           comment,
         }),

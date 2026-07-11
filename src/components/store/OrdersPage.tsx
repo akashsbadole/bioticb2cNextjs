@@ -1,17 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Package, Calendar, CheckCircle2, Clock, Truck, ChevronRight, ShoppingBag, FileText } from "lucide-react";
+import { Package, CheckCircle2, FileText, Loader2 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { formatPrice } from "@/lib/pricing";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export function OrdersPage() {
   const { auth, settings, navigate } = useAppStore();
   const currency = settings?.currency || "INR";
+  const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
+  const [returnReason, setReturnReason] = useState("");
+  const [returning, setReturning] = useState(false);
 
   const { data: orders = [], isLoading: loading } = useQuery({
     queryKey: ["orders-user"],
@@ -32,6 +44,34 @@ export function OrdersPage() {
     }));
   };
 
+  const handleReturnRequest = async (orderId: string) => {
+    if (!returnReason.trim()) {
+      toast.error("Please provide a reason for the return");
+      return;
+    }
+
+    setReturning(true);
+    try {
+      const res = await fetch("/api/returns", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, reason: returnReason }),
+      });
+
+      if (res.ok) {
+        toast.success("Return request submitted");
+        setReturningOrderId(null);
+        setReturnReason("");
+      } else {
+        const err = await res.json();
+        toast.error(err.error || "Failed to submit return request");
+      }
+    } catch {
+      toast.error("An error occurred");
+    } finally {
+      setReturning(false);
+    }
+  };
 
   if (!auth.user) {
     return (
@@ -60,7 +100,7 @@ export function OrdersPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          {orders.map((order) => (
+          {orders.map((order: any) => (
             <div key={order.id} className="border rounded-xl bg-card overflow-hidden transition-shadow hover:shadow-md">
               <div className="bg-muted/50 px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b">
                 <div className="flex gap-6 flex-wrap">
@@ -75,10 +115,13 @@ export function OrdersPage() {
                   <div>
                     <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Status</p>
                     <Badge variant="outline" className="mt-0.5">{order.status}</Badge>
+                    {order.trackingNumber && (order.status === 'shipped' || order.status === 'delivered') && (
+                      <p className="text-[10px] mt-1 text-emerald-600 font-medium">{order.trackingNumber}</p>
+                    )}
                   </div>
                 </div>
                 <div className="text-right flex items-center gap-4">
-                    <Button variant="ghost" size="sm" className="text-xs h-8 hide-print" onClick={() => window.print()}>
+                    <Button variant="ghost" size="sm" className="text-xs h-8" onClick={() => window.open(`/api/orders/${order.id}/invoice`, '_blank')}>
                         <FileText className="mr-1 h-3 w-3" /> Invoice
                     </Button>
                     <div>
@@ -88,7 +131,6 @@ export function OrdersPage() {
                 </div>
               </div>
               <div className="p-6 space-y-8">
-                {/* Order Tracking Stepper */}
                 <div className="relative flex justify-between max-w-2xl mx-auto py-4">
                     <div className="absolute top-1/2 left-0 w-full h-0.5 bg-muted -translate-y-1/2 z-0" />
                     {getStepStatus(order.status).map((step, idx) => (
@@ -136,15 +178,7 @@ export function OrdersPage() {
                                         variant="ghost"
                                         size="sm"
                                         className="text-xs h-8 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                                        onClick={async () => {
-                                            if (confirm("Request return for this order?")) {
-                                                const res = await fetch(`/api/orders?orderId=${order.id}`, {
-                                                    method: 'PUT',
-                                                    body: JSON.stringify({ returnStatus: 'requested' })
-                                                });
-                                                if (res.ok) { window.location.reload(); }
-                                            }
-                                        }}
+                                        onClick={() => setReturningOrderId(order.id)}
                                     >
                                         Return
                                     </Button>
@@ -160,6 +194,36 @@ export function OrdersPage() {
             </div>
           ))}
         </div>
+      )}
+
+      {returningOrderId && (
+      <Dialog open={!!returningOrderId} onOpenChange={() => setReturningOrderId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request Return</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              Please provide a reason for your return request. Our team will review it within 24 business hours.
+            </p>
+            <Textarea
+              placeholder="Reason for return..."
+              value={returnReason}
+              onChange={(e) => setReturnReason(e.target.value)}
+              rows={4}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReturningOrderId(null)} disabled={returning}>
+              Cancel
+            </Button>
+            <Button onClick={() => returningOrderId && handleReturnRequest(returningOrderId)} disabled={returning}>
+              {returning && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Submit Request
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       )}
     </div>
   );
