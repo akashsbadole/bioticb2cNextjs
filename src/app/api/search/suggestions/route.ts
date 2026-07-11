@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
           isActive: true,
           deletedAt: null,
           ...storeFilter,
-          name: { contains: q, mode: 'insensitive' },
+          name: { contains: q },
         },
         select: { name: true },
         take: limit,

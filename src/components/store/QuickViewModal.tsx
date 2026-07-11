@@ -16,6 +16,7 @@ import { Separator } from '@/components/ui/separator';
 import { useAppStore } from '@/lib/store';
 import { getFirstImage } from '@/lib/utils';
 import { formatPrice } from '@/lib/pricing';
+import { toast } from 'sonner';
 
 interface Product {
   id: string;
@@ -24,8 +25,6 @@ interface Product {
   shortDescription: string | null;
   price: number;
   comparePrice: number | null;
-  wholesalePrice: number | null;
-  minOrderQty: number;
   images: string;
   Category: { id: string; name: string; slug?: string } | null;
   isFeatured: boolean;
@@ -45,7 +44,7 @@ export function QuickViewModal({
   onNavigate,
 }: QuickViewModalProps) {
   const { settings, addToCart } = useAppStore();
-  const isB2C = settings?.store_mode === "b2c";
+  const isB2C = true;
   const image = getFirstImage(product.images);
   const hasDiscount = product.comparePrice && product.comparePrice > product.price;
   const discountPercent = hasDiscount
@@ -137,14 +136,6 @@ export function QuickViewModal({
                   </span>
                 )}
               </div>
-              {product.wholesalePrice && (
-                <p className="text-sm text-amber-700 dark:text-amber-400 font-medium">
-                  Wholesale: {formatPrice(product.wholesalePrice)}
-                  <span className="text-muted-foreground font-normal">
-                    {' '}· Min. {product.minOrderQty} units
-                  </span>
-                </p>
-              )}
             </div>
           </div>
 

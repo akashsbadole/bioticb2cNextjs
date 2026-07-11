@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { verifyToken } from '@/lib/auth-edge';
+import { requireAuth } from '@/lib/admin-auth';
 
 function generateStoreSlug(name: string): string {
   return name
@@ -13,18 +13,12 @@ function generateStoreSlug(name: string): string {
 // GET /api/stores - List user's stores
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    const token = authHeader.split(' ')[1];
-    const payload = await verifyToken(token);
-    if (!payload?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const authRes = await requireAuth(request);
+    if (!authRes.success) return authRes.response;
+    const userId = authRes.payload.userId;
 
     const stores = await db.store.findMany({
-      where: { ownerUserId: payload.userId },
+      where: { ownerUserId: userId },
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
@@ -54,15 +48,9 @@ export async function GET(request: NextRequest) {
 // POST /api/stores - Create a new store
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    const token = authHeader.split(' ')[1];
-    const payload = await verifyToken(token);
-    if (!payload?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const authRes = await requireAuth(request);
+    if (!authRes.success) return authRes.response;
+    const userId = authRes.payload.userId;
 
     const body = await request.json();
     const { name, domain } = body;
@@ -101,7 +89,7 @@ export async function POST(request: NextRequest) {
         name: name.trim(),
         slug,
         domain: domain || null,
-        ownerUserId: payload.userId,
+        ownerUserId: userId,
         settings: defaultSettings,
         theme: JSON.stringify({
           primaryColor: '#10b981',
@@ -112,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     // Set as user's current store
     await db.user.update({
-      where: { id: payload.userId },
+      where: { id: userId },
       data: { currentStoreId: store.id },
     });
 

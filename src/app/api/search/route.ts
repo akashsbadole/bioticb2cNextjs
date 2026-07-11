@@ -66,9 +66,9 @@ export async function GET(request: NextRequest) {
         deletedAt: null,
         ...storeFilter,
         OR: [
-          { name: { contains: q, mode: 'insensitive' } },
-          { sku: { contains: q, mode: 'insensitive' } },
-          { description: { contains: q, mode: 'insensitive' } },
+          { name: { contains: q } },
+          { sku: { contains: q } },
+          { description: { contains: q } },
         ],
       };
 

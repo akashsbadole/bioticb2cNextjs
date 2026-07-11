@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useCallback, useState, ReactNode } from "react";
+import { useSession } from "next-auth/react";
 import { useAppStore } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { StoreLayout } from "./StoreLayout";
@@ -20,6 +21,8 @@ import { CheckoutPage } from "./CheckoutPage";
 import { OrderSuccessPage } from "./OrderSuccessPage";
 import { OrdersPage } from "./OrdersPage";
 import { AccountPage } from "./AccountPage";
+import { LoginPage } from "./LoginPage";
+import { RegisterPage } from "./RegisterPage";
 import { WishlistPage } from "./WishlistPage";
 import { FaqPage } from "./FaqPage";
 import { ComparisonPage } from "./ComparisonPage";
@@ -52,6 +55,10 @@ const routeFromPath = (path: string, navigate: (page: string, data?: unknown) =>
     navigate("order-success", segments[1]);
   } else if (segments[0] === "account") {
     navigate("account");
+  } else if (segments[0] === "login") {
+    navigate("login");
+  } else if (segments[0] === "register") {
+    navigate("register");
   } else if (segments[0] === "wishlist") {
     navigate("wishlist");
   } else if (segments[0] === "faq") {
@@ -82,6 +89,19 @@ function toPage(initialPage: string | { type: string; slug?: string } | undefine
 export function StoreShell({ initialPage, children }: StoreShellProps) {
   const storePage = useAppStore((s) => s.currentPage);
   const navigate = useAppStore((s) => s.navigate);
+  const setAuthUser = useAppStore((s) => s.setAuthUser);
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.user) {
+      setAuthUser({
+        id: session.user.id,
+        email: session.user.email || "",
+        name: session.user.name || "",
+        role: (session.user as { role?: string }).role || "customer",
+      });
+    }
+  }, [session, setAuthUser]);
 
   const initialPageObj = toPage(initialPage);
 
@@ -158,6 +178,10 @@ export function StoreShell({ initialPage, children }: StoreShellProps) {
         return <OrdersPage />;
       case "account":
         return <AccountPage />;
+      case "login":
+        return <LoginPage />;
+      case "register":
+        return <RegisterPage />;
       case "wishlist":
         return <WishlistPage />;
       case "faq":

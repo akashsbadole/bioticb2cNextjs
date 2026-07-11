@@ -1,41 +1,31 @@
-import { currentUser } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
-import { db } from '@/lib/db';
-import AdminDashboardClient from './AdminDashboardClient';
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import AdminDashboardClient from "./AdminDashboardClient";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const user = await currentUser();
+  const session = await auth();
+  const userId = session?.user?.id;
+  const role = (session?.user as { role?: string } | undefined)?.role;
 
-  if (!user) {
-    redirect('/admin');
-  }
-
-  const role = (user.publicMetadata?.role as string) || 'clerk';
-
-  if (role !== 'admin' && role !== 'clerk' && role !== 'editor') {
-    redirect('/');
+  if (!userId || (role !== "admin" && role !== "editor")) {
+    redirect("/admin");
   }
 
   const dbUser = await db.user.findUnique({
-    where: { clerkId: user.id },
+    where: { id: userId },
     select: { id: true, email: true, name: true, role: true },
   });
 
   return (
     <AdminDashboardClient
-      initialUser={dbUser ? {
-        id: dbUser.id,
-        email: dbUser.email,
-        name: dbUser.name,
-        role: dbUser.role,
-      } : {
-        id: user.id,
-        email: user.emailAddresses[0].emailAddress,
-        name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.emailAddresses[0].emailAddress,
-        role: role,
-      }}
+      initialUser={
+        dbUser
+          ? { id: dbUser.id, email: dbUser.email, name: dbUser.name, role: dbUser.role }
+          : { id: userId, email: session.user?.email || "", name: "", role: role || "admin" }
+      }
     />
   );
 }

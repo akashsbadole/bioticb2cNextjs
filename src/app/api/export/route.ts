@@ -30,9 +30,9 @@ export async function GET(request: NextRequest) {
           include: { Category: true },
           orderBy: { createdAt: 'desc' },
         });
-        csvContent = toCsvRow(['ID', 'Name', 'Slug', 'SKU', 'Price', 'Compare Price', 'Wholesale Price', 'Min Order Qty', 'Category', 'Active', 'Featured', 'Created At']);
+        csvContent = toCsvRow(['ID', 'Name', 'Slug', 'SKU', 'Price', 'Compare Price', 'Category', 'Active', 'Featured', 'Created At']);
         for (const p of products) {
-          csvContent += toCsvRow([p.id, p.name, p.slug, p.sku || '', p.price, p.comparePrice || '', p.wholesalePrice || '', p.minOrderQty, p.Category?.name || '', p.isActive, p.isFeatured, p.createdAt.toISOString()]);
+          csvContent += toCsvRow([p.id, p.name, p.slug, p.sku || '', p.price, p.comparePrice || '', p.Category?.name || '', p.isActive, p.isFeatured, p.createdAt.toISOString()]);
         }
         filename = `products-${new Date().toISOString().slice(0, 10)}.csv`;
         break;
@@ -73,9 +73,9 @@ export async function GET(request: NextRequest) {
           include: { Product: { select: { name: true } }, User: { select: { name: true } } },
           orderBy: { createdAt: 'desc' },
         });
-        csvContent = toCsvRow(['ID', 'Name', 'Email', 'Phone', 'Company', 'Subject', 'Type', 'Status', 'Product', 'Message', 'Created At']);
+        csvContent = toCsvRow(['ID', 'Name', 'Email', 'Phone', 'Subject', 'Status', 'Product', 'Message', 'Created At']);
         for (const e of enquiries) {
-          csvContent += toCsvRow([e.id, e.name, e.email, e.phone || '', e.companyName || '', e.subject, e.type, e.status, e.Product?.name || '', e.message.replace(/\n/g, ' '), e.createdAt.toISOString()]);
+          csvContent += toCsvRow([e.id, e.name, e.email, e.phone || '', e.subject, e.status, e.Product?.name || '', e.message.replace(/\n/g, ' '), e.createdAt.toISOString()]);
         }
         filename = `enquiries-${new Date().toISOString().slice(0, 10)}.csv`;
         break;

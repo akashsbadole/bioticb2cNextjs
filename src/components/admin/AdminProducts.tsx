@@ -105,8 +105,6 @@ interface Product {
   shortDescription: string | null;
   price: number;
   comparePrice: number | null;
-  wholesalePrice: number | null;
-  minOrderQty: number;
   sku: string | null;
   barcode: string | null;
   images: string;
@@ -142,8 +140,6 @@ interface ProductFormData {
   shortDescription: string;
   price: string;
   comparePrice: string;
-  wholesalePrice: string;
-  minOrderQty: string;
   sku: string;
   barcode: string;
   images: string;
@@ -175,8 +171,6 @@ const emptyForm: ProductFormData = {
   shortDescription: "",
   price: "",
   comparePrice: "",
-  wholesalePrice: "",
-  minOrderQty: "1",
   sku: "",
   barcode: "",
   images: "",
@@ -440,10 +434,6 @@ export function AdminProducts() {
       shortDescription: product.shortDescription || "",
       price: String(product.price),
       comparePrice: product.comparePrice ? String(product.comparePrice) : "",
-      wholesalePrice: product.wholesalePrice
-        ? String(product.wholesalePrice)
-        : "",
-      minOrderQty: String(product.minOrderQty || 1),
       sku: product.sku || "",
       barcode: product.barcode || "",
       images: imgs.join(", "),
@@ -468,13 +458,7 @@ export function AdminProducts() {
       relatedProductIds: product.relatedProductIds || "",
     });
     setSeoOpen(!!(product.metaTitle || product.metaDescription));
-    setB2bOpen(
-      !!(
-        product.wholesalePrice ||
-        product.minOrderQty > 1 ||
-        product.whatsappNumber
-      ),
-    );
+    setB2bOpen(!!product.whatsappNumber);
     setEditTab("general");
     setProductBlocks(normalizePageBlocks(product.blocks || "[]"));
     setFormOpen(true);
@@ -510,10 +494,6 @@ export function AdminProducts() {
         shortDescription: form.shortDescription.trim() || null,
         price: Number(form.price),
         comparePrice: form.comparePrice ? Number(form.comparePrice) : null,
-        wholesalePrice: form.wholesalePrice
-          ? Number(form.wholesalePrice)
-          : null,
-        minOrderQty: parseInt(form.minOrderQty) || 1,
         sku: form.sku.trim() || null,
         barcode: form.barcode.trim() || null,
         images: imagesArray,
@@ -970,9 +950,6 @@ export function AdminProducts() {
                     Category
                   </TableHead>
                   <TableHead>Price</TableHead>
-                  <TableHead className="hidden xl:table-cell">
-                    Wholesale
-                  </TableHead>
                   <TableHead className="hidden sm:table-cell">Stock</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="hidden lg:table-cell">
@@ -1035,22 +1012,6 @@ export function AdminProducts() {
                             </span>
                           )}
                         </div>
-                      </TableCell>
-                      <TableCell className="hidden xl:table-cell">
-                        {product.wholesalePrice ? (
-                          <div className="flex flex-col">
-                            <span className="font-medium text-amber-700 dark:text-amber-400">
-                              {formatPrice(product.wholesalePrice)}
-                            </span>
-                            {product.minOrderQty > 1 && (
-                              <span className="text-xs text-muted-foreground">
-                                MOQ: {product.minOrderQty}
-                              </span>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
                       </TableCell>
                       <TableCell>
                         {editingStockId === product.id ? (
@@ -1292,7 +1253,7 @@ export function AdminProducts() {
                   </div>
                 </div>
 
-                {/* B2B Section (Collapsible) */}
+                {/* Inquiry Settings (Collapsible) */}
                 <Collapsible open={b2bOpen} onOpenChange={setB2bOpen}>
                   <CollapsibleTrigger asChild>
                     <Button
@@ -1302,13 +1263,7 @@ export function AdminProducts() {
                     >
                       <span className="flex items-center gap-2">
                         <Package className="h-4 w-4" />
-                        B2B / Wholesale Settings
-                        {(form.wholesalePrice ||
-                          parseInt(form.minOrderQty) > 1) && (
-                          <span className="text-xs text-emerald-600 font-normal">
-                            (configured)
-                          </span>
-                        )}
+                        WhatsApp / Inquiry Settings
                       </span>
                       <ChevronDown className="h-4 w-4 transition-transform duration-200" />
                     </Button>
@@ -1331,44 +1286,6 @@ export function AdminProducts() {
                         />
                         <p className="text-xs text-muted-foreground">
                           WhatsApp number for product inquiries
-                        </p>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="prod-wholesale">Wholesale Price</Label>
-                        <Input
-                          id="prod-wholesale"
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={form.wholesalePrice}
-                          onChange={(e) =>
-                            setForm((prev) => ({
-                              ...prev,
-                              wholesalePrice: e.target.value,
-                            }))
-                          }
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Leave empty to hide wholesale pricing
-                        </p>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="prod-moq">Min Order Quantity</Label>
-                        <Input
-                          id="prod-moq"
-                          type="number"
-                          min="1"
-                          placeholder="1"
-                          value={form.minOrderQty}
-                          onChange={(e) =>
-                            setForm((prev) => ({
-                              ...prev,
-                              minOrderQty: e.target.value,
-                            }))
-                          }
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Minimum units per order
                         </p>
                       </div>
                     </div>

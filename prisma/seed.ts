@@ -42,8 +42,6 @@ async function main() {
         name: 'Pro Wireless Headphones',
         slug: 'pro-wireless-headphones',
         price: 299.99,
-        wholesalePrice: 189.99,
-        minOrderQty: 5,
         isActive: true,
         images: '[]',
         categoryId: electronicsId,

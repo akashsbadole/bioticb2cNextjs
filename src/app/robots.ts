@@ -12,7 +12,6 @@ export default function robots(): MetadataRoute.Robots {
         '/api/admin',
         '/api/auth',
         '/checkout',
-        '/portal',
       ],
     },
     sitemap: `${baseUrl}/sitemap.xml`,

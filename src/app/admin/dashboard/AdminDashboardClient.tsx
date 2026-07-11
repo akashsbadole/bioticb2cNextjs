@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useUser, useClerk } from '@clerk/nextjs';
+import { signOut } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
@@ -18,16 +18,15 @@ export default function AdminDashboardClient({ initialUser }: { initialUser: Adm
   const searchParams = useSearchParams();
   const tab = searchParams.get('tab') || 'dashboard';
   const { setAdminLogin, setAdminLogout } = useAppStore();
-  const { signOut } = useClerk();
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     setHydrated(true);
-    setAdminLogin(initialUser, 'clerk-session');
+    setAdminLogin(initialUser, 'nextauth');
   }, [initialUser, setAdminLogin]);
 
   const handleLogout = async () => {
-    await signOut();
+    await signOut({ redirect: false });
     setAdminLogout();
     router.push('/');
   };

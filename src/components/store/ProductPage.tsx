@@ -31,7 +31,7 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
 
   const { auth, settings, addToCart, addToRecentlyViewed, wishlistIds, toggleWishlistId } = useAppStore();
   const currency = settings?.currency || "INR";
-  const isB2C = settings?.store_mode === "b2c";
+  const isB2C = true;
 
   const { data: product, isLoading: loading } = useQuery({
     queryKey: ["product", slug],

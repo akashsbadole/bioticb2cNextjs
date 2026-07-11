@@ -22,6 +22,8 @@ export type Page =
   | { type: "order-success"; orderId: string }
   | { type: "orders" }
   | { type: "wishlist" }
+  | { type: "login" }
+  | { type: "register" }
   | { type: "faq" }
   | { type: "compare" };
 
@@ -65,21 +67,12 @@ interface AppState {
   adminUser: AdminUser | null;
   adminToken: string | null;
   auth: {
-    user:
-      | (AdminUser & {
-          tier?: string;
-          isVerified?: boolean;
-          companyName?: string | null;
-          taxId?: string | null;
-          businessPhone?: string | null;
-          businessAddress?: string | null;
-          phone?: string | null;
-        })
-      | null;
+    user: (AdminUser & { isVerified?: boolean; phone?: string | null }) | null;
     token: string | null;
   };
   setAdminLogin: (user: AdminUser, token: string) => void;
   setAdminLogout: () => void;
+  setAuthUser: (user: AdminUser) => void;
   login: (user: any, token: string) => void;
   logout: () => void;
 
@@ -251,12 +244,22 @@ export const useAppStore = create<AppState>()(
           case "orders":
             set({ currentPage: { type: "orders" } });
             if (typeof window !== "undefined")
-              window.history.pushState({}, "", "/portal/orders");
+              window.history.pushState({}, "", "/account");
             break;
           case "wishlist":
             set({ currentPage: { type: "wishlist" } });
             if (typeof window !== "undefined")
               window.history.pushState({}, "", "/wishlist");
+            break;
+          case "login":
+            set({ currentPage: { type: "login" } });
+            if (typeof window !== "undefined")
+              window.history.pushState({}, "", "/login");
+            break;
+          case "register":
+            set({ currentPage: { type: "register" } });
+            if (typeof window !== "undefined")
+              window.history.pushState({}, "", "/register");
             break;
           case "faq":
             set({ currentPage: { type: "faq" } });
@@ -332,25 +335,21 @@ export const useAppStore = create<AppState>()(
           auth: { user: null, token: null },
           currentPage: { type: "home" },
         }),
+      setAuthUser: (user) =>
+        set({
+          auth: { user, token: null },
+          isAdmin: user.role === "admin" || user.role === "editor",
+          adminUser: user.role === "admin" || user.role === "editor" ? user : null,
+        }),
       login: (user, token) =>
         set({
           auth: { user, token },
           isAdmin:
-            user.role === "admin" ||
-            user.role === "clerk" ||
-            user.role === "editor",
+            user.role === "admin" || user.role === "editor",
           adminUser:
-            user.role === "admin" ||
-            user.role === "clerk" ||
-            user.role === "editor"
-              ? user
-              : null,
+            user.role === "admin" || user.role === "editor" ? user : null,
           adminToken:
-            user.role === "admin" ||
-            user.role === "clerk" ||
-            user.role === "editor"
-              ? token
-              : null,
+            user.role === "admin" || user.role === "editor" ? token : null,
         }),
       logout: () => {
         set({

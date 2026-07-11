@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
                 data: {
                     email,
                     name,
-                    role: 'buyer',
+                    role: 'customer',
                     isActive: true,
                     currentStoreId: storeId || null,
                     // Note: No password imported from CSV

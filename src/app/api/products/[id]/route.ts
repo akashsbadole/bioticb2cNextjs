@@ -111,10 +111,6 @@ export async function PUT(
         ...(body.comparePrice !== undefined && {
           comparePrice: body.comparePrice ? (isNaN(parseFloat(body.comparePrice)) ? null : parseFloat(body.comparePrice)) : null,
         }),
-        ...(body.wholesalePrice !== undefined && {
-          wholesalePrice: body.wholesalePrice ? (isNaN(parseFloat(body.wholesalePrice)) ? null : parseFloat(body.wholesalePrice)) : null,
-        }),
-        ...(body.minOrderQty !== undefined && { minOrderQty: body.minOrderQty }),
         ...(body.sku !== undefined && { sku: body.sku }),
         ...(body.barcode !== undefined && { barcode: body.barcode }),
         ...(body.attributes !== undefined && { attributes: body.attributes }),

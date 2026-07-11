@@ -30,7 +30,7 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, sku, price, comparePrice, wholesalePrice, stock, images, sortOrder, isActive } = body;
+    const { name, sku, price, comparePrice, stock, images, sortOrder, isActive } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -55,7 +55,6 @@ export async function POST(
         sku: sku || null,
         price: price !== undefined ? parseFloat(price) : null,
         comparePrice: comparePrice ? parseFloat(comparePrice) : null,
-        wholesalePrice: wholesalePrice ? parseFloat(wholesalePrice) : null,
         stock: stock ?? 0,
         images: typeof images === 'string' ? images : JSON.stringify(images || []),
         sortOrder: sortOrder ?? 0,

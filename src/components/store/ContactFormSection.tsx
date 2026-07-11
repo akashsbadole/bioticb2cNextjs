@@ -34,10 +34,8 @@ export function ContactFormSection({
           name: formData.get("name"),
           email: formData.get("email"),
           phone: formData.get("phone") || null,
-          companyName: formData.get("company") || null,
           message: formData.get("message") || "",
           subject: formData.get("subject") || "Contact form enquiry",
-          type: "contact",
         }),
       });
       if (res.ok) {
@@ -80,10 +78,6 @@ export function ContactFormSection({
             <div className="space-y-1.5">
               <Label htmlFor="cf-phone">Phone</Label>
               <Input id="cf-phone" name="phone" type="tel" placeholder="Phone number" />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="cf-company">Company</Label>
-              <Input id="cf-company" name="company" placeholder="Company name" />
             </div>
           </div>
           <div className="space-y-1.5">

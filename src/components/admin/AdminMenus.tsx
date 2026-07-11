@@ -94,7 +94,6 @@ const INTERNAL_PAGES = [
 
   { label: 'Wishlist', value: 'wishlist' },
   { label: 'Orders', value: 'orders' },
-  { label: 'Buyer Portal', value: 'portal' },
   { label: 'Product Page', value: 'product-page' },
   { label: 'Custom Page (Slug)', value: 'content-page' },
   { label: 'External URL', value: 'url' },

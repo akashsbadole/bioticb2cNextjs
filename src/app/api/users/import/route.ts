@@ -41,7 +41,9 @@ export async function POST(request: NextRequest) {
       const email = getValue('email');
       const name = getValue('name');
       const password = getValue('password') || generateRandomPassword();
-      const role = getValue('role') || 'clerk';
+      const rawRole = getValue('role');
+      const role =
+        rawRole && ['admin', 'editor', 'customer'].includes(rawRole) ? rawRole : 'customer';
 
       if (!email || !name) {
         errors.push(`Row ${i + 1}: Missing email or name`);

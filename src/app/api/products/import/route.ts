@@ -39,7 +39,7 @@ async function resolveCategory(categoryName: string, storeId?: string | null): P
 
   const existing = await db.category.findFirst({
     where: {
-      name: { equals: name, mode: 'insensitive' },
+      name: { equals: name },
       ...(storeId ? { storeId } : {}),
     },
   });
@@ -71,8 +71,6 @@ interface ProductData {
   shortDescription: string | null;
   price: number;
   comparePrice: number | null;
-  wholesalePrice: number | null;
-  minOrderQty: number;
   sku: string | null;
   images: string;
   categoryId: string | null;
@@ -101,8 +99,6 @@ function parseNativeRow(headers: string[], row: string[]): ProductData | null {
     shortDescription: getValue(headers, row, 'shortdescription') || null,
     price,
     comparePrice: parseFloat(getValue(headers, row, 'compareprice')) || null,
-    wholesalePrice: parseFloat(getValue(headers, row, 'wholesaleprice')) || null,
-    minOrderQty: parseInt(getValue(headers, row, 'minorderqty')) || 1,
     sku: getValue(headers, row, 'sku') || null,
     images: JSON.stringify([]),
     categoryId: getValue(headers, row, 'categoryid') || null,
@@ -142,8 +138,6 @@ function parseWooCommerceRow(headers: string[], row: string[], images: string[])
     shortDescription: null,
     price,
     comparePrice: parseFloat(getValue(headers, row, 'sale_price')) || null,
-    wholesalePrice: null,
-    minOrderQty: 1,
     sku: getValue(headers, row, 'sku') || null,
     images: JSON.stringify(images),
     categoryId: null,
@@ -225,8 +219,6 @@ function mergeShopifyProduct(rows: ShopifyRow[], storeId?: string | null): Produ
     shortDescription: null,
     price: first.variantPrice,
     comparePrice: first.variantComparePrice,
-    wholesalePrice: null,
-    minOrderQty: 1,
     sku: first.variantSku || null,
     images: JSON.stringify(images),
     categoryId: null,

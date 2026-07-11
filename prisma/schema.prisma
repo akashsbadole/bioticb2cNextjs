@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")
-  directUrl  = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 // ─── Platform Models ───────────────────────────────────────────
@@ -31,7 +30,6 @@ model Store {
   Product       Product[]
   Category      Category[]
   Brand         Brand[]
-  Quote         Quote[]
   BlogPost      BlogPost[]
   Banner        Banner[]
   ContentPage   ContentPage[]
@@ -44,6 +42,7 @@ model Store {
   Coupon        Coupon[]
   Review        Review[]
   Wishlist      Wishlist[]
+  Popup         Popup[]
 
   @@index([ownerUserId])
   @@index([isActive])
@@ -84,6 +83,19 @@ model EmailVerificationToken {
   @@index([token])
 }
 
+model OtpToken {
+  id         String   @id @default(cuid())
+  identifier String // email address used as the account identifier
+  channel    String   @default("email") // email | sms
+  codeHash   String
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([identifier])
+  @@index([expiresAt])
+}
+
 // ─── Catalog ───────────────────────────────────────────────────
 
 model Product {
@@ -95,8 +107,6 @@ model Product {
   shortDescription  String?
   price             Float
   comparePrice      Float?
-  wholesalePrice    Float?
-  minOrderQty       Int              @default(1)
   sku               String?
   barcode           String?
   images            String           @default("[]")
@@ -130,7 +140,6 @@ model Product {
   Brand             Brand?           @relation(fields: [brandId], references: [id])
   Store             Store?           @relation(fields: [storeId], references: [id])
   ProductVariant    ProductVariant[]
-  ProductTier       ProductTier[]
   OrderItem         OrderItem[]
   CartItem          CartItem[]
   Review            Review[]
@@ -197,17 +206,6 @@ model Category {
   @@index([storeId])
 }
 
-model ProductTier {
-  id        String   @id @default(cuid())
-  productId String
-  tierName  String
-  minQty    Int
-  price     Float
-  Product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@index([productId])
-}
-
 model ProductVariant {
   id             String   @id @default(cuid())
   productId      String
@@ -216,7 +214,6 @@ model ProductVariant {
   barcode        String?
   price          Float?
   comparePrice   Float?
-  wholesalePrice Float?
   stock          Int      @default(0)
   images         String   @default("[]")
   sortOrder      Int      @default(0)
@@ -427,6 +424,31 @@ model Banner {
   @@index([storeId])
 }
 
+model Popup {
+  id               String    @id @default(cuid())
+  storeId          String?
+  title            String
+  subtitle         String?
+  content          String?
+  image            String?
+  ctaText          String?
+  ctaLink          String?
+  triggerType      String    @default("delay") // delay, immediate, on_exit, scroll
+  delayMs          Int       @default(3000)
+  displayFrequency String    @default("once") // once, every_visit, daily
+  position         String    @default("center") // center, top, bottom-left, bottom-right
+  backgroundColor  String?
+  isActive         Boolean   @default(true)
+  startDate        DateTime?
+  endDate          DateTime?
+  sortOrder        Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  Store            Store?    @relation(fields: [storeId], references: [id])
+
+  @@index([storeId])
+}
+
 model Brand {
   id          String    @id @default(cuid())
   storeId     String?
@@ -473,25 +495,16 @@ model Enquiry {
   name           String
   email          String
   phone          String?
-  companyName    String?
-  companyEmail   String?
-  companyPhone   String?
-  companyAddress String?
-  quantity       Int?
   subject        String
   message        String
   productId      String?
-  type           String   @default("product")
   status         String   @default("new")
   userId         String?
-  companyId      String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @default(now())
   Product        Product? @relation(fields: [productId], references: [id])
   User           User?    @relation(fields: [userId], references: [id])
-  Company        Company? @relation(fields: [companyId], references: [id])
   Store          Store?   @relation(fields: [storeId], references: [id])
-  Quote          Quote?
 
   @@index([storeId])
 }
@@ -571,11 +584,9 @@ model User {
   email                   String               @unique
   name                    String
   password                String?
-  role                    String               @default("clerk")
+  role                    String               @default("customer")
   isActive                Boolean              @default(true)
-  companyId               String?
   isVerified              Boolean              @default(false)
-  tier                    String               @default("standard")
   documents               String               @default("[]")
   addresses               String               @default("[]")
   phone                   String?
@@ -589,8 +600,6 @@ model User {
   Enquiry                 Enquiry[]
   PasswordResetToken      PasswordResetToken[]
   EmailVerificationToken  EmailVerificationToken[]
-  Company                 Company?             @relation(fields: [companyId], references: [id])
-  Quote                   Quote[]
   Order                   Order[]
   Cart                    Cart?
   Review                  Review[]
@@ -628,48 +637,3 @@ model Notification {
   @@index([isRead])
 }
 
-model Company {
-  id          String    @id @default(cuid())
-  name        String
-  taxId       String?
-  address     String?
-  website     String?
-  isVerified  Boolean   @default(false)
-  tier        String    @default("standard")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
-  User        User[]
-  Enquiry     Enquiry[]
-  Quote       Quote[]
-}
-
-model Quote {
-  id            String    @id @default(cuid())
-  storeId       String?
-  enquiryId     String?   @unique
-  companyId     String?
-  userId        String
-  quoteNumber   String    @unique
-  items         String    @default("[]")
-  totalAmount   Float
-  subtotal      Float     @default(0)
-  discount      Float     @default(0)
-  tax           Float     @default(0)
-  total         Float     @default(0)
-  currency      String    @default("USD")
-  status        String    @default("draft")
-  validUntil    DateTime?
-  notes         String?
-  adminNotes    String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now())
-  Enquiry       Enquiry?  @relation(fields: [enquiryId], references: [id])
-  Company       Company?  @relation(fields: [companyId], references: [id])
-  User          User      @relation(fields: [userId], references: [id])
-  Store         Store?    @relation(fields: [storeId], references: [id])
-
-  @@index([userId])
-  @@index([status])
-  @@index([quoteNumber])
-  @@index([storeId])
-}

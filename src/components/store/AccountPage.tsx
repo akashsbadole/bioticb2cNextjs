@@ -33,6 +33,9 @@ type AccountTab = 'profile' | 'orders' | 'addresses' | 'security';
 
 export function AccountPage() {
   const [activeTab, setActiveTab] = useState<AccountTab>('profile');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const { auth, logout, navigate, settings } = useAppStore();
   const queryClient = useQueryClient();
 
@@ -69,6 +72,44 @@ export function AccountPage() {
     },
     onError: (err: any) => toast.error(err.message)
   });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: async () => {
+      if (newPassword !== confirmPassword) {
+        throw new Error('New passwords do not match');
+      }
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to change password');
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      toast.success('Password changed successfully');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  const sendVerification = async () => {
+    try {
+      await fetch('/api/auth/send-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: auth.user?.email }),
+      });
+      toast.success('Verification email sent');
+    } catch {
+      toast.error('Could not send verification email');
+    }
+  };
 
   if (!auth.user) {
     return (
@@ -166,9 +207,21 @@ export function AccountPage() {
                             </div>
 
                             <div className="pt-6 border-t flex items-center justify-between">
-                                <div className="flex items-center gap-3 text-emerald-600">
-                                    <CheckCircle2 className="h-5 w-5" />
-                                    <span className="text-sm font-bold">Email Verified</span>
+                                <div className="flex items-center gap-3">
+                                  {profile?.isVerified ? (
+                                    <div className="flex items-center gap-3 text-emerald-600">
+                                      <CheckCircle2 className="h-5 w-5" />
+                                      <span className="text-sm font-bold">Email Verified</span>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={sendVerification}
+                                      className="flex items-center gap-3 text-amber-600 hover:underline"
+                                    >
+                                      <XCircle className="h-5 w-5" />
+                                      <span className="text-sm font-bold">Verify your email</span>
+                                    </button>
+                                  )}
                                 </div>
                                 <Button size="lg" className="rounded-full px-8 h-12 font-bold shadow-lg" onClick={() => toast.success("Changes saved")}>
                                     Save Changes
@@ -236,24 +289,26 @@ export function AccountPage() {
                         </div>
 
                         <Card className="border-none shadow-xl rounded-[2.5rem] p-8 space-y-8">
-                            <div className="space-y-6">
-                                <h3 className="font-black text-xl">Change Password</h3>
-                                <div className="grid gap-6">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="curr">Current Password</Label>
-                                        <Input id="curr" type="password" className="h-12 rounded-xl bg-muted/30 border-transparent focus:bg-background" />
+                                <div className="space-y-6">
+                                    <h3 className="font-black text-xl">Change Password</h3>
+                                    <div className="grid gap-6">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="curr">Current Password</Label>
+                                            <Input id="curr" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="h-12 rounded-xl bg-muted/30 border-transparent focus:bg-background" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="new">New Password</Label>
+                                            <Input id="new" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="h-12 rounded-xl bg-muted/30 border-transparent focus:bg-background" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="conf">Confirm New Password</Label>
+                                            <Input id="conf" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="h-12 rounded-xl bg-muted/30 border-transparent focus:bg-background" />
+                                        </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="new">New Password</Label>
-                                        <Input id="new" type="password" className="h-12 rounded-xl bg-muted/30 border-transparent focus:bg-background" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="conf">Confirm New Password</Label>
-                                        <Input id="conf" type="password" className="h-12 rounded-xl bg-muted/30 border-transparent focus:bg-background" />
-                                    </div>
+                                    <Button size="lg" className="rounded-full px-10 h-12 font-bold shadow-lg mt-4" onClick={() => changePasswordMutation.mutate()} disabled={changePasswordMutation.isPending}>
+                                        {changePasswordMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Update Password'}
+                                    </Button>
                                 </div>
-                                <Button size="lg" className="rounded-full px-10 h-12 font-bold shadow-lg mt-4">Update Password</Button>
-                            </div>
 
                             <Separator className="bg-muted/50" />
 

@@ -11,12 +11,7 @@ export async function GET(
     if (!auth.success) return auth.response;
     const { id } = await params;
     const user = await db.user.findFirst({
-      where: {
-        OR: [
-          { id },
-          { clerkId: id },
-        ],
-      },
+      where: { id },
       select: {
         id: true,
         email: true,
@@ -54,12 +49,7 @@ export async function PUT(
 
     // Check user exists
     const existing = await db.user.findFirst({
-      where: {
-        OR: [
-          { id },
-          { clerkId: id },
-        ],
-      },
+      where: { id },
     });
     if (!existing) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -80,20 +70,18 @@ export async function PUT(
       data.email = trimmedEmail;
     }
     if (role !== undefined) {
-      // Only allow admin or clerk roles
+      // Only allow admin or editor roles
       const userRole = request.headers.get('x-user-role');
       if (userRole !== 'admin') {
         return NextResponse.json({ error: 'Only admins can change user roles' }, { status: 403 });
       }
-      if (!['admin', 'clerk', 'editor'].includes(role)) {
-        return NextResponse.json({ error: 'Invalid role. Must be admin, clerk, or editor' }, { status: 400 });
+      if (!['admin', 'editor', 'customer'].includes(role)) {
+        return NextResponse.json({ error: 'Invalid role. Must be admin, editor, or customer' }, { status: 400 });
       }
       data.role = role;
     }
     if (isActive !== undefined) data.isActive = isActive;
     if (body.isVerified !== undefined) data.isVerified = body.isVerified;
-    if (body.tier !== undefined) data.tier = body.tier;
-    if (body.companyId !== undefined) data.companyId = body.companyId;
     if (bio !== undefined) data.bio = bio;
     if (avatar !== undefined) data.avatar = avatar;
 
@@ -143,12 +131,7 @@ export async function DELETE(
     }
 
     const user = await db.user.findFirst({
-      where: {
-        OR: [
-          { id },
-          { clerkId: id },
-        ],
-      },
+      where: { id },
     });
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });

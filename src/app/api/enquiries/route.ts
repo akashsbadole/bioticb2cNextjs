@@ -5,7 +5,6 @@ import { createNotification } from '@/lib/notifications';
 import { enquirySchema } from '@/lib/validations';
 import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
-import { getSetting } from '@/lib/settings';
 
 // Max 10 enquiry submissions per hour per IP (POST only)
 const ENQUIRY_RATE_LIMIT = { maxRequests: 10, windowMs: 60 * 60 * 1000, prefix: 'enquiries-post' };
@@ -26,9 +25,6 @@ export async function GET(request: NextRequest) {
     if (status) {
       where.status = status;
     }
-    if (type) {
-      where.type = type;
-    }
     if (search) {
       where.OR = [
         { name: { contains: search } },
@@ -48,8 +44,7 @@ export async function GET(request: NextRequest) {
         where: scopedWhere,
         include: {
           Product: { select: { id: true, name: true } },
-          User: { select: { id: true, name: true, email: true, companyId: true } },
-          Quote: true,
+          User: { select: { id: true, name: true, email: true } },
         },
         orderBy: { createdAt: 'desc' },
         skip,
@@ -80,15 +75,6 @@ export async function POST(request: NextRequest) {
   try {
     const storeId = getStoreId(request);
 
-    // Check if enquiries are disabled in B2C mode
-    const storeMode = await getSetting('store_mode', storeId);
-    if (storeMode === 'b2c') {
-      return NextResponse.json(
-        { error: 'Enquiries are disabled in B2C mode. Please use the shopping cart.' },
-        { status: 403 }
-      );
-    }
-
     // Rate limiting
     const rateLimitResponse = checkRateLimit(request, ENQUIRY_RATE_LIMIT);
     if (rateLimitResponse) return rateLimitResponse;
@@ -108,15 +94,9 @@ export async function POST(request: NextRequest) {
         name: validatedData.name,
         email: validatedData.email,
         phone: validatedData.phone || null,
-        companyName: validatedData.companyName || null,
-        companyEmail: validatedData.companyEmail || null,
-        companyPhone: validatedData.companyPhone || null,
-        companyAddress: validatedData.companyAddress || null,
-        quantity: validatedData.quantity ?? null,
         subject: validatedData.subject,
         message: validatedData.message,
         productId: validatedData.productId || null,
-        type: validatedData.type || 'product',
         status: 'new',
         userId: (body as Record<string, unknown>).userId as string | undefined || null,
         ...(storeId ? { storeId } : {}),

@@ -30,9 +30,6 @@ export async function PUT(
         ...(body.comparePrice !== undefined && {
           comparePrice: body.comparePrice ? parseFloat(body.comparePrice) : null,
         }),
-        ...(body.wholesalePrice !== undefined && {
-          wholesalePrice: body.wholesalePrice ? parseFloat(body.wholesalePrice) : null,
-        }),
         ...(body.stock !== undefined && { stock: body.stock }),
         ...(body.images !== undefined && {
           images: typeof body.images === 'string' ? body.images : JSON.stringify(body.images || []),

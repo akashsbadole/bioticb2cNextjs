@@ -69,14 +69,8 @@ interface User {
   role: string;
   isActive: boolean;
   isVerified: boolean;
-  tier: string;
-  companyId: string | null;
   avatar?: string | null;
   bio?: string | null;
-  Company?: {
-    id: string;
-    name: string;
-  } | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -88,8 +82,6 @@ interface UserFormData {
   role: string;
   isActive: boolean;
   isVerified: boolean;
-  tier: string;
-  companyId: string;
   avatar: string;
   bio: string;
 }
@@ -98,11 +90,9 @@ const emptyForm: UserFormData = {
   name: '',
   email: '',
   password: '',
-  role: 'clerk',
+  role: 'editor',
   isActive: true,
   isVerified: false,
-  tier: 'standard',
-  companyId: '',
   avatar: '',
   bio: '',
 };
@@ -116,18 +106,25 @@ function RoleBadge({ role }: { role: string }) {
       </Badge>
     );
   }
-  if (role === 'clerk') {
+  if (role === 'editor') {
     return (
       <Badge className="bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
         <UserCog className="mr-1 h-3 w-3" />
-        Clerk
+        Editor
+      </Badge>
+    );
+  }
+  if (role === 'customer') {
+    return (
+      <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+        <Building2 className="mr-1 h-3 w-3" />
+        Customer
       </Badge>
     );
   }
   return (
-    <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-      <Building2 className="mr-1 h-3 w-3" />
-      Buyer
+    <Badge variant="secondary">
+      {role}
     </Badge>
   );
 }
@@ -164,14 +161,6 @@ export function AdminUsers() {
         const res = await adminFetch(`/api/users?${params.toString()}`);
         if (!res.ok) throw new Error('Failed');
         return (await res.json()).users || [];
-    }
-  });
-
-  const { data: companies = [] } = useQuery({
-    queryKey: ['admin-companies'],
-    queryFn: async () => {
-        const res = await adminFetch('/api/companies');
-        return (await res.json()).companies || [];
     }
   });
 
@@ -227,8 +216,6 @@ export function AdminUsers() {
       role: user.role,
       isActive: user.isActive,
       isVerified: user.isVerified || false,
-      tier: user.tier || 'standard',
-      companyId: user.companyId || '',
       avatar: user.avatar || '',
       bio: user.bio || '',
     });
@@ -274,8 +261,6 @@ export function AdminUsers() {
         role: form.role,
         isActive: form.isActive,
         isVerified: form.isVerified,
-        tier: form.tier,
-        companyId: form.companyId || null,
         avatar: form.avatar || null,
         bio: form.bio.trim() || null,
     };
@@ -473,7 +458,6 @@ export function AdminUsers() {
                   </TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead className="hidden md:table-cell">Email</TableHead>
-                  <TableHead>Company</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="hidden lg:table-cell">Created</TableHead>
@@ -501,9 +485,6 @@ export function AdminUsers() {
                     </TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">
                       {user.email}
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell">
-                      {user.Company?.name || '—'}
                     </TableCell>
                     <TableCell>
                       <RoleBadge role={user.role} />
@@ -693,63 +674,15 @@ export function AdminUsers() {
                       Admin
                     </span>
                   </SelectItem>
-                  <SelectItem value="clerk">
+                  <SelectItem value="editor">
                     <span className="flex items-center gap-2">
                       <UserCog className="h-3.5 w-3.5 text-sky-600" />
-                      Clerk
-                    </span>
-                  </SelectItem>
-                  <SelectItem value="buyer">
-                    <span className="flex items-center gap-2">
-                      <Building2 className="h-3.5 w-3.5 text-amber-600" />
-                      Buyer
+                      Editor
                     </span>
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
-
-            {/* Company Selection */}
-            {form.role === 'buyer' && (
-              <div className="space-y-2">
-                <Label>Company</Label>
-                <Select
-                  value={form.companyId || '__none__'}
-                  onValueChange={(val) => setForm(prev => ({ ...prev, companyId: val === '__none__' ? '' : val }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select company" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">No Company</SelectItem>
-                    {companies.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {/* B2B Tier */}
-            {form.role === 'buyer' && (
-              <div className="space-y-2">
-                <Label>B2B Pricing Tier</Label>
-                <Select
-                  value={form.tier}
-                  onValueChange={(val) => setForm(prev => ({ ...prev, tier: val }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="standard">Standard</SelectItem>
-                    <SelectItem value="silver">Silver</SelectItem>
-                    <SelectItem value="gold">Gold</SelectItem>
-                    <SelectItem value="platinum">Platinum</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
 
             {/* Verified Status */}
             <div className="flex items-center gap-2">
@@ -759,7 +692,7 @@ export function AdminUsers() {
                   setForm(prev => ({ ...prev, isVerified: checked }))
                 }
               />
-              <Label>Verified Business Partner</Label>
+              <Label>Verified</Label>
             </div>
 
             {/* Active */}

@@ -312,7 +312,7 @@ export const BLOCK_DEFAULTS: Record<
       showButton: true,
       cards: [
         {
-          title: "B2B brands",
+          title: "Partner brands",
           description: "Bulk supply of finished goods under your brand",
           cta: "Enquire now",
           link: "/contact",
@@ -330,7 +330,7 @@ export const BLOCK_DEFAULTS: Record<
           link: "/contact",
         },
         {
-          title: "Institutional buyers",
+          title: "Business customers",
           description: "Canteens, airlines, hospitality, govt procurement",
           cta: "Send requirement",
           link: "/contact",
@@ -708,7 +708,7 @@ export const BLOCK_DEFAULTS: Record<
           highlight: true,
         },
         {
-          title: "Bulk / institutional",
+          title: "Bulk orders",
           description: "5kg, 10kg, 25kg formats",
           tag: "Bulk format",
           highlight: false,
@@ -750,7 +750,7 @@ export const BLOCK_DEFAULTS: Record<
         {
           type: "visit",
           title: "Planning a factory visit?",
-          description: "We welcome B2B buyers to visit our facility.",
+          description: "We welcome visitors to tour our facility.",
         },
       ],
     },
@@ -874,7 +874,7 @@ export const BLOCK_DEFAULTS: Record<
           {
             year: "2020",
             title: "Private label launch",
-            desc: "Started contract manufacturing and private label services for B2B clients.",
+            desc: "Started contract manufacturing and private label services for brand clients.",
           },
           {
             year: "Today",
@@ -1258,7 +1258,7 @@ export const BLOCK_DEFAULTS: Record<
             title: "Planning a factory visit?",
             subtitle: "",
             description:
-              "We welcome B2B buyers, private label partners and investors to visit our facility. Please schedule in advance.",
+              "We welcome visitors, private label partners and investors to visit our facility. Please schedule in advance.",
             highlights: [
               "Full production line walkthrough",
               "Warehouse & dispatch area tour",
@@ -1283,7 +1283,7 @@ export const BLOCK_DEFAULTS: Record<
       categoryInfo: {
         khakhra: {
           tags: ["12+ variants", "Private label"],
-          desc: "Thin, crispy, roasted flatbreads available in a wide range of flavours and spice levels. One of our flagship lines — highest daily output capacity. Ideal for B2B, retail brands and private label.",
+          desc: "Thin, crispy, roasted flatbreads available in a wide range of flavours and spice levels. One of our flagship lines — highest daily output capacity. Ideal for retail brands and private label.",
         },
         bhakhri: {
           tags: ["8+ varieties"],
@@ -1305,7 +1305,7 @@ export const BLOCK_DEFAULTS: Record<
       packagingOptions: [
         {
           title: "Purva Bites branded",
-          desc: "Ready-branded packs for distributors, modern trade and institutional buyers",
+          desc: "Ready-branded packs for distributors, modern trade and retail buyers",
           tag: "Distributor friendly",
           highlight: false,
         },
@@ -1316,7 +1316,7 @@ export const BLOCK_DEFAULTS: Record<
           highlight: true,
         },
         {
-          title: "Bulk / institutional",
+          title: "Bulk orders",
           desc: "5kg, 10kg, 25kg formats for canteens, hotels, airlines and govt procurement",
           tag: "Bulk format",
           highlight: false,

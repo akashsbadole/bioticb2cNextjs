@@ -34,7 +34,7 @@ export async function migrateWooCommerceProducts(
       const imagesRaw = row.Images || row.images || "";
 
       // Handle Category
-      let categoryId = null;
+      let categoryId: string | null = null;
       const categoryName = row.Categories || row.categories || "";
       if (categoryName) {
         const firstCat = categoryName.split(",")[0].trim();
@@ -63,18 +63,19 @@ export async function migrateWooCommerceProducts(
           // Optional: Add to Media library if doesn't exist
           try {
             const fileName = url.split('/').pop() || 'imported-image';
-            await db.media.upsert({
-              where: { url: url },
-              update: {},
-              create: {
-                url: url,
-                filename: fileName,
-                originalName: fileName,
-                mimeType: 'image/jpeg',
-                size: 0,
-                storeId: storeId
-              }
-            });
+            const existingMedia = await db.media.findFirst({ where: { url, storeId } });
+            if (!existingMedia) {
+              await db.media.create({
+                data: {
+                  url: url,
+                  filename: fileName,
+                  originalName: fileName,
+                  mimeType: 'image/jpeg',
+                  size: 0,
+                  storeId: storeId
+                }
+              });
+            }
           } catch { /* ignore media errors */ }
         } else {
           downloadedImages.push(url);

@@ -12,9 +12,7 @@ import {
   Phone,
   Package,
   Clock,
-  Building2,
   Hash,
-  MapPin,
   Loader2,
   ChevronLeft,
   ChevronRight,
@@ -71,11 +69,6 @@ interface Enquiry {
   name: string;
   email: string;
   phone: string | null;
-  companyName: string | null;
-  companyEmail: string | null;
-  companyPhone: string | null;
-  companyAddress: string | null;
-  quantity: number | null;
   subject: string;
   message: string;
   type: string;
@@ -84,8 +77,7 @@ interface Enquiry {
   createdAt: string;
   updatedAt: string;
   Product?: { id: string; name: string } | null;
-  User?: { id: string; name: string; email: string; companyId: string | null } | null;
-  Quote?: { id: string; status: string; totalAmount: number } | null;
+  User?: { id: string; name: string; email: string } | null;
 }
 
 interface PaginationInfo {
@@ -136,16 +128,6 @@ export function AdminEnquiries() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  // Quote dialog state
-  const [quoteOpen, setQuoteOpen] = useState(false);
-  const [quotingEnquiry, setQuotingEnquiry] = useState<Enquiry | null>(null);
-  const [quoteForm, setQuoteForm] = useState({
-    totalAmount: '',
-    validUntil: '',
-    notes: '',
-  });
-  const [creatingQuote, setCreatingQuote] = useState(false);
-
   const { data, isLoading: loading } = useQuery({
     queryKey: ['admin-enquiries', activeFilter, page],
     queryFn: async () => {
@@ -166,8 +148,7 @@ export function AdminEnquiries() {
     (e: Enquiry) =>
       e.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       e.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      e.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (e.companyName && e.companyName.toLowerCase().includes(searchTerm.toLowerCase()))
+      e.subject.toLowerCase().includes(searchTerm.toLowerCase())
   ) : enquiriesRaw;
 
   const handlePageChange = (newPage: number) => {
@@ -236,22 +217,6 @@ export function AdminEnquiries() {
     }
   });
 
-  const quoteMutation = useMutation({
-    mutationFn: async (data: any) => {
-        const res = await adminFetch('/api/quotes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error('Failed');
-    },
-    onSuccess: () => {
-        toast.success('Formal quote created and sent to buyer');
-        setQuoteOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['admin-enquiries'] });
-    }
-  });
-
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
         const res = await adminFetch(`/api/enquiries/${id}`, { method: 'DELETE' });
@@ -280,37 +245,6 @@ export function AdminEnquiries() {
     if (enquiry.status === 'new') {
         updateMutation.mutate({ id: enquiry.id, status: 'read' });
     }
-  };
-
-  const handleOpenQuote = (enquiry: Enquiry) => {
-    setQuotingEnquiry(enquiry);
-    setQuoteForm({
-      totalAmount: '',
-      validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      notes: '',
-    });
-    setQuoteOpen(true);
-  };
-
-  const handleCreateQuote = () => {
-    if (!quotingEnquiry || !quoteForm.totalAmount) {
-      toast.error('Please enter a total amount');
-      return;
-    }
-    quoteMutation.mutate({
-        enquiryId: quotingEnquiry.id,
-        userId: quotingEnquiry.User?.id || quotingEnquiry.id,
-        companyId: quotingEnquiry.User?.companyId,
-        totalAmount: parseFloat(quoteForm.totalAmount),
-        validUntil: quoteForm.validUntil,
-        notes: quoteForm.notes,
-        items: quotingEnquiry.productId ? [{
-            productId: quotingEnquiry.productId,
-            name: quotingEnquiry.Product?.name,
-            quantity: quotingEnquiry.quantity || 1,
-            unitPrice: parseFloat(quoteForm.totalAmount) / (quotingEnquiry.quantity || 1)
-        }] : []
-    });
   };
 
   const handleStatusChange = (newStatus: string) => {
@@ -348,10 +282,6 @@ export function AdminEnquiries() {
       return dateStr;
     }
   };
-
-  const hasB2BFields = (enq: Enquiry) =>
-    enq.companyName || enq.companyEmail || enq.companyPhone ||
-    enq.companyAddress || enq.quantity;
 
   const isAllSelected = enquiries.length > 0 && selectedIds.size === enquiries.length;
 
@@ -538,17 +468,6 @@ export function AdminEnquiries() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
-                        {!enq.Quote && enq.User?.companyId && (
-                           <Button
-                           variant="ghost"
-                           size="icon"
-                           className="h-8 w-8 text-emerald-600"
-                           onClick={() => handleOpenQuote(enq)}
-                           title="Create Quote"
-                         >
-                           <FileText className="h-4 w-4" />
-                         </Button>
-                        )}
                         <Button
                           variant="ghost"
                           size="icon"
@@ -646,12 +565,6 @@ export function AdminEnquiries() {
                     {viewEnquiry.Product.name}
                   </Badge>
                 )}
-                {viewEnquiry.quantity && (
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <Package className="h-3 w-3" />
-                    Qty: {viewEnquiry.quantity}
-                  </Badge>
-                )}
               </div>
 
               <Separator />
@@ -679,48 +592,6 @@ export function AdminEnquiries() {
                   {formatDate(viewEnquiry.createdAt)}
                 </div>
               </div>
-
-              {/* B2B Details */}
-              {hasB2BFields(viewEnquiry) && (
-                <>
-                  <Separator />
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Business Details
-                    </p>
-                    {viewEnquiry.companyName && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-                        <span>{viewEnquiry.companyName}</span>
-                      </div>
-                    )}
-                    {viewEnquiry.companyEmail && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Mail className="h-3.5 w-3.5" />
-                        {viewEnquiry.companyEmail}
-                      </div>
-                    )}
-                    {viewEnquiry.companyPhone && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Phone className="h-3.5 w-3.5" />
-                        {viewEnquiry.companyPhone}
-                      </div>
-                    )}
-                    {viewEnquiry.companyAddress && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-3.5 w-3.5" />
-                        {viewEnquiry.companyAddress}
-                      </div>
-                    )}
-                    {viewEnquiry.quantity && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Package className="h-3.5 w-3.5" />
-                        Quantity: {viewEnquiry.quantity} units
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
 
               <Separator />
 
@@ -804,56 +675,6 @@ export function AdminEnquiries() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Quote Dialog */}
-      <Dialog open={quoteOpen} onOpenChange={setQuoteOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Create Formal Quote</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label>Total Amount ($)</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  className="pl-9"
-                  value={quoteForm.totalAmount}
-                  onChange={(e) => setQuoteForm({ ...quoteForm, totalAmount: e.target.value })}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Valid Until</Label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="date"
-                  className="pl-9"
-                  value={quoteForm.validUntil}
-                  onChange={(e) => setQuoteForm({ ...quoteForm, validUntil: e.target.value })}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Notes (Internal or for Buyer)</Label>
-              <Input
-                placeholder="Special terms, shipping info..."
-                value={quoteForm.notes}
-                onChange={(e) => setQuoteForm({ ...quoteForm, notes: e.target.value })}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setQuoteOpen(false)}>Cancel</Button>
-            <Button onClick={handleCreateQuote} disabled={quoteMutation.isPending}>
-              {quoteMutation.isPending ? 'Creating...' : 'Send Quote'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

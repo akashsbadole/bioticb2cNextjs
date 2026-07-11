@@ -1,6 +1,6 @@
 /**
  * Admin authentication middleware for API routes.
- * Uses headers injected by clerkMiddleware.
+ * Uses the x-user-* headers injected by NextAuth middleware (src/middleware.ts).
  */
 
 import { NextResponse } from 'next/server';
@@ -41,7 +41,7 @@ export async function requireAdminAuth(request: NextRequest): Promise<AdminAuthR
     };
   }
 
-  if (!['admin', 'editor', 'clerk'].includes(role || '')) {
+  if (!['admin', 'editor'].includes(role || '')) {
     return {
       success: false,
       response: NextResponse.json({ error: 'Forbidden' }, { status: 403 }),
@@ -50,7 +50,7 @@ export async function requireAdminAuth(request: NextRequest): Promise<AdminAuthR
 
   return {
     success: true,
-    payload: { id: userId, email, role: role || 'clerk' }
+    payload: { id: userId, email, role: role || 'customer' }
   };
 }
 

@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { resolveUserId } from '@/lib/auth-helpers';
+import { requireAuth } from '@/lib/admin-auth';
 import { hash, compare } from '@/lib/auth';
 
 // GET /api/account - Get current user profile
 export async function GET(request: NextRequest) {
   try {
-    const userId = await resolveUserId(request);
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const auth = await requireAuth(request);
+    if (!auth.success) return auth.response;
 
     const user = await db.user.findUnique({
-      where: { id: userId },
+      where: { id: auth.payload.userId },
       select: {
         id: true,
         email: true,
@@ -22,21 +20,7 @@ export async function GET(request: NextRequest) {
         phone: true,
         avatar: true,
         isVerified: true,
-        tier: true,
         createdAt: true,
-        Company: {
-          select: {
-            name: true,
-            taxId: true,
-            address: true,
-          },
-        },
-        _count: {
-          select: {
-            Quote: true,
-            Enquiry: true,
-          },
-        },
       },
     });
 
@@ -44,15 +28,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const { Company, ...rest } = user;
-    return NextResponse.json({
-      user: {
-        ...rest,
-        companyName: Company?.name || null,
-        taxId: Company?.taxId || null,
-        businessAddress: Company?.address || null,
-      },
-    });
+    return NextResponse.json({ user });
   } catch (error) {
     console.error('Account GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -62,15 +38,13 @@ export async function GET(request: NextRequest) {
 // PUT /api/account - Update user profile
 export async function PUT(request: NextRequest) {
   try {
-    const userId = await resolveUserId(request);
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const auth = await requireAuth(request);
+    if (!auth.success) return auth.response;
 
     const body = await request.json();
-    const { name, phone, companyName, taxId, businessAddress, currentPassword, newPassword } = body;
+    const { name, phone, currentPassword, newPassword } = body;
 
-    const user = await db.user.findUnique({ where: { id: userId } });
+    const user = await db.user.findUnique({ where: { id: auth.payload.userId } });
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -79,31 +53,6 @@ export async function PUT(request: NextRequest) {
 
     if (name !== undefined) updateData.name = name;
     if (phone !== undefined) updateData.phone = phone;
-
-    // Update company fields via Company relation
-    if (companyName !== undefined || taxId !== undefined || businessAddress !== undefined) {
-      const userWithCompany = await db.user.findUnique({
-        where: { id: userId },
-        select: { companyId: true },
-      });
-
-      if (userWithCompany?.companyId) {
-        const companyUpdate: Record<string, unknown> = {};
-        if (companyName !== undefined) companyUpdate.name = companyName;
-        if (taxId !== undefined) companyUpdate.taxId = taxId;
-        if (businessAddress !== undefined) companyUpdate.address = businessAddress;
-        await db.company.update({
-          where: { id: userWithCompany.companyId },
-          data: companyUpdate,
-        });
-      } else if (companyName !== undefined) {
-        // Create a new company for this user
-        const newCompany = await db.company.create({
-          data: { name: companyName, taxId: taxId || null, address: businessAddress || null },
-        });
-        updateData.companyId = newCompany.id;
-      }
-    }
 
     // Password change
     if (newPassword) {
@@ -128,7 +77,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const updatedUser = await db.user.update({
-      where: { id: userId },
+      where: { id: auth.payload.userId },
       data: updateData,
       select: {
         id: true,
@@ -138,25 +87,11 @@ export async function PUT(request: NextRequest) {
         phone: true,
         avatar: true,
         isVerified: true,
-        tier: true,
-        Company: {
-          select: {
-            name: true,
-            taxId: true,
-            address: true,
-          },
-        },
       },
     });
 
-    const { Company: updatedCompany, ...restUser } = updatedUser;
     return NextResponse.json({
-      user: {
-        ...restUser,
-        companyName: updatedCompany?.name || null,
-        taxId: updatedCompany?.taxId || null,
-        businessAddress: updatedCompany?.address || null,
-      },
+      user: updatedUser,
       message: 'Profile updated',
     });
   } catch (error) {

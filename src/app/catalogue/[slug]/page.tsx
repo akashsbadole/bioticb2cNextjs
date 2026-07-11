@@ -9,7 +9,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   return {
     title: `${slug.charAt(0).toUpperCase() + slug.slice(1)} | Purva Bites`,
-    description: `Explore our ${slug} product range. Premium quality FMCG products for bulk orders and B2B partnerships.`,
+    description: `Explore our ${slug} product range. Premium quality FMCG products with fast delivery and great prices for retail customers.`,
   };
 }
 

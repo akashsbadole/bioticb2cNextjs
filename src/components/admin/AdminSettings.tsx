@@ -12,7 +12,6 @@ import {
   Server,
   Loader2,
   Search,
-  Building2,
   Info,
   Upload,
   FileText,
@@ -81,18 +80,6 @@ const defaultSettings: Settings = {
   seo_canonical_url: "",
   header_scripts: "",
   footer_scripts: "",
-  b2b_show_company_fields: "true",
-  b2b_require_company: "true",
-  b2b_default_moq: "1",
-  b2b_auto_reply: "true",
-  b2b_enable_tiered_pricing: "false",
-  store_mode: "b2b", // b2b or b2c
-  b2b_enable_buyer_portal: "false",
-  b2b_verify_new_accounts: "false",
-
-  b2b_discount_silver: "0.05",
-  b2b_discount_gold: "0.10",
-  b2b_discount_platinum: "0.15",
   company_gstin: "",
   company_fssai: "",
   company_cin: "",
@@ -224,32 +211,6 @@ export function AdminSettings() {
           <CardDescription>Basic store information</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="store_mode">Store Mode</Label>
-            <div className="flex items-center gap-4 mt-2">
-              <Button
-                type="button"
-                variant={settings.store_mode === "b2b" ? "default" : "outline"}
-                onClick={() => handleSettingChange("store_mode", "b2b")}
-                className="flex-1"
-              >
-                B2B (Wholesale / Quotes)
-              </Button>
-              <Button
-                type="button"
-                variant={settings.store_mode === "b2c" ? "default" : "outline"}
-                onClick={() => handleSettingChange("store_mode", "b2c")}
-                className="flex-1"
-              >
-                B2C (Retail / Checkout)
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {settings.store_mode === "b2b"
-                ? "In B2B mode, customers request quotes for products. Direct checkout is disabled."
-                : "In B2C mode, customers can add products to cart and checkout directly with payments."}
-            </p>
-          </div>
           <div className="space-y-2">
             <Label htmlFor="site_name">Site Name</Label>
             <Input
@@ -733,216 +694,6 @@ export function AdminSettings() {
         </CardContent>
       </Card>
 
-      {/* B2B Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Building2 className="h-4 w-4" />
-            B2B Settings
-          </CardTitle>
-          <CardDescription>
-            Configure business-to-business enquiry and quotation behavior
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-6 sm:grid-cols-2">
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label
-                htmlFor="b2b_show_company_fields"
-                className="cursor-pointer"
-              >
-                Show Company Fields
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                Display company name field on enquiry forms
-              </p>
-            </div>
-            <Switch
-              id="b2b_show_company_fields"
-              checked={settings.b2b_show_company_fields === "true"}
-              onCheckedChange={(checked) =>
-                handleSettingChange("b2b_show_company_fields", String(checked))
-              }
-            />
-          </div>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label htmlFor="b2b_require_company" className="cursor-pointer">
-                Require Company Name
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                Make company name mandatory for RFQ submissions
-              </p>
-            </div>
-            <Switch
-              id="b2b_require_company"
-              checked={settings.b2b_require_company === "true"}
-              onCheckedChange={(checked) =>
-                handleSettingChange("b2b_require_company", String(checked))
-              }
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="b2b_default_moq">
-              Default Minimum Order Quantity
-            </Label>
-            <Input
-              id="b2b_default_moq"
-              type="number"
-              min="1"
-              value={settings.b2b_default_moq}
-              onChange={(e) =>
-                handleSettingChange("b2b_default_moq", e.target.value)
-              }
-              placeholder="1"
-            />
-            <p className="text-xs text-muted-foreground">
-              Default MOQ displayed on product enquiry forms
-            </p>
-          </div>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label htmlFor="b2b_auto_reply" className="cursor-pointer">
-                Auto-Reply to Customer
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                Automatically send confirmation email to enquirers
-              </p>
-            </div>
-            <Switch
-              id="b2b_auto_reply"
-              checked={settings.b2b_auto_reply === "true"}
-              onCheckedChange={(checked) =>
-                handleSettingChange("b2b_auto_reply", String(checked))
-              }
-            />
-          </div>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label
-                htmlFor="b2b_enable_tiered_pricing"
-                className="cursor-pointer"
-              >
-                Enable Tiered Pricing
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                Show different prices based on customer tier (Standard, Gold,
-                etc.)
-              </p>
-            </div>
-            <Switch
-              id="b2b_enable_tiered_pricing"
-              checked={settings.b2b_enable_tiered_pricing === "true"}
-              onCheckedChange={(checked) =>
-                handleSettingChange(
-                  "b2b_enable_tiered_pricing",
-                  String(checked),
-                )
-              }
-            />
-          </div>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label
-                htmlFor="b2b_enable_buyer_portal"
-                className="cursor-pointer"
-              >
-                Enable Buyer Portal
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                Allow customers to login and view their personalized dashboard
-              </p>
-            </div>
-            <Switch
-              id="b2b_enable_buyer_portal"
-              checked={settings.b2b_enable_buyer_portal === "true"}
-              onCheckedChange={(checked) =>
-                handleSettingChange("b2b_enable_buyer_portal", String(checked))
-              }
-            />
-          </div>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label
-                htmlFor="b2b_verify_new_accounts"
-                className="cursor-pointer"
-              >
-                Verify New Accounts
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                Manually approve B2B accounts before they can see tiered pricing
-              </p>
-            </div>
-            <Switch
-              id="b2b_verify_new_accounts"
-              checked={settings.b2b_verify_new_accounts === "true"}
-              onCheckedChange={(checked) =>
-                handleSettingChange("b2b_verify_new_accounts", String(checked))
-              }
-            />
-          </div>
-
-          <Separator className="sm:col-span-2" />
-
-          <div className="sm:col-span-2 space-y-4">
-            <h3 className="text-sm font-medium flex items-center gap-2">
-              <Info className="h-4 w-4" />
-              B2B Tier Discount Percentages
-            </h3>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="space-y-2">
-                <Label htmlFor="discount-silver">Silver Tier (%)</Label>
-                <Input
-                  id="discount-silver"
-                  type="number"
-                  value={Math.round(
-                    Number(settings.b2b_discount_silver || 0.05) * 100,
-                  )}
-                  onChange={(e) =>
-                    handleSettingChange(
-                      "b2b_discount_silver",
-                      String(Number(e.target.value) / 100),
-                    )
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="discount-gold">Gold Tier (%)</Label>
-                <Input
-                  id="discount-gold"
-                  type="number"
-                  value={Math.round(
-                    Number(settings.b2b_discount_gold || 0.1) * 100,
-                  )}
-                  onChange={(e) =>
-                    handleSettingChange(
-                      "b2b_discount_gold",
-                      String(Number(e.target.value) / 100),
-                    )
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="discount-platinum">Platinum Tier (%)</Label>
-                <Input
-                  id="discount-platinum"
-                  type="number"
-                  value={Math.round(
-                    Number(settings.b2b_discount_platinum || 0.15) * 100,
-                  )}
-                  onChange={(e) =>
-                    handleSettingChange(
-                      "b2b_discount_platinum",
-                      String(Number(e.target.value) / 100),
-                    )
-                  }
-                />
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Email / SMTP Settings */}
       <Card>
         <CardHeader>
@@ -1087,11 +838,7 @@ function AuthorProfiles() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [savingId, setSavingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
+  async function fetchUsers() {
     try {
       const res = await adminFetch('/api/users?all=true');
       if (res.ok) {
@@ -1101,7 +848,12 @@ function AuthorProfiles() {
     } catch {
       toast.error('Failed to load users');
     }
-  };
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchUsers();
+  }, []);
 
   const uploadAvatar = async (file: File, userId: string) => {
     setSavingId(userId);
@@ -1214,6 +966,7 @@ function AuthorRow({
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setBio(user.bio || '');
     setDirty(false);
   }, [user.bio]);

@@ -3,7 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { ClerkProvider } from "@clerk/nextjs";
+import { SessionProvider } from "next-auth/react";
 import { QueryProvider } from "@/providers/QueryProvider";
 
 const poppins = Poppins({
@@ -90,14 +90,14 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} antialiased bg-background text-foreground`}
       >
-        <ClerkProvider>
+        <SessionProvider>
           <QueryProvider>
             <ThemeProvider>
               {children}
               <Toaster position="top-right" richColors closeButton />
             </ThemeProvider>
           </QueryProvider>
-        </ClerkProvider>
+        </SessionProvider>
       </body>
     </html>
   );

@@ -12,8 +12,6 @@ export const productSchema = z.object({
   shortDescription: z.string().max(500).optional().nullable(),
   price: z.number().positive('Price must be positive'),
   comparePrice: z.number().positive().optional().nullable(),
-  wholesalePrice: z.number().positive().optional().nullable(),
-  minOrderQty: z.number().int().min(1).default(1),
   sku: z.string().optional().nullable(),
   categoryId: z.string().optional().nullable(),
   whatsappNumber: z.string().optional().nullable(),
@@ -81,25 +79,19 @@ export const enquirySchema = z.object({
   subject: z.string().min(1, 'Subject is required').max(200),
   message: z.string().min(1, 'Message is required').max(5000),
   productId: z.string().optional().nullable(),
-  type: z.enum(['product', 'contact', 'rfq']).default('product'),
-  quantity: z.number().int().positive().optional().nullable(),
-  companyName: z.string().optional().nullable(),
-  companyEmail: z.string().email().optional().nullable(),
-  companyPhone: z.string().optional().nullable(),
-  companyAddress: z.string().optional().nullable(),
 });
 
 export const userCreateSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   email: z.string().email('Invalid email'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  role: z.enum(['admin', 'clerk', 'editor']).default('clerk'),
+  role: z.enum(['admin', 'editor', 'customer']).default('customer'),
 });
 
 export const userUpdateSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   email: z.string().email().optional(),
-  role: z.enum(['admin', 'clerk', 'editor']).optional(),
+  role: z.enum(['admin', 'editor', 'customer']).optional(),
   isActive: z.boolean().optional(),
   password: z.string().min(8).optional(),
 });

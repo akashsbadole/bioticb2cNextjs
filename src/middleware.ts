@@ -1,7 +1,9 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 
-const isProtectedRoute = createRouteMatcher(["/api/admin(.*)"]);
+const isAdminRoute = (req: NextRequest) =>
+  req.nextUrl.pathname.startsWith("/admin") ||
+  req.nextUrl.pathname.startsWith("/api/admin");
 
 // ─── Store Resolution (Edge-compatible, in-memory cache) ───
 
@@ -53,7 +55,7 @@ async function resolveStoreId(hostname: string): Promise<string | null> {
   const subdomain = extractSubdomain(hostname);
   if (subdomain) {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `http://localhost:${3000}`;
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `http://localhost:3000`;
       const res = await fetch(`${baseUrl}/api/stores/resolve?slug=${encodeURIComponent(subdomain)}`, {
         headers: { "x-internal-request": "true" },
         signal: AbortSignal.timeout(2000),
@@ -67,7 +69,7 @@ async function resolveStoreId(hostname: string): Promise<string | null> {
 
   if (!storeId && isCustomDomain(hostname)) {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `http://localhost:${3000}`;
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `http://localhost:3000`;
       const res = await fetch(`${baseUrl}/api/stores/resolve?domain=${encodeURIComponent(host)}`, {
         headers: { "x-internal-request": "true" },
         signal: AbortSignal.timeout(2000),
@@ -129,12 +131,17 @@ async function checkRedirect(pathname: string, request: NextRequest): Promise<Ca
   return null;
 }
 
-export default clerkMiddleware(async (auth, req) => {
+export default auth(async (req) => {
   const { pathname } = req.nextUrl;
   const hostname = req.headers.get("host") || "";
 
   // 1. Handle Redirects for non-API routes
-  if (!pathname.startsWith("/api/") && !pathname.startsWith("/_next/") && !pathname.startsWith("/_proxy/") && !pathname.includes(".")) {
+  if (
+    !pathname.startsWith("/api/") &&
+    !pathname.startsWith("/_next/") &&
+    !pathname.startsWith("/_proxy/") &&
+    !pathname.includes(".")
+  ) {
     const redirect = await checkRedirect(pathname, req);
     if (redirect && redirect.to) {
       const status = redirect.type === "302" ? 302 : 301;
@@ -147,19 +154,23 @@ export default clerkMiddleware(async (auth, req) => {
   // 2. Resolve Store
   const storeId = await resolveStoreId(hostname);
 
-  // 3. Handle Protected Routes
-  if (isProtectedRoute(req)) {
-    const session = await auth();
-    if (!session.userId) {
-      return session.redirectToSignIn();
-    }
+  // 3. Authentication (NextAuth session, populated by the auth() wrapper)
+  const session = req.auth;
 
-    // RBAC could be added here via publicMetadata if needed
-    // const role = session.sessionClaims?.publicMetadata?.role as string || 'clerk';
-    // ... logic for RBAC ...
+  // 4. Role-based access for admin routes
+  if (isAdminRoute(req)) {
+    const role = (session?.user as { role?: string } | undefined)?.role;
+    const isAdmin = !!session && (role === "admin" || role === "editor");
+    if (!isAdmin) {
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      const url = new URL("/admin", req.url);
+      return NextResponse.redirect(url);
+    }
   }
 
-  // 4. Inject Headers
+  // 5. Inject headers for downstream API routes
   const requestHeaders = new Headers(req.headers);
   requestHeaders.delete("x-user-id");
   requestHeaders.delete("x-user-role");
@@ -169,12 +180,10 @@ export default clerkMiddleware(async (auth, req) => {
     requestHeaders.set("x-store-id", storeId);
   }
 
-  // If authenticated, we could potentially inject user info from session
-  const session = await auth();
-  if (session.userId) {
-    requestHeaders.set("x-user-id", session.userId);
-    const role = (session.sessionClaims?.publicMetadata as any)?.role || "clerk";
-    requestHeaders.set("x-user-role", role);
+  if (session?.user) {
+    requestHeaders.set("x-user-id", session.user.id);
+    requestHeaders.set("x-user-role", (session.user as { role?: string }).role || "customer");
+    requestHeaders.set("x-user-email", session.user.email || "");
   }
 
   return NextResponse.next({
@@ -184,9 +193,7 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
     "/(api|trpc)(.*)",
   ],
 };

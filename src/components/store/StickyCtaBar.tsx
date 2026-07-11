@@ -38,7 +38,7 @@ export function StickyCtaBar({ onNavigate, settings }: StickyCtaBarProps) {
               className="bg-primary text-white hover:bg-primary/90"
               onClick={() => onNavigate('products')}
             >
-              Get bulk quote
+              Shop now
               <ArrowRight className="ml-1 h-3 w-3" />
             </Button>
             {whatsappNumber && (

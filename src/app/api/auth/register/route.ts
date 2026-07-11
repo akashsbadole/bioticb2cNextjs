@@ -1,80 +1,48 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { hash } from 'bcryptjs';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import { createUser } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 
-const registerSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  companyName: z.string().min(1, 'Company name is required'),
-  taxId: z.string().min(1, 'Tax ID is required'),
-  address: z.string().min(1, 'Address is required'),
+const REGISTER_RATE_LIMIT = { maxRequests: 5, windowMs: 60 * 60 * 1000, prefix: "auth-register" };
+
+const schema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  password: z.string().min(6),
+  phone: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
+  const rateLimitResponse = checkRateLimit(request, REGISTER_RATE_LIMIT);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
-    const result = registerSchema.safeParse(body);
-
-    if (!result.success) {
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: result.error.flatten().fieldErrors },
-        { status: 400 }
+        { error: "Validation failed", details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
       );
     }
 
-    const { name, email, password, companyName, taxId, address } = result.data;
+    const { name, email, password, phone } = parsed.data;
+    const normalized = email.trim().toLowerCase();
 
-    // Check if user already exists
-    const existingUser = await db.user.findUnique({
-      where: { email: email.toLowerCase() },
-    });
-
-    if (existingUser) {
-      return NextResponse.json(
-        { error: 'A user with this email already exists' },
-        { status: 409 }
-      );
+    const existing = await db.user.findUnique({ where: { email: normalized } });
+    if (existing) {
+      return NextResponse.json({ error: "Email already registered" }, { status: 409 });
     }
 
-    const hashedPassword = await hash(password, 12);
+    const user = await createUser({ name, email: normalized, password, phone: phone || null });
 
-    // Use a transaction to create Company and User
-    const user = await db.$transaction(async (tx) => {
-      const company = await tx.company.create({
-        data: {
-          name: companyName,
-          taxId,
-          address,
-          isVerified: false,
-          tier: 'standard',
-        },
-      });
-
-      return tx.user.create({
-        data: {
-          name,
-          email: email.toLowerCase(),
-          password: hashedPassword,
-          role: 'buyer',
-          isActive: true, // User can log in, but might be restricted if company not verified
-          isVerified: false,
-          companyId: company.id,
-          tier: 'standard',
-        },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          role: true,
-        },
-      });
+    return NextResponse.json({
+      success: true,
+      user: { id: user.id, email: user.email, name: user.name, role: user.role },
     });
-
-    return NextResponse.json({ user }, { status: 201 });
   } catch (error) {
-    console.error('Registration error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Register error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

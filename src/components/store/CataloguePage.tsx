@@ -37,7 +37,7 @@ export function CataloguePage({ onNavigate: _onNavigate }: { onNavigate?: any })
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
   const [visibleCount, setVisibleCount] = useState(12);
 
-  const isB2C = settings?.store_mode === "b2c";
+  const isB2C = true;
   const currency = settings?.currency || "INR";
 
   const { data: categories = [] } = useQuery({

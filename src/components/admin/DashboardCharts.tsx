@@ -28,7 +28,6 @@ interface DashboardChartData {
     lastWeek: number;
     total: number;
     newCount: number;
-    rfqCount: number;
   };
   conversionRate: number;
   productStats: {
@@ -216,8 +215,8 @@ export function DashboardCharts() {
               <p className="text-lg font-bold text-amber-600">{data.enquiryStats.newCount}</p>
             </div>
             <div className="rounded-lg border p-3">
-              <p className="text-xs text-muted-foreground">RFQs</p>
-              <p className="text-lg font-bold text-orange-600">{data.enquiryStats.rfqCount}</p>
+              <p className="text-xs text-muted-foreground">Total</p>
+              <p className="text-lg font-bold text-orange-600">{data.enquiryStats.total}</p>
             </div>
           </div>
 

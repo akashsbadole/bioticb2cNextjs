@@ -7,7 +7,6 @@ import {
   X,
   User,
   ShoppingBag,
-  FileText,
   Search,
   ChevronDown,
   ChevronRight,
@@ -72,7 +71,7 @@ const mainNavLinks: NavItem[] = [];
 
 export function StoreHeader({ onNavigate }: StoreHeaderProps) {
   const { currentPage, settings, cart, wishlistIds } = useAppStore();
-  const isB2C = settings?.store_mode === "b2c";
+  const isB2C = true;
   const cartItemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -525,17 +524,6 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
               </Button>
             )}
 
-            {/* Get Bulk Quote CTA (B2B) */}
-            {!isB2C && (
-              <Button
-                size="sm"
-                className="hidden md:flex text-sm bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5 px-4"
-                onClick={() => onNavigate("products")}
-              >
-                <FileText className="h-4 w-4" />
-                Get Bulk Quote
-              </Button>
-            )}
             {/* Mobile Menu Trigger */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild className="lg:hidden">
@@ -640,19 +628,6 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
                         ))}
 
                   <Separator className="my-2" />
-
-                  {/* Bulk Quote CTA (B2B) */}
-                  {!isB2C && (
-                    <SheetClose asChild>
-                      <Button
-                        className="justify-start text-sm h-9 bg-primary text-primary-foreground w-full"
-                        onClick={() => onNavigate("products")}
-                      >
-                        <FileText className="mr-2 h-4 w-4" />
-                        Get Bulk Quote
-                      </Button>
-                    </SheetClose>
-                  )}
 
                   {/* Cart CTA (B2C) */}
                   {isB2C && (

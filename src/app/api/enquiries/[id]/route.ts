@@ -33,21 +33,6 @@ export async function PUT(
         ...(body.phone !== undefined && {
           phone: body.phone || null,
         }),
-        ...(body.companyName !== undefined && {
-          companyName: body.companyName || null,
-        }),
-        ...(body.companyEmail !== undefined && {
-          companyEmail: body.companyEmail || null,
-        }),
-        ...(body.companyPhone !== undefined && {
-          companyPhone: body.companyPhone || null,
-        }),
-        ...(body.companyAddress !== undefined && {
-          companyAddress: body.companyAddress || null,
-        }),
-        ...(body.quantity !== undefined && {
-          quantity: body.quantity ?? null,
-        }),
         ...(body.subject !== undefined && { subject: body.subject }),
         ...(body.message !== undefined && { message: body.message }),
       },

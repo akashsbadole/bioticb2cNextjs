@@ -38,8 +38,8 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { sku: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search } },
+        { sku: { contains: search } },
       ];
     }
 
@@ -206,8 +206,6 @@ export async function POST(request: NextRequest) {
         shortDescription: validatedData.shortDescription || null,
         price: validatedData.price,
         comparePrice: validatedData.comparePrice || null,
-        wholesalePrice: validatedData.wholesalePrice || null,
-        minOrderQty: validatedData.minOrderQty ?? 1,
         sku: validatedData.sku || null,
         barcode: body.barcode || null,
         attributes: body.attributes || "{}",

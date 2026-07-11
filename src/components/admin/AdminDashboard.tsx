@@ -20,6 +20,7 @@ import {
   Search,
   KeyRound,
   BookOpen,
+  Megaphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,7 +47,6 @@ import { AdminEnquiries } from "@/components/admin/AdminEnquiries";
 import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminCoupons } from "@/components/admin/AdminCoupons";
 import { AdminReviews } from "@/components/admin/AdminReviews";
-import { AdminQuotes } from "@/components/admin/AdminQuotes";
 import { AdminBanners } from "@/components/admin/AdminBanners";
 import { AdminSettings } from "@/components/admin/AdminSettings";
 import { AdminMedia } from "@/components/admin/AdminMedia";
@@ -55,6 +55,7 @@ import { AdminSearchDialog } from "@/components/admin/AdminSearchDialog";
 import { AdminMenus } from "@/components/admin/AdminMenus";
 import { AdminNewsletter } from "@/components/admin/AdminNewsletter";
 import { AdminAbandonedCarts } from "@/components/admin/AdminAbandonedCarts";
+import { AdminPopups } from "@/components/admin/AdminPopups";
 import { AdminBlog } from "@/components/admin/AdminBlog";
 import { NotificationBell } from "@/components/admin/NotificationBell";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -78,11 +79,11 @@ const sidebarItems = [
   { id: "abandoned-carts", label: "Abandoned Carts", icon: ShoppingCart },
   { id: "coupons", label: "Coupons", icon: Ticket },
   { id: "reviews", label: "Reviews", icon: Star },
-  { id: "quotes", label: "Quotes", icon: FileText },
   { id: "enquiries", label: "Enquiries", icon: MessageSquare },
   { id: "media", label: "Media", icon: ImageIcon },
   { id: "pages", label: "Pages", icon: FileText },
   { id: "banners", label: "Banners", icon: ImageIcon },
+  { id: "popups", label: "Popups", icon: Megaphone },
   { id: "newsletter", label: "Newsletter", icon: Mail },
   { id: "menus", label: "Menus", icon: Menu },
   { id: "settings", label: "Settings", icon: Settings },
@@ -215,6 +216,7 @@ export function AdminDashboard({
 
   // Sync activeTab prop changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentTab(activeTab);
   }, [activeTab]);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -319,10 +321,10 @@ export function AdminDashboard({
         return <AdminCoupons />;
       case "reviews":
         return <AdminReviews />;
-      case "quotes":
-        return <AdminQuotes />;
       case "banners":
         return <AdminBanners />;
+      case "popups":
+        return <AdminPopups />;
       case "media":
         return <AdminMedia />;
       case "pages":

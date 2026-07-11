@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     const headers = [
       'name', 'slug', 'description', 'shortDescription', 'price',
-      'comparePrice', 'wholesalePrice', 'minOrderQty', 'sku',
+      'comparePrice', 'sku',
       'categoryId', 'categoryName', 'isFeatured', 'isActive',
       'sortOrder', 'stock', 'lowStockThreshold', 'whatsappNumber',
     ];
@@ -28,8 +28,6 @@ export async function GET(request: NextRequest) {
       escapeCSV(p.shortDescription),
       escapeCSV(p.price),
       escapeCSV(p.comparePrice),
-      escapeCSV(p.wholesalePrice),
-      escapeCSV(p.minOrderQty),
       escapeCSV(p.sku),
       escapeCSV(p.categoryId),
       escapeCSV(p.Category?.name || ''),

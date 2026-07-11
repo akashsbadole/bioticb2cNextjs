@@ -24,7 +24,7 @@ const categoryInfo: Record<
   khakhra: {
     name: "Khakhra",
     tags: ["12+ variants", "Private label"],
-    desc: "Thin, crispy, roasted flatbreads available in a wide range of flavours and spice levels. One of our flagship lines — highest daily output capacity. Ideal for B2B, retail brands and private label.",
+    desc: "Thin, crispy, roasted flatbreads available in a wide range of flavours and spice levels. One of our flagship lines — highest daily output capacity. Loved by families across India.",
     variants: "12+ variants",
   },
   bhakhri: {
@@ -170,14 +170,14 @@ export function ProductsPage({
         </div>
       </section>
 
-      {/* Breadcrumb + B2B notice */}
+      {/* Breadcrumb */}
       <section className="bg-muted/40 py-3 px-4">
         <div className="container mx-auto max-w-5xl flex items-center justify-between">
           <p className="text-xs text-muted-foreground">Home › Products</p>
           <div className="flex items-center gap-2 bg-background border rounded px-3 py-1.5">
             <Info className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">
-              We do not sell retail. All orders are B2B, bulk & trade only.
+              Premium products with secure checkout and fast delivery.
             </span>
           </div>
         </div>
@@ -286,7 +286,7 @@ export function ProductsPage({
                     Available: {product.sizes}
                   </p>
                   <p className="text-[10px] text-muted-foreground mb-3">
-                    Min. order: B2B / trade only
+                    Ships in 2–4 business days
                   </p>
                   <button
                     onClick={() => onNavigate("contact")}
@@ -359,74 +359,6 @@ export function ProductsPage({
                 </span>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Inline Enquiry Form */}
-      <section className="bg-gray-900 text-white py-12 px-4">
-        <div className="container mx-auto max-w-5xl">
-          <h2 className="text-xl font-bold text-center mb-2">
-            Interested in bulk or private label?
-          </h2>
-          <p className="text-xs text-gray-400 text-center mb-8">
-            Share your requirement — our team will respond within 24 hours with
-            pricing & sample details
-          </p>
-          <div className="max-w-3xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-              <input
-                placeholder="Your name *"
-                className="bg-white/5 border border-white/10 rounded px-3 py-2 text-xs text-white placeholder:text-gray-500"
-              />
-              <input
-                placeholder="Company name *"
-                className="bg-white/5 border border-white/10 rounded px-3 py-2 text-xs text-white placeholder:text-gray-500"
-              />
-              <input
-                placeholder="Phone number *"
-                className="bg-white/5 border border-white/10 rounded px-3 py-2 text-xs text-white placeholder:text-gray-500"
-              />
-              <input
-                placeholder="Email address"
-                className="bg-white/5 border border-white/10 rounded px-3 py-2 text-xs text-white placeholder:text-gray-500"
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-3 mb-3">
-              <select className="bg-white/5 border border-white/10 rounded px-3 py-2 text-xs text-gray-500">
-                <option>Product category</option>
-                {categories
-                  .filter((c) => c.id !== "all")
-                  .map((c) => (
-                    <option key={c.id}>{c.label}</option>
-                  ))}
-              </select>
-              <select className="bg-white/5 border border-white/10 rounded px-3 py-2 text-xs text-gray-500">
-                <option>Order type (bulk / PL / branded)</option>
-                <option>Bulk</option>
-                <option>Private label</option>
-                <option>Branded</option>
-              </select>
-              <input
-                placeholder="Approx. qty / month"
-                className="bg-white/5 border border-white/10 rounded px-3 py-2 text-xs text-white placeholder:text-gray-500"
-              />
-            </div>
-            <textarea
-              placeholder="Any specific requirements, flavour preferences or packaging notes (optional)"
-              className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-xs text-white placeholder:text-gray-500 mb-4 h-20 resize-none"
-            />
-            <div className="text-center">
-              <button
-                onClick={() => onNavigate("contact")}
-                className="bg-primary text-primary-foreground text-sm font-medium rounded-full px-8 py-2.5 hover:bg-primary/90 transition-colors"
-              >
-                Submit product enquiry
-              </button>
-              <p className="text-[10px] text-gray-500 mt-2">
-                Goes directly to CRM · no spam · sales team alerted instantly
-              </p>
-            </div>
           </div>
         </div>
       </section>

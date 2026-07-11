@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { verifyToken } from '@/lib/auth-edge';
+import { requireAuth } from '@/lib/admin-auth';
 
 // POST /api/stores/[id]/switch - Switch active store
 export async function POST(
@@ -8,21 +8,15 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    const token = authHeader.split(' ')[1];
-    const payload = await verifyToken(token);
-    if (!payload?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const authRes = await requireAuth(request);
+    if (!authRes.success) return authRes.response;
+    const userId = authRes.payload.userId;
 
     const { id } = await params;
 
     // Verify user owns this store
     const store = await db.store.findFirst({
-      where: { id, ownerUserId: payload.userId, isActive: true },
+      where: { id, ownerUserId: userId, isActive: true },
     });
 
     if (!store) {
@@ -31,7 +25,7 @@ export async function POST(
 
     // Update user's current store
     await db.user.update({
-      where: { id: payload.userId },
+      where: { id: userId },
       data: { currentStoreId: id },
     });
 

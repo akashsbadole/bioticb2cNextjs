@@ -73,11 +73,6 @@ export async function sendEnquiryNotificationToAdmin(enquiry: {
   name: string;
   email: string;
   phone?: string;
-  companyName?: string;
-  companyEmail?: string;
-  companyPhone?: string;
-  companyAddress?: string;
-  quantity?: number;
   subject: string;
   message: string;
   type: string;
@@ -92,11 +87,6 @@ export async function sendEnquiryNotificationToAdmin(enquiry: {
   content += `<div class="field-label">Contact Name</div><div class="field-value">${enquiry.name}</div>`;
   content += `<div class="field-label">Email</div><div class="field-value">${enquiry.email}</div>`;
   if (enquiry.phone) content += `<div class="field-label">Phone</div><div class="field-value">${enquiry.phone}</div>`;
-  if (enquiry.companyName) content += `<div class="field-label">Company</div><div class="field-value">${enquiry.companyName}</div>`;
-  if (enquiry.companyEmail) content += `<div class="field-label">Company Email</div><div class="field-value">${enquiry.companyEmail}</div>`;
-  if (enquiry.companyPhone) content += `<div class="field-label">Company Phone</div><div class="field-value">${enquiry.companyPhone}</div>`;
-  if (enquiry.companyAddress) content += `<div class="field-label">Company Address</div><div class="field-value">${enquiry.companyAddress}</div>`;
-  if (enquiry.quantity) content += `<div class="field-label">Quantity Needed</div><div class="field-value">${enquiry.quantity} units</div>`;
   if (enquiry.productName) content += `<div class="field-label">Product</div><div class="field-value">${enquiry.productName}</div>`;
   content += `<div class="field-label">Subject</div><div class="field-value">${enquiry.subject}</div>`;
   content += `<div class="field-label">Message</div><div class="field-value">${enquiry.message.replace(/\n/g, '<br>')}</div>`;

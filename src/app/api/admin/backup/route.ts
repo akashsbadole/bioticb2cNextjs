@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
       emailVerificationTokens,
       products,
       categories,
-      productTiers,
       productVariants,
       blogPosts,
       contentPages,
@@ -29,8 +28,6 @@ export async function GET(request: NextRequest) {
       users,
       activityLogs,
       notifications,
-      companies,
-      quotes,
     ] = await Promise.all([
       db.store.findMany(),
       db.newsletterSubscriber.findMany(),
@@ -38,7 +35,6 @@ export async function GET(request: NextRequest) {
       db.emailVerificationToken.findMany(),
       db.product.findMany(),
       db.category.findMany(),
-      db.productTier.findMany(),
       db.productVariant.findMany(),
       db.blogPost.findMany(),
       db.contentPage.findMany(),
@@ -52,12 +48,10 @@ export async function GET(request: NextRequest) {
       db.user.findMany(),
       db.activityLog.findMany(),
       db.notification.findMany(),
-      db.company.findMany(),
-      db.quote.findMany(),
     ]);
 
     const backup = {
-      version: '1.1',
+      version: '1.2',
       createdAt: new Date().toISOString(),
       data: {
         stores,
@@ -66,7 +60,6 @@ export async function GET(request: NextRequest) {
         emailVerificationTokens,
         products,
         categories,
-        productTiers,
         productVariants,
         blogPosts,
         contentPages,
@@ -80,8 +73,6 @@ export async function GET(request: NextRequest) {
         users,
         activityLogs,
         notifications,
-        companies,
-        quotes,
       },
     };
 
@@ -130,16 +121,7 @@ export async function POST(request: NextRequest) {
     const results: Record<string, number> = {};
 
     await db.$transaction(async (tx) => {
-      // 1. Companies
-      if (data.companies) {
-        for (const item of data.companies) {
-          const { id, ...rest } = item;
-          await tx.company.upsert({ where: { id }, update: rest, create: { id, ...rest } });
-        }
-        results.companies = data.companies.length;
-      }
-
-      // 2. Users (Pass 1: without currentStoreId)
+      // 1. Users (Pass 1: without currentStoreId)
       if (data.users) {
         for (const item of data.users) {
           const { id, currentStoreId, ...rest } = item;
@@ -207,16 +189,7 @@ export async function POST(request: NextRequest) {
         results.products = data.products.length;
       }
 
-      // 8. ProductTiers
-      if (data.productTiers) {
-        for (const item of data.productTiers) {
-          const { id, ...rest } = item;
-          await tx.productTier.upsert({ where: { id }, update: rest, create: { id, ...rest } });
-        }
-        results.productTiers = data.productTiers.length;
-      }
-
-      // 9. ProductVariants
+      // 8. ProductVariants
       if (data.productVariants) {
         for (const item of data.productVariants) {
           const { id, ...rest } = item;
@@ -340,16 +313,7 @@ export async function POST(request: NextRequest) {
         results.notifications = data.notifications.length;
       }
 
-      // 22. Quotes
-      if (data.quotes) {
-        for (const item of data.quotes) {
-          const { id, ...rest } = item;
-          await tx.quote.upsert({ where: { id }, update: rest, create: { id, ...rest } });
-        }
-        results.quotes = data.quotes.length;
-      }
-
-      // 23. NewsletterSubscribers
+      // 22. NewsletterSubscribers
       if (data.newsletterSubscribers) {
         for (const item of data.newsletterSubscribers) {
           const { id, ...rest } = item;

@@ -17,6 +17,7 @@ import { MobileBottomNav } from "./MobileBottomNav";
 import { CompareBar } from "./CompareBar";
 import { GlobalEnquiryModal } from "./GlobalEnquiryModal";
 import { StickyCtaBar } from "./StickyCtaBar";
+import { Popup } from "./Popup";
 import { CustomScripts } from "./CustomScripts";
 
 interface StoreLayoutProps {
@@ -59,7 +60,7 @@ export function StoreLayout({
 
     const siteName = settings.site_name || "Purva Bites";
     const siteDesc =
-      settings.site_description || "Premium Products & B2B Wholesale Supplier";
+      settings.site_description || "Premium Products for Your Home & Business";
     const contactEmail = settings.contact_email || "";
     const contactPhone = settings.contact_phone || "";
 
@@ -154,6 +155,8 @@ export function StoreLayout({
       <CookieConsent />
 
       <GlobalEnquiryModal />
+
+      <Popup />
 
       <CustomScripts />
     </div>

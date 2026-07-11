@@ -93,7 +93,6 @@ export async function GET(request: NextRequest) {
       lastWeek: lastWeekCount,
       total: await db.enquiry.count({ where: enquiryWhere }),
       newCount: await db.enquiry.count({ where: { status: 'new', ...enquiryWhere } }),
-      rfqCount: await db.enquiry.count({ where: { type: 'rfq', ...enquiryWhere } }),
     };
 
     // Conversion rate = enquiries replied or closed / total enquiries * 100
@@ -111,15 +110,6 @@ export async function GET(request: NextRequest) {
       recentActivity,
       enquiryStats,
       conversionRate,
-      quoteStats: {
-        total: await db.quote.count(),
-        sent: await db.quote.count({ where: { status: 'sent' } }),
-        accepted: await db.quote.count({ where: { status: 'accepted' } }),
-        totalAmount: (await db.quote.aggregate({
-          where: { status: 'accepted' },
-          _sum: { totalAmount: true }
-        }))._sum.totalAmount || 0,
-      }
     });
   } catch (error) {
     console.error('Dashboard stats error:', error);

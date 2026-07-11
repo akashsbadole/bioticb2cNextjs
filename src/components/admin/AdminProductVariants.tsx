@@ -51,7 +51,6 @@ interface ProductVariant {
   sku: string | null;
   price: number | null;
   comparePrice: number | null;
-  wholesalePrice: number | null;
   stock: number;
   images: string;
   sortOrder: number;
@@ -69,7 +68,6 @@ interface VariantFormData {
   sku: string;
   price: string;
   comparePrice: string;
-  wholesalePrice: string;
   stock: string;
   images: string;
   sortOrder: string;
@@ -81,7 +79,6 @@ const emptyVariantForm: VariantFormData = {
   sku: '',
   price: '',
   comparePrice: '',
-  wholesalePrice: '',
   stock: '0',
   images: '',
   sortOrder: '0',
@@ -214,7 +211,6 @@ export function AdminProductVariants({ productId, lowStockThreshold = 10, onVari
       sku: variant.sku || '',
       price: variant.price !== null ? String(variant.price) : '',
       comparePrice: variant.comparePrice ? String(variant.comparePrice) : '',
-      wholesalePrice: variant.wholesalePrice ? String(variant.wholesalePrice) : '',
       stock: String(variant.stock),
       images: variant.images || '',
       sortOrder: String(variant.sortOrder),
@@ -233,7 +229,6 @@ export function AdminProductVariants({ productId, lowStockThreshold = 10, onVari
         sku: form.sku.trim() || null,
         price: form.price || null,
         comparePrice: form.comparePrice || null,
-        wholesalePrice: form.wholesalePrice || null,
         stock: parseInt(form.stock) || 0,
         images: form.images || '[]',
         sortOrder: parseInt(form.sortOrder) || 0,
@@ -300,7 +295,6 @@ export function AdminProductVariants({ productId, lowStockThreshold = 10, onVari
                 <TableHead>Name</TableHead>
                 <TableHead>SKU</TableHead>
                 <TableHead>Price</TableHead>
-                <TableHead className="hidden sm:table-cell">Wholesale</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -314,11 +308,6 @@ export function AdminProductVariants({ productId, lowStockThreshold = 10, onVari
                     {variant.sku || '—'}
                   </TableCell>
                   <TableCell>{formatPriceValue(variant.price)}</TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    <span className="text-amber-700 dark:text-amber-400">
-                      {formatPriceValue(variant.wholesalePrice)}
-                    </span>
-                  </TableCell>
                   <TableCell>
                     {editingStockId === variant.id ? (
                       <div className="flex items-center gap-1">
@@ -462,17 +451,6 @@ export function AdminProductVariants({ productId, lowStockThreshold = 10, onVari
                   placeholder="0.00"
                   value={form.comparePrice}
                   onChange={(e) => setForm(prev => ({ ...prev, comparePrice: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="variant-wholesale">Wholesale</Label>
-                <Input
-                  id="variant-wholesale"
-                  type="number"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={form.wholesalePrice}
-                  onChange={(e) => setForm(prev => ({ ...prev, wholesalePrice: e.target.value }))}
                 />
               </div>
             </div>

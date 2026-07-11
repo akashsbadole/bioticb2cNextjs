@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { verifyToken } from '@/lib/auth-edge';
+import { requireAuth } from '@/lib/admin-auth';
 import { normalizeImageUrl } from '@/lib/utils';
 
 // GET /api/stores/[id] - Get store details
@@ -9,20 +9,14 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    const token = authHeader.split(' ')[1];
-    const payload = await verifyToken(token);
-    if (!payload?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const authRes = await requireAuth(request);
+    if (!authRes.success) return authRes.response;
+    const userId = authRes.payload.userId;
 
     const { id } = await params;
 
     const store = await db.store.findFirst({
-      where: { id, ownerUserId: payload.userId },
+      where: { id, ownerUserId: userId },
       include: {
         _count: {
           select: {
@@ -50,22 +44,16 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    const token = authHeader.split(' ')[1];
-    const payload = await verifyToken(token);
-    if (!payload?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const authRes = await requireAuth(request);
+    if (!authRes.success) return authRes.response;
+    const userId = authRes.payload.userId;
 
     const { id } = await params;
     const body = await request.json();
 
     // Verify ownership
     const existing = await db.store.findFirst({
-      where: { id, ownerUserId: payload.userId },
+      where: { id, ownerUserId: userId },
     });
 
     if (!existing) {
@@ -114,20 +102,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    const token = authHeader.split(' ')[1];
-    const payload = await verifyToken(token);
-    if (!payload?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const authRes = await requireAuth(request);
+    if (!authRes.success) return authRes.response;
+    const userId = authRes.payload.userId;
 
     const { id } = await params;
 
     const existing = await db.store.findFirst({
-      where: { id, ownerUserId: payload.userId },
+      where: { id, ownerUserId: userId },
     });
 
     if (!existing) {
@@ -141,10 +123,10 @@ export async function DELETE(
     });
 
     // Clear user's current store if it was this one
-    const user = await db.user.findUnique({ where: { id: payload.userId } });
+    const user = await db.user.findUnique({ where: { id: userId } });
     if (user?.currentStoreId === id) {
       await db.user.update({
-        where: { id: payload.userId },
+        where: { id: userId },
         data: { currentStoreId: null },
       });
     }

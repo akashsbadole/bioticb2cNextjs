@@ -1,28 +1,14 @@
-import { SignIn } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { AdminLogin } from "@/components/admin/AdminLogin";
 
 export default async function AdminPage() {
-  const { userId } = await auth();
-  if (userId) {
+  const session = await auth();
+  const role = (session?.user as { role?: string } | undefined)?.role;
+
+  if (session?.user && (role === "admin" || role === "editor")) {
     redirect("/admin/dashboard");
   }
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md p-4">
-        <SignIn
-          routing="hash"
-          fallbackRedirectUrl="/admin/dashboard"
-          signUpUrl="/register"
-          appearance={{
-            elements: {
-              formButtonPrimary: 'bg-emerald-600 hover:bg-emerald-700',
-              footerActionLink: 'text-emerald-600 hover:text-emerald-700'
-            }
-          }}
-        />
-      </div>
-    </div>
-  );
+  return <AdminLogin />;
 }
