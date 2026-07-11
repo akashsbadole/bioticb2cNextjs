@@ -1,24 +1,10 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { authenticateUser, getUserById } from "@/lib/auth";
-import { verifyOtp } from "@/lib/otp";
-import type { AuthUser } from "@/lib/auth";
+import { authConfig } from "./auth.config";
+import type { NextAuthConfig } from "next-auth";
 
-function toNextAuthUser(user: AuthUser) {
-  return {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-  };
-}
-
-export const authConfig = {
-  trustHost: true,
-  session: { strategy: "jwt" as const },
-  pages: {
-    signIn: "/admin",
-  },
+const config: NextAuthConfig = {
+  ...authConfig,
   providers: [
     Credentials({
       id: "credentials",
@@ -28,13 +14,18 @@ export const authConfig = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
-        const user = await authenticateUser(
-          String(credentials.email),
-          String(credentials.password),
-        );
+        const { authenticateUser } = await import("@/lib/auth");
+        const email = String(credentials?.email ?? "").trim().toLowerCase();
+        const password = String(credentials?.password ?? "");
+        if (!email || !password) return null;
+        const user = await authenticateUser(email, password);
         if (!user) return null;
-        return toNextAuthUser(user);
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        };
       },
     }),
     Credentials({
@@ -45,37 +36,47 @@ export const authConfig = {
         code: { label: "Code", type: "text" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.code) return null;
-        const user = await verifyOtp(
-          String(credentials.email),
-          String(credentials.code),
-        );
+        const { verifyOtp } = await import("@/lib/otp");
+        const email = String(credentials?.email ?? "").trim().toLowerCase();
+        const code = String(credentials?.code ?? "").trim();
+        if (!email || !code) return null;
+        const user = await verifyOtp(email, code);
         if (!user) return null;
-        return toNextAuthUser(user);
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        };
       },
     }),
   ],
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = (user as { role?: string }).role;
+      const u = user as { id?: string; role?: string } | undefined;
+      if (u?.id) {
+        token.id = u.id;
+        token.role = u.role ?? "customer";
+      }
+      // Keep role fresh from the database (Node runtime only).
+      if (token.id) {
+        try {
+          const { getUserById } = await import("@/lib/auth");
+          const dbUser = await getUserById(token.id as string);
+          if (dbUser) {
+            token.id = dbUser.id;
+            token.role = (dbUser as { role?: string }).role ?? "customer";
+          }
+        } catch {
+          /* ignore */
+        }
       }
       return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-      }
-      return session;
     },
   },
 };
 
-export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
+export const { handlers, auth, signIn, signOut } = NextAuth(config);
 
 export const { GET, POST } = handlers;
-
-// Re-export for convenience where only user lookup is needed.
-export { getUserById };

@@ -19,7 +19,7 @@ function VerifyEmailContent() {
       setMessage('Missing verification token.');
       return;
     }
-    fetch(`/api/auth/verify-email?token=${encodeURIComponent(token)}`)
+    fetch(`/api/account/verify-email?token=${encodeURIComponent(token)}`)
       .then(async (res) => {
         const data = await res.json().catch(() => ({}));
         if (res.ok) {

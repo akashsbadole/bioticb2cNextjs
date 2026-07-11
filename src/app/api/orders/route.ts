@@ -135,7 +135,9 @@ export async function POST(request: NextRequest) {
     if (paymentMethod === 'payu') {
        const payuKey = process.env.PAYU_MERCHANT_KEY || 'test_key';
        const payuSalt = process.env.PAYU_MERCHANT_SALT || 'test_salt';
-       const isProd = process.env.NODE_ENV === 'production';
+        const isProd =
+          process.env.PAYU_TEST_MODE === 'false' ||
+          process.env.NODE_ENV === 'production';
        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
        const paymentData = {

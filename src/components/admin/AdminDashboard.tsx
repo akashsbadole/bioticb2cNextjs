@@ -280,7 +280,7 @@ export function AdminDashboard({
     setSavingPwd(true);
     try {
       const { adminFetch } = await import("@/lib/admin-fetch");
-      const res = await adminFetch("/api/auth/change-password", {
+      const res = await adminFetch("/api/account/change-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ currentPassword, newPassword }),

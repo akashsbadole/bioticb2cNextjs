@@ -2,6 +2,47 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { toast } from "sonner";
 
+// ── Abandoned-cart recovery: persist cart to DB for guests & users ──
+
+function getDeviceId(): string | null {
+  if (typeof window === "undefined") return null;
+  let id = localStorage.getItem("cart_device_id");
+  if (!id) {
+    id =
+      (typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `dev_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+    localStorage.setItem("cart_device_id", id);
+  }
+  return id;
+}
+
+let cartSyncTimer: ReturnType<typeof setTimeout> | null = null;
+function scheduleCartSync() {
+  if (typeof window === "undefined") return;
+  if (cartSyncTimer) clearTimeout(cartSyncTimer);
+  cartSyncTimer = setTimeout(() => {
+    const state = useAppStore.getState();
+    const items = state.cart.items.map((i) => ({
+      productId: i.productId,
+      variantId: i.variantId,
+      quantity: i.quantity,
+    }));
+    const deviceId = getDeviceId();
+    if (!deviceId) return;
+    fetch("/api/account/cart/sync", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(state.auth.token
+          ? { Authorization: `Bearer ${state.auth.token}` }
+          : {}),
+      },
+      body: JSON.stringify({ items, guestToken: deviceId }),
+    }).catch(() => {});
+  }, 800);
+}
+
 export type Page =
   | { type: "home" }
   | { type: "catalogue" }
@@ -293,6 +334,7 @@ export const useAppStore = create<AppState>()(
         } else {
           set({ cart: { items: [...currentItems, item] } });
         }
+        scheduleCartSync();
       },
       removeFromCart: (productId, variantId) => {
         set({
@@ -302,6 +344,7 @@ export const useAppStore = create<AppState>()(
             ),
           },
         });
+        scheduleCartSync();
       },
       updateCartQuantity: (productId, quantity, variantId) => {
         set({
@@ -313,8 +356,12 @@ export const useAppStore = create<AppState>()(
             ),
           },
         });
+        scheduleCartSync();
       },
-      clearCart: () => set({ cart: { items: [] } }),
+      clearCart: () => {
+        set({ cart: { items: [] } });
+        scheduleCartSync();
+      },
 
       isAdmin: false,
       adminUser: null,

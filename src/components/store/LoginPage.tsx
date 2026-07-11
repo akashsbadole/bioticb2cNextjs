@@ -50,7 +50,7 @@ export function LoginPage() {
     }
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/request-otp", {
+      const res = await fetch("/api/account/request-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, channel: "email" }),
@@ -89,7 +89,7 @@ export function LoginPage() {
       return;
     }
     try {
-      await fetch("/api/auth/forgot-password", {
+      await fetch("/api/account/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

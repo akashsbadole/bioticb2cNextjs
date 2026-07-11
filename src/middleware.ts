@@ -1,91 +1,87 @@
-import { auth } from "@/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "./auth.config";
 import { NextRequest, NextResponse } from "next/server";
+
+const { auth } = NextAuth(authConfig);
 
 const isAdminRoute = (req: NextRequest) =>
   req.nextUrl.pathname.startsWith("/admin") ||
   req.nextUrl.pathname.startsWith("/api/admin");
 
-// ─── Store Resolution (Edge-compatible, in-memory cache) ───
+// ─── Rate Limiting (in-memory, Edge-compatible) ───
 
-interface CachedStore {
-  id: string;
-  slug: string;
-  expiresAt: number;
+interface RateBucket {
+  count: number;
+  resetAt: number;
+}
+const rateBuckets = new Map<string, RateBucket>();
+const RATE_WINDOW = 60 * 1000;
+
+const AUTH_RATE_LIMIT = 20;
+const API_RATE_LIMIT = 120;
+
+function getClientIp(req: NextRequest): string {
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0].trim();
+  return req.headers.get("x-real-ip") || req.headers.get("host") || "unknown";
 }
 
-const storeCache = new Map<string, CachedStore>();
-const STORE_CACHE_TTL = 5 * 60 * 1000;
-
-const PLATFORM_DOMAINS = [
-  process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || process.env.PLATFORM_DOMAIN || "localhost",
-  process.env.PLATFORM_DOMAIN || "localhost",
-];
-
-function extractSubdomain(hostname: string): string | null {
-  const host = hostname.split(":")[0];
-  if (!host || host === "localhost" || /^\d+\.\d+\.\d+\.\d+$/.test(host)) {
-    return null;
+function rateLimit(key: string, limit: number): { allowed: boolean; retryAfter: number } {
+  const now = Date.now();
+  const bucket = rateBuckets.get(key);
+  if (!bucket || bucket.resetAt <= now) {
+    rateBuckets.set(key, { count: 1, resetAt: now + RATE_WINDOW });
+    return { allowed: true, retryAfter: 0 };
   }
-  for (const domain of PLATFORM_DOMAINS) {
-    if (host.endsWith(`.${domain}`)) {
-      const sub = host.replace(`.${domain}`, "");
-      return sub || null;
-    }
+  bucket.count += 1;
+  if (bucket.count > limit) {
+    return { allowed: false, retryAfter: Math.ceil((bucket.resetAt - now) / 1000) };
   }
-  return null;
+  return { allowed: true, retryAfter: 0 };
 }
 
-function isCustomDomain(hostname: string): boolean {
-  const host = hostname.split(":")[0];
-  if (!host || host === "localhost" || /^\d+\.\d+\.\d+\.\d+$/.test(host)) {
+// ─── CSRF / Same-Origin Protection ───
+
+const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS", "TRACE"]);
+
+function isSameOrigin(req: NextRequest): boolean {
+  const origin = req.headers.get("origin");
+  const host = req.headers.get("host");
+  if (!origin) return true;
+  try {
+    return new URL(origin).host === host;
+  } catch {
     return false;
   }
-  return !PLATFORM_DOMAINS.some((d) => host.endsWith(`.${d}`));
 }
 
-async function resolveStoreId(hostname: string): Promise<string | null> {
-  const host = hostname.split(":")[0];
+// ─── Default Store Resolution (single-store mode) ───
+// The app is single-tenant: middleware always resolves to the one default
+// store (slug from DEFAULT_STORE_SLUG, defaults to "main"). The ID is fetched
+// once from an internal endpoint and cached for an hour.
 
-  const cached = storeCache.get(host);
-  if (cached && cached.expiresAt > Date.now()) {
-    return cached.id;
+let defaultStoreId: string | null = null;
+let defaultStoreCacheExpiry = 0;
+const DEFAULT_STORE_TTL = 60 * 60 * 1000;
+
+async function resolveDefaultStoreId(): Promise<string | null> {
+  const now = Date.now();
+  if (defaultStoreId && defaultStoreCacheExpiry > now) {
+    return defaultStoreId;
   }
-
-  let storeId: string | null = null;
-  const subdomain = extractSubdomain(hostname);
-  if (subdomain) {
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `http://localhost:3000`;
-      const res = await fetch(`${baseUrl}/api/stores/resolve?slug=${encodeURIComponent(subdomain)}`, {
-        headers: { "x-internal-request": "true" },
-        signal: AbortSignal.timeout(2000),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        storeId = data.storeId || null;
-      }
-    } catch { /* ignore */ }
-  }
-
-  if (!storeId && isCustomDomain(hostname)) {
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `http://localhost:3000`;
-      const res = await fetch(`${baseUrl}/api/stores/resolve?domain=${encodeURIComponent(host)}`, {
-        headers: { "x-internal-request": "true" },
-        signal: AbortSignal.timeout(2000),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        storeId = data.storeId || null;
-      }
-    } catch { /* ignore */ }
-  }
-
-  if (storeId) {
-    storeCache.set(host, { id: storeId, slug: subdomain || host, expiresAt: Date.now() + STORE_CACHE_TTL });
-  }
-
-  return storeId;
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `http://localhost:3000`;
+    const res = await fetch(`${baseUrl}/api/store/default`, {
+      headers: { "x-internal-request": "true" },
+      signal: AbortSignal.timeout(2000),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      defaultStoreId = data.id || null;
+      defaultStoreCacheExpiry = now + DEFAULT_STORE_TTL;
+    }
+  } catch { /* ignore */ }
+  return defaultStoreId;
 }
 
 // ─── Redirect Check ───
@@ -133,7 +129,37 @@ async function checkRedirect(pathname: string, request: NextRequest): Promise<Ca
 
 export default auth(async (req) => {
   const { pathname } = req.nextUrl;
-  const hostname = req.headers.get("host") || "";
+  const ip = getClientIp(req);
+
+  // 0. Rate limiting + CSRF for app API routes.
+  // NextAuth's own /api/auth/* routes manage their own CSRF/rate protection and
+  // issue internal sub-requests, so we exclude them. Internal middleware fetches
+  // (x-internal-request) are also exempt to avoid self-throttling.
+  const isInternal = req.headers.get("x-internal-request") === "true";
+  if (
+    pathname.startsWith("/api/") &&
+    !pathname.startsWith("/api/auth/") &&
+    !isInternal
+  ) {
+    const isSensitive =
+      pathname.startsWith("/api/account/request-otp") ||
+      pathname.startsWith("/api/account/register");
+    const limit = isSensitive ? AUTH_RATE_LIMIT : API_RATE_LIMIT;
+    const rl = rateLimit(`${ip}:${isSensitive ? "auth" : "api"}`, limit);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Too many requests" },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfter) } },
+      );
+    }
+
+    // Enforce same-origin for state-changing API requests (CSRF defense).
+    if (!SAFE_METHODS.has(req.method)) {
+      if (!isSameOrigin(req)) {
+        return NextResponse.json({ error: "Forbidden: invalid origin" }, { status: 403 });
+      }
+    }
+  }
 
   // 1. Handle Redirects for non-API routes
   if (
@@ -151,8 +177,9 @@ export default auth(async (req) => {
     }
   }
 
-  // 2. Resolve Store
-  const storeId = await resolveStoreId(hostname);
+  // 2. Resolve Store (single default store; skip for the resolver endpoint itself)
+  const storeId =
+    pathname === "/api/store/default" ? null : await resolveDefaultStoreId();
 
   // 3. Authentication (NextAuth session, populated by the auth() wrapper)
   const session = req.auth;

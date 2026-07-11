@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { CategoryClientPage } from "./client";
 
+export const revalidate = 60;
+
 interface Props {
   params: Promise<{ slug: string }>;
 }

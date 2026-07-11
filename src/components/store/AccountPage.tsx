@@ -78,7 +78,7 @@ export function AccountPage() {
       if (newPassword !== confirmPassword) {
         throw new Error('New passwords do not match');
       }
-      const res = await fetch('/api/auth/change-password', {
+      const res = await fetch('/api/account/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword, newPassword }),
@@ -100,7 +100,7 @@ export function AccountPage() {
 
   const sendVerification = async () => {
     try {
-      await fetch('/api/auth/send-verification', {
+      await fetch('/api/account/send-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: auth.user?.email }),

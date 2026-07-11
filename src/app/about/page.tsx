@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { AboutClientPage } from "./client";
 
+export const revalidate = 300;
+
 export const metadata: Metadata = {
   title: "About Us | Purva Bites",
   description: "Learn about Purva Bites - our story, mission, vision, and the team behind India's trusted FMCG manufacturer.",

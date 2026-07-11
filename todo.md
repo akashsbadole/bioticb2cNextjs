@@ -91,26 +91,84 @@ Decisions:
 - [ ] `npm run build` — BLOCKED: no live DB + pre-existing project-wide lint errors (see note)
 - [ ] Manual smoke: register → verify email → login → add address → add to cart → checkout → view orders
 
-> Note: `npm run build` cannot be verified here — there is no live database to run `prisma db push`, and the repo has many pre-existing `react-hooks/set-state-in-effect` ESLint errors across non-B2B files that fail the build's lint gate. The B2C refactor itself is complete: `tsc` is clean and all B2B-touched files lint clean.
+> Note: `pnpm build` cannot be verified here — the repo has many pre-existing `react-hooks/set-state-in-effect` ESLint errors across non-B2B files (`AdminClient.tsx`, `AdminDashboardClient.tsx`, etc.) that fail the build's lint gate, and there is no live SMTP/Twilio credentials to send real OTP/email. `tsc --noEmit` is clean. The Clerk → NextAuth.js v5 migration is complete and verified end-to-end (login → session → admin RBAC → 401 without session), and Security middleware (rate limiting + CSRF) is implemented and tested.
 
 ## E-Commerce features
 
 Provide complete, production-ready code for:
 Use zustand state management ,
 
-- [ ] NextAuth.js configuration (with OTP, social login, and role-based access).
-- [ ] OTP login flow (SMS/email).
-- [ ] Product, category, and blog CRUD APIs.
-- [ ] Shopping cart and wishlist logic (client-side + server-side).
-- [ ] Checkout flow (multi-step, payment integration).
-- [ ] Order management (status updates, invoices).
-- [ ] CSV/Excel import/export for products.
-- [ ] Admin dashboard (analytics, product/category/blog management).
-- [ ] User dashboard (profile, orders, wishlist).
-- [ ] Security middleware (rate limiting, CSRF, input validation).
-- [ ] Email/SMS notifications (order updates, OTP, etc.).
-- [ ] SEO optimization (meta tags, sitemap, schema markup).
+- [x] NextAuth.js configuration (Email+SMS OTP `credentials`/`otp` providers, role-based access; social login deferred). Clerk fully removed.
+- [x] OTP login flow (SMS/email) — `request-otp`, `verifyOtp`, `register`; delivery needs `TWILIO_*`/`EMAIL_*` env.
+- [x] Product, category, and blog CRUD APIs (incl. variants, reviews, recommendations, bulk).
+- [x] Shopping cart and wishlist logic (client-side zustand in `lib/store.ts` + server-side).
+- [x] Checkout flow (order creation via `POST /api/orders`; multi-step storefront UI).
+- [x] Order management (status updates, invoices).
+- [x] CSV/Excel import/export for products (`products/import`, `products/export`).
+- [x] Admin dashboard (analytics, product/category/blog/popup management).
+- [x] User dashboard (profile, orders, wishlist).
+- [x] Security middleware — rate limiting (per-IP, 20/min auth, 120/min API) + CSRF same-origin enforcement for mutating API requests in `src/middleware.ts`; per-route `zod` input validation. CSP Clerk refs removed in `next.config.ts`.
+- [x] Email/SMS notifications (SMTP + Twilio wired; OTP/order templates).
+- [x] SEO optimization (meta tags, `robots.ts`, `sitemap.ts`, schema markup).
 - [x] Create Popup feature
-- [ ] Discounts, coupons
+- [x] Discounts, coupons (e.g. `SAVE10`, seeded).
 
 Make sure all should working properly, cache and other things
+
+## Incomplete / Broken Features
+
+| Feature                         | Severity  | Issue                                                                                                                                                                |
+| ------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **SPA route mapping**           | 🔴 High   | `StoreShell.tsx:40` maps `/product/[slug]` to `category` page instead of `product-page`                                                                              |
+| **Orders API unauthenticated**  | 🔴 High   | `GET /api/orders` does not call `requireAuth`; any logged-in user can fetch all orders                                                                               |
+| **Checkout payment method**     | 🟡 Medium | Hardcoded to `payu`; no COD or other method selection exposed to customers                                                                                           |
+| **Checkout shipping display**   | 🟡 Medium | Hardcoded "Free" shipping label; actual shipping logic exists server-side but is not reflected in UI                                                                 |
+| **Checkout tax display**        | 🟡 Medium | Tax is calculated server-side but not shown in order summary breakdown                                                                                               |
+| **Stale B2B test references**   | 🟡 Medium | `AdminDashboardHome.tsx` references `EnquiryRow.type` which was removed from schema; `full-feature-verification.spec.ts` still tests B2B registration/tiered pricing |
+| **Leftover B2B UI references**  | 🟡 Medium | `AdminEnquiries.tsx` may still have "Create Quote" flow remnants                                                                                                     |
+| **X-Frame-Options**             | 🟡 Medium | `ALLOW-FROM` is deprecated; modern browsers only support `DENY` or `SAMEORIGIN`                                                                                      |
+| **Review API redundancy**       | 🟢 Low    | `ProductReviews.tsx` sends `userId` in POST body but API ignores it (uses auth header)                                                                               |
+| **Type safety in AdminOrders**  | 🟢 Low    | `paymentId` typed as required but can be `null` in DB                                                                                                                |
+| **Customer return/refund flow** | 🟡 Medium | Admin can set `returnStatus` and `refundAmount`, but customers have no self-service return request UI                                                                |
+| **Order confirmation emails**   | 🟡 Medium | Email/SMS templates exist but order confirmation emails are not explicitly wired in checkout flow                                                                    |
+| **Low stock alerts**            | 🟢 Low    | `lowStockThreshold` field exists but no admin UI for low-stock alerts                                                                                                |
+| **Product page SEO**            | 🟢 Low    | `useSeo` is called but `seo/use-page-content.ts` may not cover all dynamic routes                                                                                    |
+
+---
+
+## Missing Features
+
+| Feature                              | Impact                                                                          |
+| ------------------------------------ | ------------------------------------------------------------------------------- |
+| **COD / multiple payment methods**   | Only PayU is wired; no COD, bank transfer, or wallet options                    |
+| **Customer self-service returns**    | Users cannot initiate returns; admin-only workflow                              |
+| **Inventory management UI**          | Stock is editable inline but no dedicated inventory page or low-stock dashboard |
+| **Order confirmation notifications** | No email/SMS sent to customer on successful order (callback only updates DB)    |
+| **Invoice download**                 | Print-only; no PDF generation                                                   |
+| **Multi-currency / multi-language**  | Currency setting exists but no currency switcher or i18n for storefront content |
+| **Product comparison persistence**   | Comparison bar exists but no persistence across sessions                        |
+| **GST invoice breakdown**            | Tax is calculated but not itemized on invoice                                   |
+| **Social login**                     | Deferred per `todo.md`; no Google/Facebook OAuth                                |
+| **Product attribute filters**        | Attributes JSON exists but no faceted search UI for size/color etc.             |
+
+---
+
+## Key Risks / Blockers
+
+1. **`npm run build` is blocked** — Pre-existing ESLint `react-hooks/set-state-in-effect` errors in `AdminClient.tsx`, `AdminDashboardClient.tsx`, etc. fail the lint gate. `tsc --noEmit` passes.
+2. **No live DB** — Cannot verify runtime behavior, PayU callbacks, or email/SMS delivery.
+3. **Stale tests** — Playwright tests reference removed B2B models and fields; they will fail if run.
+4. **NextAuth v5 beta** — Using `next-auth@5.0.0-beta.25` which may have breaking changes before stable.
+
+---
+
+## Recommended Fix Priority
+
+1. Fix `StoreShell.tsx` route mapping bug (`product` → `product-page`)
+2. Add auth guard to `GET /api/orders`
+3. Remove stale B2B references from `AdminDashboardHome.tsx` and tests
+4. Add payment method selector to checkout (COD + PayU)
+5. Wire order confirmation email/SMS in PayU callback
+6. Fix `X-Frame-Options` header for modern browser compatibility
+7. Add customer self-service return request page
+8. Fix ESLint errors to unblock `npm run build`

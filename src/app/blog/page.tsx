@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { BlogClientPage } from "./client";
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "Blog | Purva Bites",
   description: "Read the latest articles, news, and updates from Purva Bites.",
