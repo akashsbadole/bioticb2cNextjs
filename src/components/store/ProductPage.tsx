@@ -31,8 +31,6 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
 
   const { auth, settings, addToCart, addToRecentlyViewed, wishlistIds, toggleWishlistId } = useAppStore();
   const currency = settings?.currency || "INR";
-  const isB2C = true;
-
   const { data: product, isLoading: loading } = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => {
@@ -126,7 +124,7 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
     <div className="bg-background">
       <div className="container mx-auto px-4 py-8">
         <Breadcrumbs items={[
-            { label: "Catalogue", page: "catalogue" },
+            { label: "Shop", page: "shop" },
             { label: product.Category?.name || "General", page: "category", slug: product.Category?.slug },
             { label: product.name }
         ]} />
@@ -213,25 +211,17 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
                 )}
 
                 <div className="flex gap-4 pt-4">
-                    {isB2C ? (
-                        <>
-                            <Button size="lg" className="flex-1 h-14 rounded-2xl text-lg font-bold gap-2 shadow-xl shadow-primary/20" onClick={handleAddToCart} disabled={product.stock <= 0}>
-                                <ShoppingCart className="h-5 w-5" /> {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
-                            </Button>
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                className={`h-14 w-14 rounded-2xl p-0 transition-colors ${wishlistIds.includes(product.id) ? 'bg-rose-50 text-rose-500 border-rose-200' : 'hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200'}`}
-                                onClick={handleWishlist}
-                            >
-                                <Heart className={`h-6 w-6 ${wishlistIds.includes(product.id) ? 'fill-current' : ''}`} />
-                            </Button>
-                        </>
-                    ) : (
-                        <Button size="lg" className="flex-1 h-14 rounded-2xl text-lg font-bold gap-2" onClick={() => useAppStore.getState().openEnquiryModal(product.name, product.id)}>
-                            <Send className="h-5 w-5" /> Send Enquiry
-                        </Button>
-                    )}
+                    <Button size="lg" className="flex-1 h-14 rounded-2xl text-lg font-bold gap-2 shadow-xl shadow-primary/20" onClick={handleAddToCart} disabled={product.stock <= 0}>
+                        <ShoppingCart className="h-5 w-5" /> {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                    </Button>
+                    <Button
+                        size="lg"
+                        variant="outline"
+                        className={`h-14 w-14 rounded-2xl p-0 transition-colors ${wishlistIds.includes(product.id) ? 'bg-rose-50 text-rose-500 border-rose-200' : 'hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200'}`}
+                        onClick={handleWishlist}
+                    >
+                        <Heart className={`h-6 w-6 ${wishlistIds.includes(product.id) ? 'fill-current' : ''}`} />
+                    </Button>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-8">
@@ -287,11 +277,9 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
         </div>
 
         {/* Reviews Section */}
-        {isB2C && (
-            <section className="mt-24 pt-12 border-t">
-                <ProductReviews productId={product.id} />
-            </section>
-        )}
+        <section className="mt-24 pt-12 border-t">
+            <ProductReviews productId={product.id} />
+        </section>
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (

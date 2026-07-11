@@ -17,11 +17,13 @@ import {
   Plus,
   Trash2,
   Mail,
-  Phone
+  Phone,
+  Headphones
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useAppStore } from '@/lib/store';
 import { formatPrice } from '@/lib/pricing';
@@ -29,7 +31,7 @@ import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { OrdersPage } from './OrdersPage';
 
-type AccountTab = 'profile' | 'orders' | 'addresses' | 'security';
+type AccountTab = 'profile' | 'orders' | 'addresses' | 'security' | 'support';
 
 export function AccountPage() {
   const [activeTab, setActiveTab] = useState<AccountTab>('profile');
@@ -141,6 +143,7 @@ export function AccountPage() {
                     { id: 'profile', label: 'My Profile', icon: User },
                     { id: 'orders', label: 'Order History', icon: Package },
                     { id: 'addresses', label: 'Addresses', icon: MapPin },
+                    { id: 'support', label: 'Support', icon: Headphones },
                     { id: 'security', label: 'Security', icon: Shield },
                 ].map((tab) => (
                     <button
@@ -327,6 +330,11 @@ export function AccountPage() {
                         </Card>
                     </div>
                 )}
+                {activeTab === 'support' && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                        <SupportTab />
+                    </div>
+                )}
             </div>
         </div>
     </div>
@@ -343,4 +351,81 @@ function cn(...classes: any[]) {
 
 function Separator({ className }: { className?: string }) {
     return <div className={cn("h-[1px] w-full bg-border", className)} />
+}
+
+function SupportTab() {
+  const { auth, navigate } = useAppStore();
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [orderId, setOrderId] = useState('');
+  const [priority, setPriority] = useState('medium');
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/support', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${auth.token}`,
+        },
+        body: JSON.stringify({ subject, message, orderId: orderId || undefined, priority }),
+      });
+      if (res.ok) {
+        toast.success('Support ticket created');
+        setSubject('');
+        setMessage('');
+        setOrderId('');
+        setPriority('medium');
+      } else {
+        const err = await res.json();
+        toast.error(err.error || 'Failed to create ticket');
+      }
+    } catch {
+      toast.error('Failed to create ticket');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-black">Support</h2>
+        <p className="text-muted-foreground">Need help? Create a support ticket.</p>
+      </div>
+      <Card className="border-none shadow-xl rounded-[2.5rem] p-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="subject">Subject</Label>
+            <Input id="subject" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Brief description of your issue" required />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="message">Message</Label>
+            <Textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Describe your issue..." rows={4} required />
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="orderId">Related Order ID (optional)</Label>
+              <Input id="orderId" value={orderId} onChange={(e) => setOrderId(e.target.value)} placeholder="Order ID" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="priority">Priority</Label>
+              <select id="priority" value={priority} onChange={(e) => setPriority(e.target.value)} className="w-full h-12 rounded-xl bg-muted/30 border-transparent px-4">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+          </div>
+          <Button size="lg" className="rounded-full px-10 h-12 font-bold shadow-lg" type="submit" disabled={submitting}>
+            {submitting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+            Submit Ticket
+          </Button>
+        </form>
+      </Card>
+    </div>
+  );
 }

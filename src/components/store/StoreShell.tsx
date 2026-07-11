@@ -6,7 +6,7 @@ import { useAppStore } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { StoreLayout } from "./StoreLayout";
 import { HomePage } from "./HomePage";
-import { CataloguePage } from "./CataloguePage";
+import { ShopPage } from "./ShopPage";
 import { CategoryPage } from "./CategoryPage";
 import { ProductPage } from "./ProductPage";
 import { ProductsOverviewPage } from "./ProductsOverviewPage";
@@ -26,6 +26,8 @@ import { RegisterPage } from "./RegisterPage";
 import { WishlistPage } from "./WishlistPage";
 import { FaqPage } from "./FaqPage";
 import { ComparisonPage } from "./ComparisonPage";
+import { SupportPage } from "./SupportPage";
+import { TrackingPage } from "./TrackingPage";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 interface StoreShellProps {
@@ -36,11 +38,11 @@ interface StoreShellProps {
 const routeFromPath = (path: string, navigate: (page: string, data?: unknown) => void) => {
   if (path === "/" || path === "") return;
   const segments = path.split("/").filter(Boolean);
-  if (segments[0] === "product" && segments[1]) {
+  if (segments[0] === "products" && segments[1]) {
     navigate("product-page", segments[1]);
-  } else if (segments[0] === "catalogue") {
+  } else if (segments[0] === "shop") {
     if (segments[1]) navigate("category", segments[1]);
-    else navigate("catalogue");
+    else navigate("shop");
   } else if (segments[0] === "about") {
     navigate("about");
   } else if (segments[0] === "manufacturing") {
@@ -65,10 +67,14 @@ const routeFromPath = (path: string, navigate: (page: string, data?: unknown) =>
     navigate("faq");
   } else if (segments[0] === "compare") {
     navigate("compare");
+  } else if (segments[0] === "support") {
+    navigate("support");
+  } else if (segments[0] === "tracking") {
+    navigate("tracking");
   } else if (segments[0] === "blog") {
     if (segments[1]) navigate("blog-post", segments[1]);
     else navigate("blog");
-  } else if (segments[0] === "products" || (segments[0] === "product" && !segments[1])) {
+  } else if (segments[0] === "products") {
     navigate("products");
   } else {
     navigate("content-page", segments.join("/"));
@@ -148,8 +154,8 @@ export function StoreShell({ initialPage, children }: StoreShellProps) {
     switch (page.type) {
       case "home":
         return <HomePage onNavigate={navigate} />;
-      case "catalogue":
-        return <CataloguePage onNavigate={navigate} />;
+      case "shop":
+        return <ShopPage onNavigate={navigate} />;
       case "category":
         return <CategoryPage slug={page.slug!} onNavigate={navigate} />;
       case "content-page":
@@ -188,6 +194,10 @@ export function StoreShell({ initialPage, children }: StoreShellProps) {
         return <FaqPage />;
       case "compare":
         return <ComparisonPage />;
+      case "support":
+        return <SupportPage />;
+      case "tracking":
+        return <TrackingPage />;
       default:
         return (
           <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -210,10 +220,10 @@ export function StoreShell({ initialPage, children }: StoreShellProps) {
                 Back to Home
               </button>
               <button
-                onClick={() => navigate("catalogue")}
+                onClick={() => navigate("shop")}
                 className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
               >
-                Browse Catalogue
+                Browse Shop
               </button>
             </div>
           </div>

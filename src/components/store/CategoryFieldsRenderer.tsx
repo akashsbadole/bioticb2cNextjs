@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
-  Send,
   ImageIcon,
   ChevronDown,
   X,
@@ -11,7 +10,6 @@ import {
   ZoomIn,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAppStore } from "@/lib/store";
 import { getFirstImage } from "@/lib/utils";
 
 export interface CategoryFieldData {
@@ -266,14 +264,9 @@ function CardsSection({
                 <Button
                   size="sm"
                   className="w-full mt-2 md:mt-3 text-xs sm:text-sm"
-                  onClick={() =>
-                    useAppStore
-                      .getState()
-                      .openEnquiryModal(product.name, product.id)
-                  }
+                  onClick={() => onNavigate && onNavigate("product-page", product.slug)}
                 >
-                  <Send className="mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                  Enquire
+                  View Product
                 </Button>
               </div>
             </div>
@@ -287,19 +280,11 @@ function CardsSection({
 function CtaSection({
   heading,
   description,
-  bulkText,
-  bulkLink,
-  privateLabelText,
-  privateLabelLink,
   backgroundColor,
   onNavigate,
 }: {
   heading: string;
   description: string;
-  bulkText: string;
-  bulkLink: string;
-  privateLabelText: string;
-  privateLabelLink: string;
   backgroundColor: string;
   onNavigate?: (page: string, data?: unknown) => void;
 }) {
@@ -325,45 +310,6 @@ function CtaSection({
             {description}
           </p>
         )}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-          {bulkText && (
-            <Button
-              size="default"
-              className="w-full sm:w-auto text-sm sm:text-base text-white"
-              onClick={() => {
-                const [page, slug] = (bulkLink || "/contact")
-                  .replace(/^\//, "")
-                  .split("/");
-                if (page === "contact") {
-                  useAppStore.getState().openEnquiryModal(heading);
-                } else {
-                  onNavigate?.("content-page", slug || page);
-                }
-              }}
-            >
-              {bulkText}
-            </Button>
-          )}
-          {privateLabelText && (
-            <Button
-              size="default"
-              className="w-full sm:w-auto text-sm sm:text-base text-white"
-              variant={isDark ? "secondary" : "outline"}
-              onClick={() => {
-                const [page, slug] = (privateLabelLink || "/contact")
-                  .replace(/^\//, "")
-                  .split("/");
-                if (page === "contact") {
-                  useAppStore.getState().openEnquiryModal(heading);
-                } else {
-                  onNavigate?.("content-page", slug || page);
-                }
-              }}
-            >
-              {privateLabelText}
-            </Button>
-          )}
-        </div>
       </div>
     </section>
   );
@@ -696,10 +642,6 @@ export function CategoryFieldsRenderer({
       <CtaSection
         heading={fields.ctaHeading || ""}
         description={fields.ctaDescription || ""}
-        bulkText={fields.ctaBulkText || ""}
-        bulkLink={fields.ctaBulkLink || ""}
-        privateLabelText={fields.ctaPrivateLabelText || ""}
-        privateLabelLink={fields.ctaPrivateLabelLink || ""}
         backgroundColor={fields.ctaBackgroundColor || "dark"}
         onNavigate={onNavigate}
       />

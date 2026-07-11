@@ -30,3 +30,34 @@ export async function sendSms(to: string, body: string): Promise<SmsResult> {
     return { success: false, error: "Failed to send SMS" };
   }
 }
+
+/**
+ * Send a WhatsApp message via Twilio WhatsApp API.
+ * Uses the same Twilio credentials; the sender number must be a WhatsApp-enabled
+ * Twilio number. The `from` is automatically prefixed with `whatsapp:`.
+ */
+export async function sendWhatsApp(to: string, body: string): Promise<SmsResult> {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const from = process.env.TWILIO_PHONE_NUMBER;
+
+  if (!accountSid || !authToken || !from) {
+    console.warn(
+      "[whatsapp] Twilio is not configured. Skipping WhatsApp send.",
+    );
+    return { success: false, error: "WhatsApp provider not configured" };
+  }
+
+  try {
+    const client = twilio(accountSid, authToken);
+    await client.messages.create({
+      to,
+      from: `whatsapp:${from}`,
+      body,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("[whatsapp] Failed to send WhatsApp:", error);
+    return { success: false, error: "Failed to send WhatsApp" };
+  }
+}

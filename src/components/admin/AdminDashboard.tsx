@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   Package,
   FolderOpen,
-  MessageSquare,
   Image as ImageIcon,
   FileText,
   Settings,
@@ -43,11 +42,9 @@ import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AdminProducts } from "@/components/admin/AdminProducts";
 import { AdminCategories } from "@/components/admin/AdminCategories";
 import { AdminBrands } from "@/components/admin/AdminBrands";
-import { AdminEnquiries } from "@/components/admin/AdminEnquiries";
 import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminCoupons } from "@/components/admin/AdminCoupons";
 import { AdminReviews } from "@/components/admin/AdminReviews";
-import { AdminBanners } from "@/components/admin/AdminBanners";
 import { AdminSettings } from "@/components/admin/AdminSettings";
 import { AdminMedia } from "@/components/admin/AdminMedia";
 import { AdminPages } from "@/components/admin/AdminPages";
@@ -57,9 +54,10 @@ import { AdminNewsletter } from "@/components/admin/AdminNewsletter";
 import { AdminAbandonedCarts } from "@/components/admin/AdminAbandonedCarts";
 import { AdminPopups } from "@/components/admin/AdminPopups";
 import { AdminBlog } from "@/components/admin/AdminBlog";
+import { AdminSupport } from "@/components/admin/AdminSupport";
 import { NotificationBell } from "@/components/admin/NotificationBell";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Ticket, Star } from "lucide-react";
+import { Ticket, Star, Headphones } from "lucide-react";
 
 interface AdminDashboardProps {
   user: { id: string; email: string; name: string; role: string } | null;
@@ -79,12 +77,11 @@ const sidebarItems = [
   { id: "abandoned-carts", label: "Abandoned Carts", icon: ShoppingCart },
   { id: "coupons", label: "Coupons", icon: Ticket },
   { id: "reviews", label: "Reviews", icon: Star },
-  { id: "enquiries", label: "Enquiries", icon: MessageSquare },
   { id: "media", label: "Media", icon: ImageIcon },
   { id: "pages", label: "Pages", icon: FileText },
-  { id: "banners", label: "Banners", icon: ImageIcon },
   { id: "popups", label: "Popups", icon: Megaphone },
   { id: "newsletter", label: "Newsletter", icon: Mail },
+  { id: "support", label: "Support", icon: Headphones },
   { id: "menus", label: "Menus", icon: Menu },
   { id: "settings", label: "Settings", icon: Settings },
 ];
@@ -241,6 +238,7 @@ export function AdminDashboard({
   const handleTabChange = (tab: string) => {
     setCurrentTab(tab);
     setMobileOpen(false);
+    onNavigate('admin', tab);
   };
 
   const handleQuickNav = (tab: string) => {
@@ -310,8 +308,6 @@ export function AdminDashboard({
         return <AdminCategories />;
       case "brands":
         return <AdminBrands />;
-      case "enquiries":
-        return <AdminEnquiries />;
       case "orders":
         return <AdminOrders />;
       case "abandoned-carts":
@@ -320,8 +316,6 @@ export function AdminDashboard({
         return <AdminCoupons />;
       case "reviews":
         return <AdminReviews />;
-      case "banners":
-        return <AdminBanners />;
       case "popups":
         return <AdminPopups />;
       case "media":
@@ -334,6 +328,8 @@ export function AdminDashboard({
         return <AdminMenus />;
       case "newsletter":
         return <AdminNewsletter />;
+      case "support":
+        return <AdminSupport />;
       case "settings":
         return <AdminSettings />;
       default:

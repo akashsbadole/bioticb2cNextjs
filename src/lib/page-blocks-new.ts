@@ -14,8 +14,6 @@ export type BlockType =
     | "product-carousel"
     | "product-categories"
 
-    // Contact & interaction
-    | "lead-capture"
     | "faq"
 
     // Page content blocks (fully customizable JSON)
@@ -43,7 +41,7 @@ export const BLOCK_DEFAULTS: Record<
             title: "Welcome",
             subtitle: "",
             buttonText: "Learn More",
-            buttonLink: "/catalogue",
+            buttonLink: "/shop",
             backgroundImage: "",
             height: "medium",
             alignment: "center",
@@ -142,21 +140,6 @@ export const BLOCK_DEFAULTS: Record<
         },
     },
 
-    // Contact & interaction
-    "lead-capture": {
-        label: "Contact Form",
-        icon: "FormInput",
-        defaultData: {
-            title: "Get in Touch",
-            description: "Send us your enquiry",
-            successMessage: "Thank you for your message!",
-            fields: [
-                { name: "name", label: "Name", type: "text", required: true },
-                { name: "email", label: "Email", type: "email", required: true },
-                { name: "message", label: "Message", type: "textarea", required: true },
-            ],
-        },
-    },
     faq: {
         label: "FAQ Section",
         icon: "HelpCircle",
@@ -243,11 +226,11 @@ export const BLOCK_DEFAULTS: Record<
         },
     },
     "catalogue-content": {
-        label: "Catalogue Template",
+        label: "Shop Template",
         icon: "Grid3X3",
         defaultData: {
             hero: {
-                title: "Product Catalogue",
+                title: "Shop",
                 subtitle: "Browse our complete range",
             },
             categories: [],

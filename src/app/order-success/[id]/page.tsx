@@ -38,12 +38,18 @@ export default function OrderSuccessPage() {
           Order ID:{" "}
           <span className="font-mono font-medium text-foreground">{orderId}</span>
         </p>
-        <div className="flex gap-3 justify-center">
+        <div className="flex gap-3 justify-center flex-wrap">
           <Link
-            href="/products"
+            href={`/invoice/${orderId}`}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
-            Continue Shopping
+            Download Invoice
+          </Link>
+          <Link
+            href={`/tracking?orderId=${orderId}`}
+            className="inline-flex items-center justify-center rounded-md border px-4 py-2 text-sm font-medium hover:bg-muted"
+          >
+            Track Order
           </Link>
           <Link
             href="/account/orders"

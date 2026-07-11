@@ -13,13 +13,13 @@ test.describe("Platform Production Readiness", () => {
     console.log("Navigating to Catalogue...");
     // Attempt navigation via button if it exists
     const browseBtn = page
-      .locator('button:has-text("Browse Catalogue")')
+      .locator('button:has-text("Browse Shop")')
       .first();
     if (await browseBtn.isVisible()) {
       await browseBtn.click();
-      await expect(page.getByText(/Product Catalogue/i)).toBeVisible();
+      await expect(page.getByText(/Shop/i)).toBeVisible();
     } else {
-      await page.goto("/catalogue");
+      await page.goto("/shop");
     }
   });
 

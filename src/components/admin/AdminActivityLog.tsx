@@ -143,7 +143,6 @@ export function AdminActivityLog() {
               <SelectItem value="Category">Category</SelectItem>
               <SelectItem value="Blog">Blog</SelectItem>
               <SelectItem value="User">User</SelectItem>
-              <SelectItem value="Enquiry">Enquiry</SelectItem>
               <SelectItem value="Page">Page</SelectItem>
               <SelectItem value="Banner">Banner</SelectItem>
               <SelectItem value="Media">Media</SelectItem>

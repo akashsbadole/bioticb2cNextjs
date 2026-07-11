@@ -45,9 +45,8 @@ function scheduleCartSync() {
 
 export type Page =
   | { type: "home" }
-  | { type: "catalogue" }
+  | { type: "shop" }
   | { type: "category"; slug: string }
-  | { type: "product"; productId: string }
   | { type: "products" }
   | { type: "contact" }
   | { type: "about" }
@@ -66,7 +65,9 @@ export type Page =
   | { type: "login" }
   | { type: "register" }
   | { type: "faq" }
-  | { type: "compare" };
+  | { type: "compare" }
+  | { type: "support" }
+  | { type: "tracking" };
 
 interface AdminUser {
   id: string;
@@ -122,11 +123,6 @@ interface AppState {
   setSettings: (settings: Record<string, string>) => void;
   fetchSettings: () => Promise<void>;
 
-  // Global Enquiry Modal
-  enquiryModal: { open: boolean; productName?: string; productId?: string };
-  openEnquiryModal: (productName?: string, productId?: string) => void;
-  closeEnquiryModal: () => void;
-
   // Comparison
   compareList: any[];
   addToCompare: (product: any) => void;
@@ -157,36 +153,20 @@ export const useAppStore = create<AppState>()(
             if (typeof window !== "undefined")
               window.history.pushState({}, "", "/");
             break;
-          case "catalogue":
-            set({ currentPage: { type: "catalogue" } });
+          case "shop":
+            set({ currentPage: { type: "shop" } });
             if (typeof window !== "undefined")
-              window.history.pushState({}, "", "/catalogue");
+              window.history.pushState({}, "", "/shop");
             break;
           case "category":
             set({ currentPage: { type: "category", slug: data as string } });
             if (typeof window !== "undefined")
-              window.history.pushState({}, "", `/product/${data as string}`);
+              window.history.pushState({}, "", `/shop/${data as string}`);
             break;
           case "products":
             set({ currentPage: { type: "products" } });
             if (typeof window !== "undefined")
-              window.history.pushState({}, "", "/product");
-            break;
-          case "product":
-            {
-              const productId = data as string;
-              fetch(`/api/products/${productId}`)
-                .then((r) => r.ok ? r.json() : null)
-                .then((product) => {
-                  const catSlug = product?.category?.slug || product?.Category?.slug;
-                  if (catSlug) {
-                    get().navigate("category", catSlug);
-                  } else {
-                    get().navigate("catalogue");
-                  }
-                })
-                .catch(() => get().navigate("catalogue"));
-            }
+              window.history.pushState({}, "", "/products");
             break;
           case "contact":
             set({ currentPage: { type: "contact" } });
@@ -216,7 +196,7 @@ export const useAppStore = create<AppState>()(
           case "product-page":
             set({ currentPage: { type: "product-page", slug: data as string } });
             if (typeof window !== "undefined")
-              window.history.pushState({}, "", `/product/${data as string}`);
+              window.history.pushState({}, "", `/products/${data as string}`);
             break;
           case "content-page": {
             const rawSlug = (data as string) || "";
@@ -234,8 +214,8 @@ export const useAppStore = create<AppState>()(
               "mfg-page-content": "manufacturing",
               "contact": "contact",
               "contact-us": "contact",
-              "catalogue": "catalogue",
-              "catalog": "catalogue",
+              "catalogue": "shop",
+              "catalog": "shop",
               "home": "home",
               "homepage": "home",
             };
@@ -311,6 +291,16 @@ export const useAppStore = create<AppState>()(
             set({ currentPage: { type: "compare" } });
             if (typeof window !== "undefined")
               window.history.pushState({}, "", "/compare");
+            break;
+          case "support":
+            set({ currentPage: { type: "support" } });
+            if (typeof window !== "undefined")
+              window.history.pushState({}, "", "/support");
+            break;
+          case "tracking":
+            set({ currentPage: { type: "tracking" } });
+            if (typeof window !== "undefined")
+              window.history.pushState({}, "", "/tracking");
             break;
         }
       },
@@ -421,10 +411,6 @@ export const useAppStore = create<AppState>()(
           console.error("Failed to fetch settings:", error);
         }
       },
-
-      enquiryModal: { open: false },
-      openEnquiryModal: (productName, productId) => set({ enquiryModal: { open: true, productName, productId } }),
-      closeEnquiryModal: () => set({ enquiryModal: { open: false } }),
 
       compareList: [],
       addToCompare: (product) => {

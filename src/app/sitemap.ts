@@ -8,14 +8,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!process.env.DATABASE_URL) {
     return [
         { url: baseUrl, lastModified: new Date() },
-        { url: `${baseUrl}/catalogue`, lastModified: new Date() }
+        { url: `${baseUrl}/shop`, lastModified: new Date() }
     ];
   }
 
   // 1. Static Pages
   const staticPages = [
     '',
-    '/catalogue',
+    '/shop',
     '/about',
     '/contact',
     '/faq',
@@ -32,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     select: { slug: true, updatedAt: true }
   });
   const productPages = products.map(p => ({
-    url: `${baseUrl}/product/${p.slug}`,
+    url: `${baseUrl}/products/${p.slug}`,
     lastModified: p.updatedAt,
     changeFrequency: 'daily' as const,
     priority: 0.8,
@@ -44,7 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     select: { slug: true, updatedAt: true }
   });
   const categoryPages = categories.map(c => ({
-    url: `${baseUrl}/catalogue/${c.slug}`, // Fixed: should be catalogue or category
+    url: `${baseUrl}/shop/${c.slug}`, // Fixed: should be shop or category
     lastModified: c.updatedAt,
     changeFrequency: 'weekly' as const,
     priority: 0.7,

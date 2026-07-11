@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { verifyPayUHash } from '@/lib/payments/payu';
 import { sendOrderConfirmation } from '@/lib/email';
+import { sendWhatsApp } from '@/lib/sms';
 import { createNotification } from '@/lib/notifications';
 
 export async function POST(request: NextRequest) {
@@ -68,6 +69,13 @@ export async function POST(request: NextRequest) {
         });
       } catch {
         // Don't fail the callback if email fails
+      }
+
+      if (order.customerPhone) {
+        sendWhatsApp(
+          order.customerPhone,
+          `Thank you for your order ${order.orderNumber || order.id.slice(0, 8)}! Your payment of ₹${order.totalAmount.toFixed(2)} has been received. We will notify you once it ships.`,
+        ).catch(() => {});
       }
 
       try {

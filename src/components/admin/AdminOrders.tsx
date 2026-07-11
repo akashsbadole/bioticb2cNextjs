@@ -52,6 +52,7 @@ interface Order {
   totalAmount: number;
   customerName: string;
   customerEmail: string;
+  gstin?: string | null;
   paymentStatus: string;
   returnStatus?: string;
   refundAmount?: number;
@@ -62,6 +63,7 @@ interface Order {
   items: Array<{
     id: string;
     name: string;
+    hsnCode?: string | null;
     quantity: number;
     price: number;
   }>;
@@ -295,8 +297,11 @@ export function AdminOrders() {
                             } catch {
                                 return selectedOrder.shippingAddress;
                             }
-                        })()}
+                         })()}
                     </p>
+                  )}
+                  {selectedOrder.gstin && (
+                    <p className="text-sm mt-1">GSTIN: {selectedOrder.gstin}</p>
                   )}
                 </div>
                 <div className="text-right">
@@ -319,22 +324,24 @@ export function AdminOrders() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Product</TableHead>
+                      <TableHead className="text-center">HSN</TableHead>
                       <TableHead className="text-center">Qty</TableHead>
                       <TableHead className="text-right">Price</TableHead>
                       <TableHead className="text-right">Total</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {selectedOrder.items.map((item) => (
+                      {selectedOrder.items.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell className="text-sm">{item.name}</TableCell>
+                        <TableCell className="text-center text-xs font-mono text-muted-foreground">{item.hsnCode || "—"}</TableCell>
                         <TableCell className="text-center text-sm">{item.quantity}</TableCell>
                         <TableCell className="text-right text-sm">{formatPrice(item.price, currency)}</TableCell>
                         <TableCell className="text-right text-sm font-medium">{formatPrice(item.price * item.quantity, currency)}</TableCell>
                       </TableRow>
                     ))}
                     <TableRow>
-                      <TableCell colSpan={3} className="text-right font-bold">Total</TableCell>
+                      <TableCell colSpan={4} className="text-right font-bold">Total</TableCell>
                       <TableCell className="text-right font-bold text-primary">
                         {formatPrice(selectedOrder.totalAmount, currency)}
                       </TableCell>

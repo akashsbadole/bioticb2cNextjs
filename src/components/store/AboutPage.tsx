@@ -16,11 +16,9 @@ import {
   Linkedin,
 } from "lucide-react";
 import { BLOCK_DEFAULTS, deepMerge, normalizePageBlocks } from "@/lib/page-blocks";
-import { useAppStore } from "@/lib/store";
 import { useSeo } from "@/lib/use-seo";
 import { StoreHeroBanner } from "@/components/store/StoreHeroBanner";
 import { useContentPage, getPageContentData } from "@/lib/use-page-content";
-import { ContactFormSection } from "@/components/store/ContactFormSection";
 import { getGoogleMapsEmbedUrl } from "@/lib/utils";
 
 interface AboutPageProps {
@@ -472,28 +470,18 @@ export function AboutPage({ onNavigate, data: externalData }: AboutPageProps) {
                 <p className="text-xs text-white/70 mb-5 leading-relaxed">
                   {item.desc}
                 </p>
-                {item.useForm || idx >= 1 ? (
                   <button
-                    onClick={() => useAppStore.getState().openEnquiryModal()}
+                    onClick={() => onNavigate(item.page || "contact")}
                     className="w-full text-xs font-medium bg-white text-primary rounded-md py-2.5 hover:bg-white/90 transition-colors"
                   >
-                    {item.cta || "Send Enquiry"}
+                    {item.cta || "Get in Touch"}
                   </button>
-                ) : (
-                  <button
-                    onClick={() => onNavigate(item.page)}
-                    className="w-full text-xs font-medium bg-white text-primary rounded-md py-2.5 hover:bg-white/90 transition-colors"
-                  >
-                    {item.cta}
-                  </button>
-                )}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <ContactFormSection title="Get in Touch" submitText="Send Enquiry →" />
     </div>
   );
 }

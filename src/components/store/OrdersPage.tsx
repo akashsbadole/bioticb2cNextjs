@@ -168,6 +168,12 @@ export function OrdersPage() {
                                 <p className="text-sm font-medium mt-1">{formatPrice(item.price, currency)}</p>
                             </div>
                             <div className="flex flex-col items-end gap-2">
+                                <Button variant="ghost" size="sm" className="text-xs h-8" onClick={() => window.open(`/invoice/${order.id}`)}>
+                                    Invoice
+                                </Button>
+                                <Button variant="ghost" size="sm" className="text-xs h-8" onClick={() => navigate("tracking")}>
+                                    Track
+                                </Button>
                                 {item.Product?.isDigital && order.paymentStatus === 'paid' && item.Product.downloadUrl && (
                                     <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-8" onClick={() => window.open(item.Product.downloadUrl)}>
                                         Download

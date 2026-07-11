@@ -29,7 +29,7 @@ test.describe('Full Feature Verification', () => {
         slug: `header-${Date.now()}`,
         location: 'primary',
         isActive: true,
-        items: [{ label: primaryLabel, url: '/catalogue', sortOrder: 0, isActive: true }]
+        items: [{ label: primaryLabel, url: '/shop', sortOrder: 0, isActive: true }]
       },
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
@@ -92,9 +92,9 @@ test.describe('Full Feature Verification', () => {
 
     await page.wait_for_timeout(2000);
 
-    // 4. Browse catalogue
-    await page.goto('/catalogue');
-    await expect(page.locator('body')).toContainText('Catalogue', { timeout: 15000 });
+    // 4. Browse shop
+    await page.goto('/shop');
+    await expect(page.locator('body')).toContainText('Shop', { timeout: 15000 });
   });
 
   test('CMS Page and Manual Seeding', async ({ page, request }) => {
@@ -151,8 +151,8 @@ test.describe('Full Feature Verification', () => {
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
 
-    // 3. Verify on catalogue
-    await page.goto('/catalogue');
+    // 3. Verify on shop
+    await page.goto('/shop');
     await expect(page.getByText(prodName).first()).toBeVisible({ timeout: 15000 });
 
     // 4. Cleanup

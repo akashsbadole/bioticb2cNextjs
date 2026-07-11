@@ -30,8 +30,6 @@ interface CategoryPageProps {
   ctaDescription: null,
   ctaBulkText: null,
   ctaBulkLink: null,
-  ctaPrivateLabelText: null,
-  ctaPrivateLabelLink: null,
   ctaBackgroundColor: null,
   processTitle: null,
   processSubtitle: null,
@@ -76,8 +74,6 @@ export function CategoryPage({ slug, onNavigate }: CategoryPageProps) {
                 ctaDescription: cat.ctaDescription || null,
                 ctaBulkText: cat.ctaBulkText || null,
                 ctaBulkLink: cat.ctaBulkLink || null,
-                ctaPrivateLabelText: cat.ctaPrivateLabelText || null,
-                ctaPrivateLabelLink: cat.ctaPrivateLabelLink || null,
                 ctaBackgroundColor: cat.ctaBackgroundColor || null,
                 processTitle: cat.processTitle || null,
                 processSubtitle: cat.processSubtitle || null,
@@ -115,8 +111,8 @@ export function CategoryPage({ slug, onNavigate }: CategoryPageProps) {
         <p className="text-sm text-muted-foreground mb-4">
           The category you're looking for doesn't exist.
         </p>
-        <Button onClick={() => onNavigate("catalogue")}>
-          Back to catalogue
+        <Button onClick={() => onNavigate("shop")}>
+          Back to shop
         </Button>
       </div>
     );

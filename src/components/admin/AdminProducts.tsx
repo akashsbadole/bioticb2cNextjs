@@ -107,6 +107,7 @@ interface Product {
   comparePrice: number | null;
   sku: string | null;
   barcode: string | null;
+  hsnCode: string | null;
   images: string;
   categoryId: string | null;
   isFeatured: boolean;
@@ -142,6 +143,7 @@ interface ProductFormData {
   comparePrice: string;
   sku: string;
   barcode: string;
+  hsnCode: string;
   images: string;
   categoryId: string;
   isFeatured: boolean;
@@ -173,6 +175,7 @@ const emptyForm: ProductFormData = {
   comparePrice: "",
   sku: "",
   barcode: "",
+  hsnCode: "",
   images: "",
   categoryId: "",
   isFeatured: false,
@@ -303,17 +306,15 @@ export function AdminProducts() {
     }
   });
 
-  const { data: settings = [] } = useQuery({
+  const { data: settings = {} } = useQuery({
     queryKey: ["admin-settings"],
     queryFn: async () => {
         const res = await adminFetch("/api/store/settings");
-        return (await res.json()).settings || [];
+        return (await res.json()).settings || {};
     }
   });
 
-  const currency = useMemo(() => {
-    return settings.find((s: any) => s.key === "currency")?.value || "INR";
-  }, [settings]);
+  const currency = (settings as Record<string, string>).currency || "INR";
 
   // Mutations
   const saveMutation = useMutation({
@@ -436,6 +437,7 @@ export function AdminProducts() {
       comparePrice: product.comparePrice ? String(product.comparePrice) : "",
       sku: product.sku || "",
       barcode: product.barcode || "",
+      hsnCode: product.hsnCode || "",
       images: imgs.join(", "),
       categoryId: product.categoryId || "",
       isFeatured: product.isFeatured,
@@ -496,6 +498,7 @@ export function AdminProducts() {
         comparePrice: form.comparePrice ? Number(form.comparePrice) : null,
         sku: form.sku.trim() || null,
         barcode: form.barcode.trim() || null,
+        hsnCode: form.hsnCode.trim() || null,
         images: imagesArray,
         categoryId: form.categoryId || null,
         isFeatured: form.isFeatured,
@@ -757,7 +760,7 @@ export function AdminProducts() {
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Products</h2>
           <p className="text-muted-foreground mt-1">
-            Manage your product catalogue
+            Manage your products
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -1326,6 +1329,18 @@ export function AdminProducts() {
                         setForm((prev) => ({ ...prev, barcode: e.target.value }))
                       }
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="prod-hsn">HSN/SAC Code</Label>
+                    <Input
+                      id="prod-hsn"
+                      placeholder="2106 90 99"
+                      value={form.hsnCode}
+                      onChange={(e) =>
+                        setForm((prev) => ({ ...prev, hsnCode: e.target.value }))
+                      }
+                    />
+                    <p className="text-xs text-muted-foreground">For GST invoice compliance</p>
                   </div>
                   <div className="space-y-2">
                     <Label>Category</Label>

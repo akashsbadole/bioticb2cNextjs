@@ -75,7 +75,7 @@ test('B2B Security and Pricing Verification', async ({ page }) => {
 
     // 5. Verify Pricing
     console.log("Checking price as Silver Buyer...");
-    await page.goto("http://localhost:3000/catalogue");
+    await page.goto("http://localhost:3000/shop");
     await page.waitForSelector('.grid > div');
     await page.locator('.grid > div').first().click();
     await expect(page.getByText("Exclusive silver tier price applied")).toBeVisible();

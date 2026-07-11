@@ -28,7 +28,6 @@ import {
   Factory,
   Video,
   Award,
-  FormInput,
   UserCircle,
   Building,
   ArrowDownToLine,
@@ -39,7 +38,6 @@ import {
   Play,
   Phone,
   MessageCircle,
-  Send,
   ArrowRight,
   Mail,
   Newspaper,
@@ -50,7 +48,6 @@ import {
   BarChart3,
   GitMerge,
   MapPin,
-  Workflow,
 } from "lucide-react";
 import { getFirstImage } from "@/lib/utils";
 import { formatPrice } from "@/lib/pricing";
@@ -81,7 +78,6 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Factory,
   Video,
   Award,
-  FormInput,
   UserCircle,
   Building,
   ArrowDownToLine,
@@ -92,7 +88,6 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Play,
   Phone,
   MessageCircle,
-  Send,
   ArrowRight,
   Mail,
   Newspaper,
@@ -200,7 +195,7 @@ function HeroBlock({
   const title = (data.title as string) || "Welcome";
   const subtitle = (data.subtitle as string) || "";
   const buttonText = (data.buttonText as string) || "";
-  const buttonLink = (data.buttonLink as string) || "/catalogue";
+  const buttonLink = (data.buttonLink as string) || "/shop";
   const height = (data.height as string) || "medium";
   const alignment = (data.alignment as string) || "center";
 
@@ -248,7 +243,7 @@ function HeroBlock({
                 onNavigate &&
                 buttonLink &&
                 onNavigate(
-                  buttonLink.startsWith("/") ? "content-page" : "catalogue",
+                  buttonLink.startsWith("/") ? "content-page" : "shop",
                   buttonLink.replace("/page/", ""),
                 )
               }
@@ -559,7 +554,7 @@ function ProductsBlock({
               <Card
                 key={product.id}
                 className="group flex flex-row overflow-hidden py-0 gap-0 transition-shadow hover:shadow-lg cursor-pointer h-32"
-                onClick={() => onNavigate && onNavigate("product", product.id)}
+                onClick={() => onNavigate && onNavigate("product-page", product.slug)}
               >
                 <div className="relative w-32 shrink-0 overflow-hidden bg-muted">
                   {image ? (
@@ -594,7 +589,7 @@ function ProductsBlock({
               <Card
                 key={product.id}
                 className="group overflow-hidden py-0 gap-0 transition-shadow hover:shadow-lg cursor-pointer"
-                onClick={() => onNavigate && onNavigate("product", product.id)}
+                onClick={() => onNavigate && onNavigate("product-page", product.slug)}
               >
                 <div className="relative aspect-square overflow-hidden bg-muted">
                   {image ? (
@@ -825,7 +820,7 @@ function AudienceCardsBlock({
                             ? "content-page"
                             : card.link === "/contact"
                               ? "contact"
-                              : "catalogue",
+                              : "shop",
                           card.link.replace("/page/", ""),
                         );
                       } else {
@@ -1003,11 +998,11 @@ function CapabilitiesBlock({
                           ? "content-page"
                           : ctaLink === "/contact"
                             ? "contact"
-                            : "catalogue",
+                            : "shop",
                         ctaLink.replace("/page/", ""),
                       );
                     } else if (onNavigate) {
-                      onNavigate("catalogue");
+                      onNavigate("shop");
                     }
                   }}
                 >
@@ -1177,16 +1172,16 @@ function ProductCategoriesBlock({
               className="hover:opacity-90"
               onClick={() => {
                 if (ctaLink && onNavigate) {
-                  onNavigate(
-                    ctaLink.startsWith("/page/")
-                      ? "content-page"
-                      : ctaLink === "/contact"
-                        ? "contact"
-                        : "catalogue",
-                    ctaLink.replace("/page/", ""),
-                  );
-                } else if (onNavigate) {
-                  onNavigate("catalogue");
+                    onNavigate(
+                      ctaLink.startsWith("/page/")
+                        ? "content-page"
+                        : ctaLink === "/contact"
+                          ? "contact"
+                          : "shop",
+                      ctaLink.replace("/page/", ""),
+                    );
+                  } else if (onNavigate) {
+                    onNavigate("shop");
                 }
               }}
             >
@@ -1367,155 +1362,6 @@ function CertificationsBlock({
   );
 }
 
-function LeadCaptureBlock({ data }: { data: Record<string, unknown> }) {
-  const heading = (data.heading as string) || "";
-  const description = (data.description as string) || "";
-  const submitText = (data.submitText as string) || "Submit";
-  const disclaimer = (data.disclaimer as string) || "";
-  const fields =
-    (data.fields as Array<{
-      name: string;
-      label: string;
-      type: string;
-      required: boolean;
-      placeholder: string;
-      options?: string[];
-    }>) || [];
-  const messageField = (data.messageField as boolean) ?? true;
-
-  return (
-    <section className="relative overflow-hidden bg-foreground text-background">
-      <div className="absolute inset-0 bg-green-900" />
-      <div className="relative z-10 container mx-auto px-4 py-16">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.5 }}
-          className="max-w-2xl mx-auto"
-        >
-          {heading && (
-            <h2 className="text-2xl md:text-3xl font-bold text-center text-white mb-2">
-              {heading}
-            </h2>
-          )}
-          {description && (
-            <p className="text-sm text-white text-center mb-8">{description}</p>
-          )}
-
-          <form
-            className="space-y-4"
-            onSubmit={async (e) => {
-              e.preventDefault();
-              const form = e.currentTarget;
-              const formData = new FormData(form);
-              const apiEndpoint =
-                (data.apiEndpoint as string) || "/api/enquiries";
-              const successMessage =
-                (data.successMessage as string) ||
-                "Enquiry submitted! We'll call you back within 24 hours.";
-
-              try {
-                const res = await fetch(apiEndpoint, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(Object.fromEntries(formData)),
-                });
-                if (res.ok) {
-                  toast.success(successMessage, {
-                    icon: <Send className="h-4 w-4" />,
-                  });
-                  form.reset();
-                } else {
-                  const err = await res.json();
-                  toast.error(
-                    err.error || "Failed to submit. Please try again.",
-                  );
-                }
-              } catch {
-                toast.error("Network error. Please try again.");
-              }
-            }}
-          >
-            {fields.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {fields.map((field) => (
-                  <div
-                    key={field.name}
-                    className={`space-y-1 ${field.type === "textarea" ? "sm:col-span-2 md:col-span-3" : ""}`}
-                  >
-                    {field.label && (
-                      <label className="text-xs font-medium text-background/80 ml-1">
-                        {field.label}
-                        {field.required && (
-                          <span className="text-rose-400 ml-1">*</span>
-                        )}
-                      </label>
-                    )}
-                    {field.type === "select" ? (
-                      <Select name={field.name} required={field.required}>
-                        <SelectTrigger className="bg-background/10 border-background/20 text-background">
-                          <SelectValue placeholder={field.placeholder} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {(field.options || []).map((opt) => (
-                            <SelectItem key={opt} value={opt.toLowerCase()}>
-                              {opt}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : field.type === "textarea" ? (
-                      <Textarea
-                        name={field.name}
-                        placeholder={field.placeholder}
-                        required={field.required}
-                        className="bg-background/10 border-background/20 text-background placeholder:text-background/50"
-                        rows={4}
-                      />
-                    ) : (
-                      <Input
-                        name={field.name}
-                        type={field.type}
-                        placeholder={field.placeholder}
-                        required={field.required}
-                        className="bg-background/10 border-background/20 text-background placeholder:text-background/50"
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-            {messageField && (
-              <Textarea
-                name="message"
-                placeholder="Brief requirement or message (optional)"
-                rows={3}
-                className="bg-background/10 border-background/20 text-background placeholder:text-background/50"
-              />
-            )}
-            <div className="text-center">
-              <Button
-                type="submit"
-                size="lg"
-                className="bg-primary text-white hover:bg-background/40"
-              >
-                {submitText}
-                <Send className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-            {disclaimer && (
-              <p className="text-xs text-background/50 text-center mt-3">
-                {disclaimer}
-              </p>
-            )}
-          </form>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
 function LeadershipBlock({
   data,
   onNavigate,
@@ -1597,7 +1443,7 @@ function LeadershipBlock({
                         ? "content-page"
                         : ctaLink === "/contact"
                           ? "contact"
-                          : "catalogue",
+                          : "shop",
                       ctaLink.replace("/page/", ""),
                     );
                   } else if (onNavigate) {
@@ -1783,9 +1629,7 @@ function StickyCtaBlock({
                     : "text-muted-foreground"
               }
               onClick={() => {
-                if (btn.action === "enquiry") {
-                  onNavigate?.("contact");
-                } else if (btn.action === "whatsapp") {
+                if (btn.action === "whatsapp") {
                   window.open(btn.link || "https://wa.me/", "_blank");
                 } else if (btn.action === "phone") {
                   window.location.href = btn.link || "tel:";
@@ -1797,8 +1641,8 @@ function StickyCtaBlock({
                     );
                   } else if (btn.link === "/" || btn.link === "/home") {
                     onNavigate?.("home");
-                  } else if (btn.link === "/catalogue") {
-                    onNavigate?.("catalogue");
+                  } else if (btn.link === "/shop") {
+                    onNavigate?.("shop");
                   } else if (btn.link === "/contact") {
                     onNavigate?.("contact");
                   } else if (
@@ -1812,10 +1656,10 @@ function StickyCtaBlock({
                     onNavigate?.("blog");
                   } else if (btn.link?.startsWith("/blog/")) {
                     onNavigate?.("blog-post", btn.link.replace("/blog/", ""));
-                  } else if (btn.link?.startsWith("/product/")) {
+                  } else if (btn.link?.startsWith("/products/")) {
                     onNavigate?.(
                       "product-page",
-                      btn.link.replace("/product/", ""),
+                      btn.link.replace("/products/", ""),
                     );
                   } else if (btn.link?.startsWith("/")) {
                     onNavigate?.("content-page", btn.link.replace(/^\//, ""));
@@ -1861,7 +1705,6 @@ const BLOCK_ICONS: Record<
   "product-categories": LayoutGrid,
   "factory-reel": Video,
   certifications: Award,
-  "lead-capture": FormInput,
   leadership: UserCircle,
   "partner-logos": Building,
   "sticky-cta": ArrowDownToLine,
@@ -1874,8 +1717,6 @@ const BLOCK_ICONS: Record<
   "packaging-grid": Package,
   "certification-cards": Award,
   "address-cards": MapPin,
-  "quick-connect": Phone,
-  "crm-flow": Workflow,
   "product-hero": Type,
   "product-content-split": Columns,
   "product-cards": LayoutGrid,
@@ -2224,8 +2065,8 @@ function HeroSplitBlock({
                     const page =
                       btn.link === "/contact"
                         ? "contact"
-                        : btn.link === "/catalogue"
-                          ? "catalogue"
+                        : btn.link === "/shop"
+                          ? "shop"
                           : "content-page";
                     onNavigate?.(
                       page,
@@ -2572,7 +2413,7 @@ function QuickConnectBlock({
               </p>
               <button
                 onClick={() => {
-                  if (ch.type === "catalogue") onNavigate?.("catalogue");
+                  if (ch.type === "shop") onNavigate?.("shop");
                   else if (
                     ch.type === "whatsapp" ||
                     ch.type === "phone" ||
@@ -2588,7 +2429,7 @@ function QuickConnectBlock({
                     ? "Tap to call"
                     : ch.type === "email"
                       ? "Copy email"
-                      : "Get catalogue"}
+                      : "Browse shop"}
               </button>
             </div>
           ))}
@@ -2692,7 +2533,7 @@ function SliderBlock({
               <Button
                 style={{ backgroundColor: ctaButtonColor, color: ctaTextColor }}
                 className="hover:opacity-90"
-                onClick={() => onNavigate && onNavigate("catalogue")}
+                onClick={() => onNavigate && onNavigate("shop")}
               >
                 View Collection
               </Button>
@@ -2761,7 +2602,7 @@ function AboutBlock({
                       ? "content-page"
                       : buttonLink === "/contact"
                         ? "contact"
-                        : "catalogue",
+                        : "shop",
                     buttonLink.replace("/page/", ""),
                   );
                 } else if (onNavigate) {
@@ -2962,17 +2803,8 @@ function ProductCardsBlock({
                       {product.shortDescription}
                     </p>
                   )}
-                  <Button
-                    size="sm"
-                    className="w-full mt-3"
-                    onClick={() =>
-                      useAppStore
-                        .getState()
-                        .openEnquiryModal(product.name, product.id)
-                    }
-                  >
-                    <Send className="mr-2 h-3.5 w-3.5" />
-                    Enquire
+                  <Button size="sm" className="w-full mt-3" onClick={() => onNavigate && onNavigate("product-page", product.slug)}>
+                    View Product
                   </Button>
                 </div>
               </div>
@@ -3029,14 +2861,7 @@ function ProductCtaBlock({
           {showBulkCta && (
             <Button
               size="lg"
-              onClick={() => {
-                const [page, slug] = bulkCtaLink.replace(/^\//, "").split("/");
-                if (page === "contact") {
-                  useAppStore.getState().openEnquiryModal(heading);
-                } else {
-                  onNavigate?.("content-page", slug || page);
-                }
-              }}
+              onClick={() => onNavigate?.("contact")}
             >
               {bulkCtaText}
             </Button>
@@ -3045,16 +2870,7 @@ function ProductCtaBlock({
             <Button
               size="lg"
               variant={isDark ? "secondary" : "outline"}
-              onClick={() => {
-                const [page, slug] = privateLabelCtaLink
-                  .replace(/^\//, "")
-                  .split("/");
-                if (page === "contact") {
-                  useAppStore.getState().openEnquiryModal(heading);
-                } else {
-                  onNavigate?.("content-page", slug || page);
-                }
-              }}
+              onClick={() => onNavigate?.("contact")}
             >
               {privateLabelCtaText}
             </Button>
@@ -3218,8 +3034,6 @@ export function PageBlockRenderer({
         return <FactoryReelBlock data={data} onNavigate={onNavigate} />;
       case "certifications":
         return <CertificationsBlock data={data} onNavigate={onNavigate} />;
-      case "lead-capture":
-        return <LeadCaptureBlock data={data} />;
       case "leadership":
         return <LeadershipBlock data={data} onNavigate={onNavigate} />;
       case "partner-logos":

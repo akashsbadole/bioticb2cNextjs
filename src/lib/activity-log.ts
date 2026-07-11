@@ -5,7 +5,6 @@ type LogAction =
   | 'product.create' | 'product.update' | 'product.delete' | 'product.bulk'
   | 'category.create' | 'category.update' | 'category.delete' | 'category.bulk'
   | 'blog.create' | 'blog.update' | 'blog.delete' | 'blog.bulk'
-  | 'enquiry.update' | 'enquiry.delete'
   | 'page.create' | 'page.update' | 'page.delete'
   | 'banner.create' | 'banner.update' | 'banner.delete'
   | 'media.upload' | 'media.delete'

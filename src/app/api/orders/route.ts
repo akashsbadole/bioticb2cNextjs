@@ -25,6 +25,7 @@ const orderSchema = z.object({
     state: z.string().min(1),
     zipCode: z.string().min(1),
     notes: z.string().max(2000).optional(),
+    gstin: z.string().optional().nullable(),
   }),
   paymentMethod: z.enum(['payu', 'cod']),
   couponCode: z.string().optional(),
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
     const isAllDigital = dbProducts.every(p => p.isDigital);
 
     // Calculate totals on server
-    let calculatedSubtotal = 0;
+      let calculatedSubtotal = 0;
     const orderItemsData = items.map((item: any) => {
         const dbProduct = dbProducts.find(p => p.id === item.productId);
         if (!dbProduct) throw new Error(`Product ${item.productId} not found`);
@@ -85,6 +86,8 @@ export async function POST(request: NextRequest) {
             productId: item.productId,
             variantId: item.variantId,
             name: dbProduct.name,
+            sku: dbProduct.sku,
+            hsnCode: dbProduct.hsnCode,
             quantity: item.quantity,
             price: price,
             total: total
@@ -100,6 +103,7 @@ export async function POST(request: NextRequest) {
     const gstRate = parseFloat(getSetting('tax_rate_gst') || '0');
     const shippingFixed = parseFloat(getSetting('shipping_fixed_cost') || '0');
     const freeShippingThreshold = parseFloat(getSetting('shipping_free_threshold') || '0');
+    const codFee = parseFloat(getSetting('cod_fee') || '0');
 
     let discount = 0;
 
@@ -164,15 +168,22 @@ export async function POST(request: NextRequest) {
                 : shippingFixed;
     }
 
+    // COD convenience fee
+    if (paymentMethod === 'cod' && codFee > 0) {
+        shippingAmount = (shippingAmount || 0) + codFee;
+    }
+
     const calculatedTotal = (calculatedSubtotal - discount) + taxAmount + shippingAmount;
 
     // Create order in transaction
     const order = await db.$transaction(async (tx) => {
       // 1. Create the order
+      const orderCount = await tx.order.count();
       const newOrder = await tx.order.create({
         data: {
           storeId,
           userId: auth.success ? auth.payload.userId : null,
+          orderNumber: `ORD-${String(orderCount + 1).padStart(6, '0')}`,
           totalAmount: calculatedTotal,
           subtotal: calculatedSubtotal,
           tax: taxAmount,
@@ -191,6 +202,13 @@ export async function POST(request: NextRequest) {
             state: customer.state,
             zipCode: customer.zipCode,
           }),
+          billingAddress: customer.gstin ? JSON.stringify({
+            address: customer.address,
+            city: customer.city,
+            state: customer.state,
+            zipCode: customer.zipCode,
+          }) : null,
+          gstin: customer.gstin || null,
           notes: customer.notes,
         },
       });
@@ -331,7 +349,8 @@ export async function GET(request: NextRequest) {
                                 images: true,
                                 slug: true,
                                 isDigital: true,
-                                downloadUrl: true
+                                downloadUrl: true,
+                                hsnCode: true
                             }
                         }
                     }

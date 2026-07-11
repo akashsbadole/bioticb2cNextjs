@@ -116,7 +116,7 @@ export function ProductsPage({
       <div className="flex flex-col">
         <div className="p-8 text-center">
           <h1 className="text-4xl font-bold mb-4">
-            {(externalData.hero as any)?.title || "Our Product Catalog"}
+            {(externalData.hero as any)?.title || "Our Products"}
           </h1>
           <p className="text-xl text-muted-foreground mb-6">
             {(externalData.hero as any)?.subtitle ||
@@ -154,7 +154,7 @@ export function ProductsPage({
           </p>
           <div className="flex gap-4 justify-center">
             <button
-              onClick={() => onNavigate("catalogue")}
+              onClick={() => onNavigate("shop")}
               className="bg-primary text-primary-foreground text-sm font-medium rounded-full px-6 py-2.5 hover:bg-primary/90 transition-colors"
             >
               Shop now
@@ -370,10 +370,10 @@ export function ProductsPage({
           </p>
           <div className="flex gap-3">
             <button
-              onClick={() => onNavigate("catalogue")}
+              onClick={() => onNavigate("shop")}
               className="text-xs bg-primary text-primary-foreground rounded-full px-4 py-2 flex items-center gap-1.5 hover:bg-primary/90 transition-colors"
             >
-              <Download className="h-3 w-3" /> Download full catalogue
+              <Download className="h-3 w-3" /> Download full product list
             </button>
             <button
               onClick={() => onNavigate("manufacturing")}

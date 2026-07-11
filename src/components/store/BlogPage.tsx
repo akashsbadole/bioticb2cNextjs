@@ -152,46 +152,16 @@ export function BlogPage({ onNavigate }: BlogPageProps) {
             ))}
             {selectedTag && (
               <button
-                onClick={() => {
-                  const form = document.getElementById("blog-enquiry-form");
-                  if (form) {
-                    form.scrollIntoView({ behavior: "smooth" });
-                  } else {
-                    onNavigate("contact");
-                  }
-                }}
+                onClick={() => onNavigate("contact")}
                 className="inline-flex items-center gap-1.5 text-xs bg-primary text-primary-foreground rounded-full px-3 py-1.5 hover:bg-primary/90 transition-colors"
               >
                 <Send className="h-3 w-3" />
-                Enquire about {selectedTag}
+                Get in touch
               </button>
             )}
           </div>
         </div>
       )}
-
-      {/* Enquire from tag filter */}
-      <section className="bg-muted/40 py-8 px-4 border-t">
-        <div className="max-w-6xl mx-auto">
-          {selectedTag && (
-            <div className="bg-background border rounded-xl p-6 shadow-sm">
-              <h3 className="text-lg font-bold mb-1">
-                Enquire about {selectedTag}
-              </h3>
-              <p className="text-xs text-muted-foreground mb-5">
-                Fill in your details and we'll respond within 24 hours
-              </p>
-              <button
-                onClick={() => useAppStore.getState().openEnquiryModal()}
-                className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-medium px-6 py-2.5 rounded-md text-sm hover:bg-primary/90 transition-colors"
-              >
-                <Send className="h-4 w-4" />
-                Send Enquiry
-              </button>
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* Blog Posts Grid */}
       {filteredPosts.length === 0 ? (

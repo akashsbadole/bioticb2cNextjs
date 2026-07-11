@@ -59,16 +59,8 @@ async function main() {
   });
   console.log(`   ✅ ${blogPosts.count} blog posts migrated\n`);
 
-  // 5. Migrate banners
-  console.log("5. Migrating banners...");
-  const banners = await prisma.banner.updateMany({
-    where: { storeId: null },
-    data: { storeId: defaultStore.id },
-  });
-  console.log(`   ✅ ${banners.count} banners migrated\n`);
-
-  // 6. Migrate content pages
-  console.log("6. Migrating content pages...");
+  // 5. Migrate content pages
+  console.log("5. Migrating content pages...");
   const pages = await prisma.contentPage.updateMany({
     where: { storeId: null },
     data: { storeId: defaultStore.id },

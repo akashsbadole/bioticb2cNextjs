@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'type parameter required' }, { status: 400 });
     }
 
-    const validTypes = ['products', 'categories', 'blog', 'enquiries', 'users'];
+    const validTypes = ['products', 'categories', 'blog', 'users'];
     if (!validTypes.includes(type)) {
       return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
     }
@@ -65,19 +65,6 @@ export async function GET(request: NextRequest) {
           csvContent += toCsvRow([p.id, p.title, p.slug, p.User?.name || '', p.isPublished, tags, p.createdAt.toISOString()]);
         }
         filename = `blog-posts-${new Date().toISOString().slice(0, 10)}.csv`;
-        break;
-      }
-
-      case 'enquiries': {
-        const enquiries = await db.enquiry.findMany({
-          include: { Product: { select: { name: true } }, User: { select: { name: true } } },
-          orderBy: { createdAt: 'desc' },
-        });
-        csvContent = toCsvRow(['ID', 'Name', 'Email', 'Phone', 'Subject', 'Status', 'Product', 'Message', 'Created At']);
-        for (const e of enquiries) {
-          csvContent += toCsvRow([e.id, e.name, e.email, e.phone || '', e.subject, e.status, e.Product?.name || '', e.message.replace(/\n/g, ' '), e.createdAt.toISOString()]);
-        }
-        filename = `enquiries-${new Date().toISOString().slice(0, 10)}.csv`;
         break;
       }
 

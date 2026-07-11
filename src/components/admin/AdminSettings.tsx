@@ -86,6 +86,8 @@ const defaultSettings: Settings = {
   tax_rate_gst: "18",
   shipping_fixed_cost: "50",
   shipping_free_threshold: "500",
+  cod_enabled: "false",
+  cod_fee: "0",
   chat_widget_id: "",
 };
 
@@ -456,6 +458,22 @@ export function AdminSettings() {
             <Label htmlFor="free">Free Shipping Min Amount</Label>
             <Input id="free" type="number" value={settings.shipping_free_threshold} onChange={(e) => handleSettingChange("shipping_free_threshold", e.target.value)} />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="cod_enabled">Cash on Delivery</Label>
+            <div className="flex items-center gap-2 h-10">
+              <Switch
+                id="cod_enabled"
+                checked={settings.cod_enabled === "true"}
+                onCheckedChange={(checked) => handleSettingChange("cod_enabled", checked ? "true" : "false")}
+              />
+              <span className="text-sm text-muted-foreground">{settings.cod_enabled === "true" ? "Enabled" : "Disabled"}</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cod_fee">COD Convenience Fee (₹)</Label>
+            <Input id="cod_fee" type="number" min="0" step="1" value={settings.cod_fee} onChange={(e) => handleSettingChange("cod_fee", e.target.value)} />
+            <p className="text-xs text-muted-foreground">Additional fee charged on COD orders</p>
+          </div>
           <div className="space-y-2 sm:col-span-3">
             <Label htmlFor="chat">Tawk.to Chat Widget ID</Label>
             <Input id="chat" placeholder="6789..." value={settings.chat_widget_id} onChange={(e) => handleSettingChange("chat_widget_id", e.target.value)} />
@@ -714,7 +732,7 @@ export function AdminSettings() {
                   SMTP not configured
                 </p>
                 <p className="text-amber-700 dark:text-amber-300 mt-1">
-                   Email notifications (enquiry notifications, password resets)
+                   Email notifications (password resets)
                   will not be sent until SMTP is configured.
                 </p>
               </div>

@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Clock, Zap, ShoppingBag, Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/pricing";
-import { getFirstImage } from "@/lib/utils";
+import { Clock } from "lucide-react";
 import { PageBlockRenderer } from "./PageBlockRenderer";
 import { RecentlyViewed } from "./RecentlyViewed";
+import { BannerSlider } from "./BannerSlider";
+import { CategoryGrid } from "./CategoryGrid";
+import { ProductSlider } from "./ProductSlider";
+import { ReviewCarousel } from "./ReviewCarousel";
 import type { PageBlock } from "@/lib/page-blocks";
 import { normalizePageBlocks } from "@/lib/page-blocks";
 import { useSeo } from "@/lib/use-seo";
 import { StoreLoading } from "./StoreLoading";
-// import { ContactFormSection } from "./ContactFormSection";
 
 interface HomePageProps {
   onNavigate: (page: string, data?: unknown) => void;
@@ -25,15 +25,6 @@ export function HomePage({
   settings,
   data: externalData,
 }: HomePageProps) {
-  const { data: newArrivals = [] } = useQuery({
-    queryKey: ["new-arrivals"],
-    queryFn: async () => {
-        const res = await fetch("/api/products?limit=4&sort=newest");
-        const data = await res.json();
-        return data.products || [];
-    }
-  });
-
   const { data: homepageData, isLoading: cmsLoading } = useQuery({
     queryKey: ["homepage-cms"],
     enabled: !externalData,
@@ -57,6 +48,7 @@ export function HomePage({
 
   const blocks = homepageData?.blocks || null;
   const homeMeta = homepageData?.meta || null;
+  const currency = settings?.currency || "INR";
 
   const siteOrigin =
     typeof window !== "undefined" ? window.location.origin : "";
@@ -78,7 +70,7 @@ export function HomePage({
             "@type": "SearchAction",
             target: {
               "@type": "EntryPoint",
-              urlTemplate: `${siteOrigin}/catalogue?search={search_term_string}`,
+              urlTemplate: `${siteOrigin}/shop?search={search_term_string}`,
             },
             "query-input": "required name=search_term_string",
           },
@@ -101,79 +93,53 @@ export function HomePage({
     return <StoreLoading />;
   }
 
-  // Error state
-  if (!externalData && (!blocks || blocks.length === 0)) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <p className="text-muted-foreground">
-          Unable to load homepage content.
-        </p>
-        <p className="mt-2 text-sm text-muted-foreground/70">
-          Please ensure the homepage content page exists in the admin panel.
-        </p>
-      </div>
-    );
-  }
-
-  // If external data is provided, render it directly
   if (externalData) {
     return (
       <div className="flex flex-col">
-        <div className="p-8 text-center">
-          <h1 className="text-4xl font-bold mb-4">
-            {(externalData.hero as any)?.title || "Welcome to Our Company"}
-          </h1>
-          <p className="text-xl text-muted-foreground mb-6">
-            {(externalData.hero as any)?.subtitle ||
-              "Your trusted partner for quality products"}
-          </p>
-          <div className="space-y-8">
-            <pre className="text-left text-sm bg-muted p-4 rounded-lg overflow-auto max-h-96">
-              {JSON.stringify(externalData, null, 2)}
-            </pre>
-          </div>
-        </div>
+        <BannerSlider onNavigate={onNavigate} />
+        <CategoryGrid onNavigate={onNavigate} />
+        <ProductSlider
+          title="Featured Products"
+          queryParams="featured=true&limit=10"
+          currency={currency}
+          onNavigate={onNavigate}
+        />
+        <ProductSlider
+          title="New Arrivals"
+          icon={<Clock className="h-6 w-6 text-primary" />}
+          queryParams="sort=newest&limit=10"
+          currency={currency}
+          onNavigate={onNavigate}
+        />
+        <ReviewCarousel />
       </div>
     );
   }
 
-  // Render CMS blocks
   return (
     <div className="flex flex-col">
-      {newArrivals.length > 0 && (
-        <section className="py-12 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-2">
-                    <Clock className="h-6 w-6 text-primary" />
-                    <h2 className="text-2xl font-bold">New Arrivals</h2>
-                </div>
-                <Button variant="link" onClick={() => onNavigate("products")}>View All</Button>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {newArrivals.map((p) => (
-                    <div key={p.id} className="bg-background rounded-2xl p-4 shadow-sm hover:shadow-md transition-all cursor-pointer group" onClick={() => onNavigate("product-page", p.slug)}>
-                        <div className="aspect-square bg-muted rounded-xl overflow-hidden mb-4 relative">
-                            {p.comparePrice && (
-                                <div className="absolute top-2 left-2 bg-rose-500 text-white text-[10px] font-bold px-2 py-1 rounded-full z-10 flex items-center gap-1">
-                                    <Zap className="h-3 w-3 fill-current" /> SALE
-                                </div>
-                            )}
-                            <img src={getFirstImage(p.images) || ''} alt={p.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform" />
-                        </div>
-                        <h3 className="font-bold text-sm truncate">{p.name}</h3>
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="text-primary font-bold">{formatPrice(p.price, settings?.currency || "INR")}</span>
-                            {p.comparePrice && <span className="text-xs text-muted-foreground line-through">{formatPrice(p.comparePrice, settings?.currency || "INR")}</span>}
-                        </div>
-                    </div>
-                ))}
-            </div>
-          </div>
-        </section>
-      )}
+      <BannerSlider onNavigate={onNavigate} />
+
+      <CategoryGrid onNavigate={onNavigate} />
+
+      <ProductSlider
+        title="Featured Products"
+        queryParams="featured=true&limit=10"
+        currency={currency}
+        onNavigate={onNavigate}
+      />
+
+      <ProductSlider
+        title="New Arrivals"
+        icon={<Clock className="h-6 w-6 text-primary" />}
+        queryParams="sort=newest&limit=10"
+        currency={currency}
+        onNavigate={onNavigate}
+      />
 
       <PageBlockRenderer blocks={blocks ?? undefined} onNavigate={onNavigate} />
+
+      <ReviewCarousel />
 
       <section className="py-20 border-t">
         <div className="container mx-auto px-4">

@@ -23,7 +23,7 @@ import { QuickViewModal } from "./QuickViewModal";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { StoreLoading } from "./StoreLoading";
 
-export function CataloguePage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
+export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
   const { auth, settings, navigate, addToCart, addToCompare, wishlistIds, toggleWishlistId } = useAppStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
@@ -37,7 +37,6 @@ export function CataloguePage({ onNavigate: _onNavigate }: { onNavigate?: any })
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
   const [visibleCount, setVisibleCount] = useState(12);
 
-  const isB2C = true;
   const currency = settings?.currency || "INR";
 
   const { data: categories = [] } = useQuery({
@@ -199,7 +198,7 @@ export function CataloguePage({ onNavigate: _onNavigate }: { onNavigate?: any })
   return (
     <div className="bg-background min-h-screen">
       <div className="container mx-auto px-4 py-8">
-        <Breadcrumbs items={[{ label: "Catalogue" }]} />
+        <Breadcrumbs items={[{ label: "Shop" }]} />
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Desktop Sidebar */}
@@ -324,25 +323,14 @@ export function CataloguePage({ onNavigate: _onNavigate }: { onNavigate?: any })
                             </div>
                         </div>
 
-                        {isB2C ? (
-                            <Button
-                                size="sm"
-                                className="w-full rounded-xl gap-2 font-bold"
-                                disabled={product.stock <= 0}
-                                onClick={() => handleAddToCart(product)}
-                            >
-                                <ShoppingCart className="h-4 w-4" /> Add to Cart
-                            </Button>
-                        ) : (
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                className="w-full rounded-xl gap-2 font-bold"
-                                onClick={() => useAppStore.getState().openEnquiryModal(product.name, product.id)}
-                            >
-                                Send Enquiry
-                            </Button>
-                        )}
+                        <Button
+                            size="sm"
+                            className="w-full rounded-xl gap-2 font-bold"
+                            disabled={product.stock <= 0}
+                            onClick={() => handleAddToCart(product)}
+                        >
+                            <ShoppingCart className="h-4 w-4" /> Add to Cart
+                        </Button>
                       </div>
                     </div>
                   );

@@ -232,7 +232,7 @@ const categories = [
       "Available whole, ground, or blended",
       "Bulk (1 kg – 50 kg) and retail packs",
     ]),
-    cardsTitle: "Our Spice Catalogue",
+    cardsTitle: "Our Spice Collection",
     cardsMaxCount: 8,
     cardsColumns: 4,
     cardsProductIds: "[]",

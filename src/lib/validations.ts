@@ -15,6 +15,7 @@ export const productSchema = z.object({
   sku: z.string().optional().nullable(),
   categoryId: z.string().optional().nullable(),
   whatsappNumber: z.string().optional().nullable(),
+  hsnCode: z.string().optional().nullable(),
   isFeatured: z.boolean().default(false),
   isActive: z.boolean().default(true),
   sortOrder: z.number().int().default(0),
@@ -70,15 +71,6 @@ export const categorySchema = z.object({
   // FAQ fields
   faqTitle: z.string().optional().nullable(),
   faqItems: z.string().optional().nullable().default('[]'),
-});
-
-export const enquirySchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100),
-  email: z.string().email('Invalid email'),
-  phone: z.string().optional().nullable(),
-  subject: z.string().min(1, 'Subject is required').max(200),
-  message: z.string().min(1, 'Message is required').max(5000),
-  productId: z.string().optional().nullable(),
 });
 
 export const userCreateSchema = z.object({

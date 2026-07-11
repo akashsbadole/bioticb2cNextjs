@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Download, Package, FolderOpen, FileText, MessageSquare, Users, Loader2 } from 'lucide-react';
+import { Download, Package, FolderOpen, FileText, Users, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -19,7 +19,6 @@ const exportItems: ExportItem[] = [
   { type: 'products', label: 'Products', icon: Package, description: 'Export all active products' },
   { type: 'categories', label: 'Categories', icon: FolderOpen, description: 'Export all categories' },
   { type: 'blog', label: 'Blog Posts', icon: FileText, description: 'Export all blog posts' },
-  { type: 'enquiries', label: 'Enquiries', icon: MessageSquare, description: 'Export all enquiries' },
   { type: 'users', label: 'Users', icon: Users, description: 'Export all users' },
 ];
 
@@ -31,15 +30,13 @@ export function AdminDataExport() {
           adminFetch('/api/products?all=true').then(r => r.ok ? r.json().then(d => d.products?.length || 0) : 0),
           adminFetch('/api/categories?all=true').then(r => r.ok ? r.json().then(d => d.categories?.length || 0) : 0),
           adminFetch('/api/blog?all=true&limit=1').then(r => r.ok ? r.json().then(d => d.pagination?.total || 0) : 0),
-          adminFetch('/api/enquiries?limit=1').then(r => r.ok ? r.json().then(d => d.pagination?.total || 0) : 0),
           adminFetch('/api/users?all=true').then(r => r.ok ? r.json().then(d => d.users?.length || 0) : 0),
         ]);
         return {
           products: results[0],
           categories: results[1],
           blog: results[2],
-          enquiries: results[3],
-          users: results[4],
+          users: results[3],
         };
     }
   });

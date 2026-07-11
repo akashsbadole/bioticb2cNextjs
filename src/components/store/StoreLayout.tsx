@@ -15,7 +15,6 @@ import { BackToTop } from "./BackToTop";
 import { CookieConsent } from "./CookieConsent";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { CompareBar } from "./CompareBar";
-import { GlobalEnquiryModal } from "./GlobalEnquiryModal";
 import { StickyCtaBar } from "./StickyCtaBar";
 import { Popup } from "./Popup";
 import { CustomScripts } from "./CustomScripts";
@@ -153,8 +152,6 @@ export function StoreLayout({
       </div>
 
       <CookieConsent />
-
-      <GlobalEnquiryModal />
 
       <Popup />
 

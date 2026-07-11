@@ -22,7 +22,7 @@ export async function GET(
         bio: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { Enquiry: true, BlogPost: true } },
+        _count: { select: { BlogPost: true } },
       },
     });
 

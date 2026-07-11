@@ -192,8 +192,10 @@ export default auth(async (req) => {
   // 3. Authentication (NextAuth session, populated by the auth() wrapper)
   const session = req.auth;
 
-  // 4. Role-based access for admin routes
-  if (isAdminRoute(req)) {
+  // 4. Role-based access for admin routes.
+  //    The /admin path itself is the login page — let it through so the server
+  //    component can decide (show login vs redirect to dashboard).
+  if (isAdminRoute(req) && pathname !== "/admin") {
     const role = (session?.user as { role?: string } | undefined)?.role;
     const isAdmin = !!session && (role === "admin" || role === "editor");
     if (!isAdmin) {

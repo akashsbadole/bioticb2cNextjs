@@ -44,7 +44,6 @@ export function QuickViewModal({
   onNavigate,
 }: QuickViewModalProps) {
   const { settings, addToCart } = useAppStore();
-  const isB2C = true;
   const image = getFirstImage(product.images);
   const hasDiscount = product.comparePrice && product.comparePrice > product.price;
   const discountPercent = hasDiscount
@@ -140,25 +139,12 @@ export function QuickViewModal({
           </div>
 
           <DialogFooter className="flex-col gap-2 sm:flex-col pt-4">
-            {isB2C ? (
-                <Button
-                    className="w-full bg-primary hover:bg-primary/80 text-white h-11 rounded-xl font-bold"
-                    onClick={handleAddToCart}
-                >
-                    <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
-                </Button>
-            ) : (
-                <Button
-                    variant="default"
-                    className="w-full h-11 rounded-xl font-bold"
-                    onClick={() => {
-                        onOpenChange(false);
-                        useAppStore.getState().openEnquiryModal(product.name, product.id);
-                    }}
-                >
-                    <Send className="mr-2 h-4 w-4" /> Enquire Now
-                </Button>
-            )}
+            <Button
+                className="w-full bg-primary hover:bg-primary/80 text-white h-11 rounded-xl font-bold"
+                onClick={handleAddToCart}
+            >
+                <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
+            </Button>
             <Button
               variant="outline"
               className="w-full h-11 rounded-xl font-bold"

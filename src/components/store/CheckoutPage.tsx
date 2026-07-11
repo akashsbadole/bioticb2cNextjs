@@ -33,6 +33,7 @@ export function CheckoutPage() {
     state: "",
     zipCode: "",
     notes: "",
+    gstin: "",
   });
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
@@ -66,7 +67,11 @@ export function CheckoutPage() {
   const shippingAmount = shippingMethods.find((m) => m.id === selectedShippingId)?.rate
     ?? shippingFixed;
 
-  const total = (subtotal - discount) + taxAmount + shippingAmount;
+  const codFee = parseFloat(settings?.cod_fee || "0");
+  const codEnabled = settings?.cod_enabled === "true";
+  const codTotalFee = paymentMethod === "cod" ? codFee : 0;
+
+  const total = (subtotal - discount) + taxAmount + shippingAmount + codTotalFee;
 
   // Fetch shipping methods on mount / cart change
   useEffect(() => {
@@ -109,16 +114,17 @@ export function CheckoutPage() {
         const def = data.addresses.find((a: any) => a.isDefault);
         if (def) {
           setSelectedAddressId(def.id);
-          setFormData((prev) => ({
-            ...prev,
-            name: def.name,
-            email: auth.user?.email || "",
-            phone: def.phone,
-            address: def.address,
-            city: def.city,
-            state: def.state,
-            zipCode: def.pincode,
-          }));
+      setFormData((prev) => ({
+        ...prev,
+        name: def.name,
+        email: auth.user?.email || "",
+        phone: def.phone,
+        address: def.address,
+        city: def.city,
+        state: def.state,
+        zipCode: def.pincode,
+        gstin: prev.gstin,
+      }));
         }
       }
     } catch {
@@ -143,6 +149,7 @@ export function CheckoutPage() {
       state: addr.state,
       zipCode: addr.pincode,
       notes: formData.notes,
+      gstin: formData.gstin,
     });
   };
 
@@ -320,6 +327,18 @@ export function CheckoutPage() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="gstin">GSTIN (for B2B invoice)</Label>
+              <Input
+                id="gstin"
+                name="gstin"
+                value={formData.gstin}
+                onChange={handleInputChange}
+                placeholder="27ABCDE1234F1Z5"
+              />
+              <p className="text-xs text-muted-foreground">Optional — required only for business invoices</p>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="address">Street Address</Label>
               <Input
                 id="address"
@@ -366,13 +385,13 @@ export function CheckoutPage() {
 
             <div className="space-y-2">
               <Label htmlFor="paymentMethod">Payment Method</Label>
-              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+              <Select value={paymentMethod} onValueChange={(val) => { setPaymentMethod(val); if (val === "payu" && codFee > 0 && settings?.cod_fee) { /* no-op */ } }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select payment method" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="payu">PayU Online</SelectItem>
-                  <SelectItem value="cod">Cash on Delivery</SelectItem>
+                  {codEnabled && <SelectItem value="cod">Cash on Delivery{codFee > 0 ? ` (+₹${codFee})` : ""}</SelectItem>}
                 </SelectContent>
               </Select>
             </div>
@@ -516,6 +535,12 @@ export function CheckoutPage() {
                   )}
                 </span>
               </div>
+              {codTotalFee > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">COD Fee</span>
+                  <span>{formatPrice(codTotalFee, currency)}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Tax</span>
                 <span>{formatPrice(taxAmount, currency)}</span>

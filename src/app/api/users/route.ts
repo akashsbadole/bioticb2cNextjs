@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
           isVerified: true,
           createdAt: true,
           updatedAt: true,
-          _count: { select: { Enquiry: true, BlogPost: true } },
+          _count: { select: { BlogPost: true } },
         },
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,

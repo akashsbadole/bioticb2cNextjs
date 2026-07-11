@@ -42,7 +42,7 @@ export function ProductsOverviewPage({ onNavigate }: ProductsOverviewPageProps) 
                     Explore our diverse collection of premium products across various categories.
                 </p>
             </div>
-            <Button size="lg" className="rounded-full font-bold h-12 px-8" onClick={() => onNavigate("catalogue")}>
+            <Button size="lg" className="rounded-full font-bold h-12 px-8" onClick={() => onNavigate("shop")}>
                 Browse All Products
             </Button>
         </div>

@@ -45,7 +45,6 @@ import {
   User,
   Factory,
   Phone,
-  FormInput,
   Monitor,
   Tablet,
   Smartphone,
@@ -116,7 +115,6 @@ const BLOCK_ICONS: Record<
   spacer: MoveVertical,
   divider: Minus,
   products: Package,
-  "lead-capture": FormInput,
   faq: HelpCircle,
 
   // Page content blocks (fully customizable)
@@ -1850,269 +1848,6 @@ function BlockEditDialog({
                   </>
                 )}
 
-                {block.type === "lead-capture" && (
-                  <>
-                    <div className="space-y-2">
-                      <Label>Section Label (small text above heading)</Label>
-                      <Input
-                        value={(localData.label as string) || ""}
-                        onChange={(e) => updateField("label", e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Heading</Label>
-                      <Input
-                        value={(localData.heading as string) || ""}
-                        onChange={(e) => updateField("heading", e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Description</Label>
-                      <Input
-                        value={(localData.description as string) || ""}
-                        onChange={(e) =>
-                          updateField("description", e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Success Message</Label>
-                      <Input
-                        value={(localData.successMessage as string) || ""}
-                        onChange={(e) =>
-                          updateField("successMessage", e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>API Endpoint</Label>
-                      <Input
-                        value={(localData.apiEndpoint as string) || ""}
-                        onChange={(e) =>
-                          updateField("apiEndpoint", e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Submit Button Text</Label>
-                      <Input
-                        value={(localData.submitText as string) || ""}
-                        onChange={(e) =>
-                          updateField("submitText", e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Disclaimer</Label>
-                      <Input
-                        value={(localData.disclaimer as string) || ""}
-                        onChange={(e) =>
-                          updateField("disclaimer", e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id="lead-message-field"
-                        checked={!!localData.messageField}
-                        onCheckedChange={(val) =>
-                          updateField("messageField", !!val)
-                        }
-                      />
-                      <Label htmlFor="lead-message-field">
-                        Show Message Field
-                      </Label>
-                    </div>
-                    <Separator />
-                    <Label className="text-base font-semibold">
-                      Form Fields
-                    </Label>
-                    {(
-                      (localData.fields as Array<{
-                        name: string;
-                        label: string;
-                        type: string;
-                        required: boolean;
-                        placeholder: string;
-                        options?: string[];
-                      }>) || []
-                    ).map((field, i) => (
-                      <Card key={i} className="p-4 space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium">
-                            Field {i + 1}: {field.name}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-rose-600"
-                            onClick={() => {
-                              const fields = [
-                                ...((localData.fields as Array<unknown>) || []),
-                              ];
-                              fields.splice(i, 1);
-                              updateField("fields", fields);
-                            }}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          <div className="space-y-1">
-                            <Label className="text-[10px] uppercase">
-                              Name
-                            </Label>
-                            <Input
-                              placeholder="name"
-                              value={field.name}
-                              onChange={(e) => {
-                                const fields = [
-                                  ...((localData.fields as Array<
-                                    Record<string, unknown>
-                                  >) || []),
-                                ];
-                                fields[i] = {
-                                  ...fields[i],
-                                  name: e.target.value,
-                                };
-                                updateField("fields", fields);
-                              }}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-[10px] uppercase">
-                              Label
-                            </Label>
-                            <Input
-                              placeholder="Label"
-                              value={field.label}
-                              onChange={(e) => {
-                                const fields = [
-                                  ...((localData.fields as Array<
-                                    Record<string, unknown>
-                                  >) || []),
-                                ];
-                                fields[i] = {
-                                  ...fields[i],
-                                  label: e.target.value,
-                                };
-                                updateField("fields", fields);
-                              }}
-                            />
-                          </div>
-                        </div>
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          <div className="space-y-1">
-                            <Label className="text-[10px] uppercase">
-                              Type
-                            </Label>
-                            <select
-                              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors"
-                              value={field.type}
-                              onChange={(e) => {
-                                const fields = [
-                                  ...((localData.fields as Array<
-                                    Record<string, unknown>
-                                  >) || []),
-                                ];
-                                fields[i] = {
-                                  ...fields[i],
-                                  type: e.target.value,
-                                };
-                                updateField("fields", fields);
-                              }}
-                            >
-                              <option value="text">Text</option>
-                              <option value="email">Email</option>
-                              <option value="tel">Phone</option>
-                              <option value="select">Select</option>
-                              <option value="textarea">Textarea</option>
-                            </select>
-                          </div>
-                          <div className="flex items-center gap-2 pt-6">
-                            <Checkbox
-                              id={`field-req-${i}`}
-                              checked={field.required}
-                              onCheckedChange={(val) => {
-                                const fields = [
-                                  ...((localData.fields as Array<
-                                    Record<string, unknown>
-                                  >) || []),
-                                ];
-                                fields[i] = { ...fields[i], required: !!val };
-                                updateField("fields", fields);
-                              }}
-                            />
-                            <Label htmlFor={`field-req-${i}`}>Required</Label>
-                          </div>
-                        </div>
-                        <Input
-                          placeholder="Placeholder"
-                          value={field.placeholder}
-                          onChange={(e) => {
-                            const fields = [
-                              ...((localData.fields as Array<
-                                Record<string, unknown>
-                              >) || []),
-                            ];
-                            fields[i] = {
-                              ...fields[i],
-                              placeholder: e.target.value,
-                            };
-                            updateField("fields", fields);
-                          }}
-                        />
-                        {field.type === "select" && (
-                          <div className="space-y-1">
-                            <Label className="text-[10px] uppercase">
-                              Options (one per line)
-                            </Label>
-                            <Textarea
-                              placeholder="Option 1&#10;Option 2"
-                              value={(field.options || []).join("\n")}
-                              onChange={(e) => {
-                                const fields = [
-                                  ...((localData.fields as Array<
-                                    Record<string, unknown>
-                                  >) || []),
-                                ];
-                                fields[i] = {
-                                  ...fields[i],
-                                  options: e.target.value
-                                    .split("\n")
-                                    .filter(Boolean),
-                                };
-                                updateField("fields", fields);
-                              }}
-                            />
-                          </div>
-                        )}
-                      </Card>
-                    ))}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const fields = [
-                          ...((localData.fields as Array<
-                            Record<string, unknown>
-                          >) || []),
-                          {
-                            name: "new_field",
-                            label: "New Field",
-                            type: "text",
-                            required: false,
-                            placeholder: "",
-                          },
-                        ];
-                        updateField("fields", fields);
-                      }}
-                    >
-                      <Plus className="mr-2 h-4 w-4" /> Add Field
-                    </Button>
-                  </>
-                )}
-
                 {block.type === "leadership" && (
                   <>
                     <div className="space-y-2">
@@ -2719,7 +2454,6 @@ function BlockEditDialog({
                                 updateField("buttons", arr);
                               }}
                             >
-                              <option value="enquiry">Open Enquiry</option>
                               <option value="whatsapp">WhatsApp Link</option>
                               <option value="phone">Phone Call</option>
                               <option value="link">Custom Link</option>
@@ -2750,7 +2484,6 @@ function BlockEditDialog({
                           {
                             text: "Button",
                             type: "primary",
-                            action: "enquiry",
                           },
                         ];
                         updateField("buttons", arr);

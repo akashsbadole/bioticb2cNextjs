@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { getStoreId } from '@/lib/store-db';
 import { sendTrackingUpdate } from '@/lib/email';
+import { sendWhatsApp } from '@/lib/sms';
 
 export async function PUT(
   request: NextRequest,
@@ -29,14 +30,22 @@ export async function PUT(
       },
     });
 
-    // Send tracking update email when tracking is newly set
-    if (trackingNumber && order.customerEmail) {
-      sendTrackingUpdate({
-        id: order.id,
-        customerName: order.customerName || 'Customer',
-        customerEmail: order.customerEmail,
-        trackingNumber: trackingNumber,
-      }).catch(() => {});
+    // Send tracking update email + WhatsApp when tracking is newly set
+    if (trackingNumber) {
+      if (order.customerEmail) {
+        sendTrackingUpdate({
+          id: order.id,
+          customerName: order.customerName || 'Customer',
+          customerEmail: order.customerEmail,
+          trackingNumber: trackingNumber,
+        }).catch(() => {});
+      }
+      if (order.customerPhone) {
+        sendWhatsApp(
+          order.customerPhone,
+          `Your order ${order.orderNumber || order.id.slice(0, 8)} has been shipped! Tracking: ${trackingNumber}`,
+        ).catch(() => {});
+      }
     }
 
     return NextResponse.json({ order });

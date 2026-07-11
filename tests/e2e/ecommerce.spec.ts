@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test('Cart and Checkout Flow', async ({ page }) => {
-  // 1. Visit catalogue
-  await page.goto('/catalogue');
+  // 1. Visit shop
+  await page.goto('/shop');
 
   // 2. Add product to cart
   const addToCartBtn = page.getByRole('button', { name: /Add to Cart/i }).first();
@@ -32,7 +32,7 @@ test('Cart and Checkout Flow', async ({ page }) => {
 });
 
 test('Search and Filter Flow', async ({ page }) => {
-  await page.goto('/catalogue');
+  await page.goto('/shop');
 
   // Search
   const searchInput = page.getByPlaceholder(/Search products/i);
@@ -50,7 +50,7 @@ test('Wishlist and Review Flow', async ({ page }) => {
   // Note: These usually require login.
   // In a real test environment we would inject a session cookie.
   // For now we test visibility.
-  await page.goto('/catalogue');
+  await page.goto('/shop');
 
   // Check wishlist buttons exist on product cards
   const wishlistBtn = page.locator('button').filter({ has: page.locator('svg.lucide-heart') }).first();

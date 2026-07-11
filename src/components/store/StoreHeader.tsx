@@ -71,7 +71,6 @@ const mainNavLinks: NavItem[] = [];
 
 export function StoreHeader({ onNavigate }: StoreHeaderProps) {
   const { currentPage, settings, cart, wishlistIds } = useAppStore();
-  const isB2C = true;
   const cartItemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -129,7 +128,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
               p.isActive &&
               ![
                 "home",
-                "catalogue",
+                "shop",
                 "about-us",
                 "manufacturing",
                 "contact",
@@ -254,10 +253,10 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
     }, 300);
   };
 
-  const handleResultClick = (product: { name: string; id: string }) => {
+  const handleResultClick = (product: { slug: string }) => {
     saveSearchToHistory(searchQuery);
     setSearchOpen(false);
-    useAppStore.getState().openEnquiryModal(product.name, product.id);
+    onNavigate("product-page", product.slug);
   };
 
   // Map known content-page slugs to their dedicated page routes so menu items
@@ -272,8 +271,8 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
     contact: "contact",
     "contact-us": "contact",
     blog: "blog",
-    catalogue: "catalogue",
-    catalog: "catalogue",
+    catalogue: "shop",
+    catalog: "shop",
     products: "products",
     product: "products",
     home: "home",
@@ -291,22 +290,18 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
         if (item.url.startsWith("/")) {
           const segments = item.url.split("/").filter(Boolean);
           const p = segments.join("/");
-          if (segments[0] === "product" && segments[1])
+          if (segments[0] === "products" && segments[1])
+            onNavigate("product-page", segments[1]);
+          else if (segments[0] === "shop" && segments[1])
             onNavigate("category", segments[1]);
-          else if (segments[0] === "product") onNavigate("products");
-          else if (segments[0] === "catalogue" && segments[1])
-            onNavigate("category", segments[1]);
-          else if (segments[0] === "catalogue") onNavigate("catalogue");
+          else if (segments[0] === "shop") onNavigate("shop");
           else if (segments[0] === "blog" && segments[1])
             onNavigate("blog-post", segments[1]);
           else if (segments[0] === "blog") onNavigate("blog");
           else if (segments[0] === "about") onNavigate("about");
           else if (segments[0] === "manufacturing") onNavigate("manufacturing");
           else if (segments[0] === "contact") onNavigate("contact");
-          else if (
-            segments[0] === "products" ||
-            (segments[0] === "product" && !segments[1])
-          )
+          else if (segments[0] === "products")
             onNavigate("products");
           else onNavigate("content-page", p);
         } else {
@@ -323,7 +318,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
           onNavigate(dedicatedPage);
         } else if (item.page === "category" && !item.slug) {
           // Top-level "Product Category" item without a specific slug
-          onNavigate("catalogue");
+          onNavigate("shop");
         } else {
           onNavigate(item.page, item.slug ?? undefined);
         }
@@ -488,41 +483,37 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
               <User className="h-4.5 w-4.5" />
             </Button>
 
-            {/* Wishlist Button (B2C) */}
-            {isB2C && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 relative"
-                onClick={() => onNavigate("wishlist")}
-                aria-label="View wishlist"
-              >
-                <Heart className="h-4.5 w-4.5" />
-                {wishlistIds.length > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">
-                    {wishlistIds.length}
-                  </span>
-                )}
-              </Button>
-            )}
+            {/* Wishlist Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 relative"
+              onClick={() => onNavigate("wishlist")}
+              aria-label="View wishlist"
+            >
+              <Heart className="h-4.5 w-4.5" />
+              {wishlistIds.length > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">
+                  {wishlistIds.length}
+                </span>
+              )}
+            </Button>
 
-            {/* Cart Button (B2C) */}
-            {isB2C && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 relative"
-                onClick={() => onNavigate("cart")}
-                aria-label="View cart"
-              >
-                <ShoppingCart className="h-4.5 w-4.5" />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                    {cartItemCount}
-                  </span>
-                )}
-              </Button>
-            )}
+            {/* Cart Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 relative"
+              onClick={() => onNavigate("cart")}
+              aria-label="View cart"
+            >
+              <ShoppingCart className="h-4.5 w-4.5" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  {cartItemCount}
+                </span>
+              )}
+            </Button>
 
             {/* Mobile Menu Trigger */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -629,19 +620,17 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
 
                   <Separator className="my-2" />
 
-                  {/* Cart CTA (B2C) */}
-                  {isB2C && (
-                    <SheetClose asChild>
-                      <Button
-                        variant="outline"
-                        className="justify-start text-sm h-9 w-full"
-                        onClick={() => onNavigate("cart")}
-                      >
-                        <ShoppingCart className="mr-2 h-4 w-4" />
-                        View Cart ({cartItemCount})
-                      </Button>
-                    </SheetClose>
-                  )}
+                  {/* Cart CTA */}
+                  <SheetClose asChild>
+                    <Button
+                      variant="outline"
+                      className="justify-start text-sm h-9 w-full"
+                      onClick={() => onNavigate("cart")}
+                    >
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      View Cart ({cartItemCount})
+                    </Button>
+                  </SheetClose>
 
                   {/* Account */}
                   <SheetClose asChild>

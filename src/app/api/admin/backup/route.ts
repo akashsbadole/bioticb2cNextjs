@@ -18,9 +18,7 @@ export async function GET(request: NextRequest) {
       productVariants,
       blogPosts,
       contentPages,
-      banners,
       media,
-      enquiries,
       redirects,
       menus,
       menuItems,
@@ -38,9 +36,7 @@ export async function GET(request: NextRequest) {
       db.productVariant.findMany(),
       db.blogPost.findMany(),
       db.contentPage.findMany(),
-      db.banner.findMany(),
       db.media.findMany(),
-      db.enquiry.findMany(),
       db.redirect.findMany(),
       db.menu.findMany(),
       db.menuItem.findMany(),
@@ -63,9 +59,8 @@ export async function GET(request: NextRequest) {
         productVariants,
         blogPosts,
         contentPages,
-        banners,
         media,
-        enquiries,
+
         redirects,
         menus,
         menuItems,
@@ -216,16 +211,7 @@ export async function POST(request: NextRequest) {
         results.contentPages = data.contentPages.length;
       }
 
-      // 12. Banners
-      if (data.banners) {
-        for (const item of data.banners) {
-          const { id, ...rest } = item;
-          await tx.banner.upsert({ where: { id }, update: rest, create: { id, ...rest } });
-        }
-        results.banners = data.banners.length;
-      }
-
-      // 13. Media
+      // 12. Media
       if (data.media) {
         for (const item of data.media) {
           const { id, ...rest } = item;
@@ -234,16 +220,7 @@ export async function POST(request: NextRequest) {
         results.media = data.media.length;
       }
 
-      // 14. Enquiries
-      if (data.enquiries) {
-        for (const item of data.enquiries) {
-          const { id, ...rest } = item;
-          await tx.enquiry.upsert({ where: { id }, update: rest, create: { id, ...rest } });
-        }
-        results.enquiries = data.enquiries.length;
-      }
-
-      // 15. Redirects
+      // 14. Redirects
       if (data.redirects) {
         for (const item of data.redirects) {
           const { id, ...rest } = item;

@@ -9,7 +9,6 @@ export type BlockType =
   | "spacer"
   | "divider"
   | "products"
-  | "lead-capture"
   | "faq"
 
   // Page content blocks (fully customizable JSON for each page type)
@@ -41,8 +40,6 @@ export type BlockType =
   | "packaging-grid"
   | "certification-cards"
   | "address-cards"
-  | "quick-connect"
-  | "crm-flow"
   | "mfg-page-content"
   | "catalogue-page-content"
 
@@ -226,7 +223,7 @@ export const BLOCK_DEFAULTS: Record<
     icon: "Package",
     defaultData: {
       hero: {
-        title: "Our Product Catalog",
+        title: "Our Products",
         subtitle: "Discover our complete range of quality products",
       },
       categories: {
@@ -378,7 +375,7 @@ export const BLOCK_DEFAULTS: Record<
         { name: "Namkeen", variants: "8+ variants" },
       ],
       ctaText: "View all products & packaging",
-      ctaLink: "/catalogue",
+      ctaLink: "/shop",
       ctaButtonColor: "var(--primary)",
       ctaTextColor: "#FFFFFF",
       showButton: true,
@@ -408,72 +405,6 @@ export const BLOCK_DEFAULTS: Record<
       ctaText: "View all certifications",
       ctaLink: "/page/manufacturing",
       gallery: [{ image: "", caption: "" }],
-    },
-  },
-  "lead-capture": {
-    label: "Lead Capture Form",
-    icon: "FormInput",
-    defaultData: {
-      label: "Looking for a manufacturing partner?",
-      heading: "Let's talk manufacturing",
-      description: "Tell us your requirement — we'll get back within 24 hours",
-      successMessage: "Enquiry submitted! We'll call you back within 24 hours.",
-      apiEndpoint: "/api/enquiries",
-      submitText: "Submit enquiry — we'll call you back",
-      disclaimer:
-        "Data goes directly to CRM · sales team alerted instantly · no spam",
-      fields: [
-        {
-          name: "name",
-          label: "Your name",
-          type: "text",
-          required: true,
-          placeholder: "Your name *",
-        },
-        {
-          name: "company",
-          label: "Company name",
-          type: "text",
-          required: true,
-          placeholder: "Company name *",
-        },
-        {
-          name: "phone",
-          label: "Phone number",
-          type: "tel",
-          required: true,
-          placeholder: "Phone number *",
-        },
-        {
-          name: "email",
-          label: "Email address",
-          type: "email",
-          required: false,
-          placeholder: "Email address",
-        },
-        {
-          name: "requirement",
-          label: "Requirement type",
-          type: "select",
-          required: false,
-          placeholder: "Requirement type",
-          options: [
-            "Bulk order",
-            "Private label",
-            "Distribution",
-            "Investment",
-            "Other",
-          ],
-        },
-        {
-          name: "city",
-          label: "City / state",
-          type: "text",
-          required: false,
-          placeholder: "City / state",
-        },
-      ],
-      messageField: true,
     },
   },
   leadership: {
@@ -589,7 +520,7 @@ export const BLOCK_DEFAULTS: Record<
         {
           text: "Get bulk quote",
           type: "primary",
-          action: "enquiry",
+          action: "link",
           link: "/contact",
         },
         {
@@ -619,7 +550,7 @@ export const BLOCK_DEFAULTS: Record<
       alignment: "left",
       buttons: [
         { text: "Primary CTA", link: "/contact", variant: "primary" },
-        { text: "Secondary CTA", link: "/catalogue", variant: "outline" },
+        { text: "Secondary CTA", link: "/shop", variant: "outline" },
       ],
       badges: [],
       ctaButtonColor: "var(--primary)",
@@ -751,73 +682,6 @@ export const BLOCK_DEFAULTS: Record<
           type: "visit",
           title: "Planning a factory visit?",
           description: "We welcome visitors to tour our facility.",
-        },
-      ],
-    },
-  },
-  "quick-connect": {
-    label: "Quick Connect",
-    icon: "Phone",
-    defaultData: {
-      title: "Prefer a quicker channel?",
-      channels: [
-        {
-          type: "whatsapp",
-          title: "WhatsApp us",
-          description: "Quick questions, product photos",
-          value: "+91 XXXXX XXXXX",
-        },
-        {
-          type: "phone",
-          title: "Call us directly",
-          description: "For urgent requirements",
-          value: "+91 XXXXX XXXXX",
-        },
-        {
-          type: "email",
-          title: "Email us",
-          description: "For detailed enquiries",
-          value: "sales@purvabites.com",
-        },
-        {
-          type: "catalogue",
-          title: "Download catalogue",
-          description: "Review at your own pace",
-          value: "PDF · 24 pages · free",
-        },
-      ],
-    },
-  },
-  "crm-flow": {
-    label: "CRM Flow",
-    icon: "Workflow",
-    defaultData: {
-      title: "What happens after you get in touch",
-      steps: [
-        {
-          num: 1,
-          title: "Enquiry received",
-          description: "Logged in CRM automatically",
-        },
-        {
-          num: 2,
-          title: "Auto-acknowledgement",
-          description: "Email confirmation within minutes",
-        },
-        {
-          num: 3,
-          title: "Sales team review",
-          description: "Routed to the right person",
-        },
-        {
-          num: 4,
-          title: "First response",
-          description: "Call or WhatsApp within 4-24 hours",
-        },
-        {
-          num: 5,
-          title: "Proposal / sample",
-          description: "Pricing or sample dispatch",
         },
       ],
     },
@@ -974,7 +838,7 @@ export const BLOCK_DEFAULTS: Record<
           },
           {
             icon: "Target",
-            title: "Get our catalogue",
+            title: "Browse our products",
             desc: "80+ SKUs, capacity details and packaging formats — send enquiry",
             cta: "Send enquiry →",
             page: "contact",
@@ -1273,13 +1137,13 @@ export const BLOCK_DEFAULTS: Record<
     },
   },
   "catalogue-page-content": {
-    label: "Catalogue Page Content",
+    label: "Shop Page Content",
     icon: "Package",
     defaultData: {
-      pageTitle: "Product Catalogue",
+      pageTitle: "Shop",
       pageDescription:
-        "Browse our complete product catalogue with pricing, bulk orders, and wholesale options.",
-      heroBadge: "Catalogue",
+        "Browse our complete product range with pricing, bulk orders, and wholesale options.",
+      heroBadge: "Shop",
       categoryInfo: {
         khakhra: {
           tags: ["12+ variants", "Private label"],

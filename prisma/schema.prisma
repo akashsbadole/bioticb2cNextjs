@@ -31,13 +31,12 @@ model Store {
   Category      Category[]
   Brand         Brand[]
   BlogPost      BlogPost[]
-  Banner        Banner[]
   ContentPage   ContentPage[]
-  Enquiry       Enquiry[]
   Media         Media[]
   Redirect      Redirect[]
   Menu          Menu[]
   Order         Order[]
+  SupportTicket SupportTicket[]
   Cart          Cart[]
   Coupon        Coupon[]
   ShippingRate  ShippingRate[]
@@ -110,6 +109,7 @@ model Product {
   comparePrice      Float?
   sku               String?
   barcode           String?
+  hsnCode           String?
   images            String           @default("[]")
   tags              String?
   attributes        String?          @default("{}") // JSON for size, color etc
@@ -137,7 +137,6 @@ model Product {
   blocks            String           @default("[]")
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @default(now())
-  Enquiry           Enquiry[]
   Category          Category?        @relation(fields: [categoryId], references: [id])
   Brand             Brand?           @relation(fields: [brandId], references: [id])
   Store             Store?           @relation(fields: [storeId], references: [id])
@@ -231,6 +230,7 @@ model ProductVariant {
 
 model Order {
   id              String      @id @default(cuid())
+  orderNumber     String?     @unique
   storeId         String?
   userId          String?
   status          String      @default("pending") // pending, processing, shipped, delivered, cancelled
@@ -252,11 +252,13 @@ model Order {
   returnStatus    String?     // requested, approved, rejected, completed
   refundAmount    Float       @default(0)
   trackingNumber  String?
+  gstin           String?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   Store           Store?      @relation(fields: [storeId], references: [id])
   User            User?       @relation(fields: [userId], references: [id])
   items           OrderItem[]
+  SupportTickets  SupportTicket[]
 
   @@index([storeId])
   @@index([userId])
@@ -269,6 +271,7 @@ model OrderItem {
   variantId String?
   name      String
   sku       String?
+  hsnCode   String?
   quantity  Int
   price     Float
   total     Float
@@ -432,23 +435,6 @@ model ContentPage {
   @@index([storeId])
 }
 
-model Banner {
-  id        String   @id @default(cuid())
-  storeId   String?  // tenant isolation
-  title     String
-  subtitle  String?
-  image     String?
-  link      String?
-  linkText  String?
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  Store     Store?   @relation(fields: [storeId], references: [id])
-
-  @@index([storeId])
-}
-
 model Popup {
   id               String    @id @default(cuid())
   storeId          String?
@@ -508,28 +494,6 @@ model Media {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
   Store        Store?   @relation(fields: [storeId], references: [id])
-
-  @@index([storeId])
-}
-
-// ─── Enquiries ─────────────────────────────────────────────────
-
-model Enquiry {
-  id             String   @id @default(cuid())
-  storeId        String?  // tenant isolation
-  name           String
-  email          String
-  phone          String?
-  subject        String
-  message        String
-  productId      String?
-  status         String   @default("new")
-  userId         String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now())
-  Product        Product? @relation(fields: [productId], references: [id])
-  User           User?    @relation(fields: [userId], references: [id])
-  Store          Store?   @relation(fields: [storeId], references: [id])
 
   @@index([storeId])
 }
@@ -622,10 +586,10 @@ model User {
   updatedAt               DateTime             @default(now())
   ActivityLog             ActivityLog[]
   BlogPost                BlogPost[]
-  Enquiry                 Enquiry[]
   PasswordResetToken      PasswordResetToken[]
   EmailVerificationToken  EmailVerificationToken[]
   Order                   Order[]
+  SupportTicket           SupportTicket[]
   Cart                    Cart?
   Review                  Review[]
   Wishlist                Wishlist[]
@@ -646,6 +610,28 @@ model ActivityLog {
   User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model SupportTicket {
+  id          String    @id @default(cuid())
+  storeId     String?
+  orderId     String?
+  userId      String
+  subject     String
+  message     String
+  status      String    @default("open") // open, in_progress, resolved, closed
+  priority    String    @default("medium") // low, medium, high
+  adminReply  String?
+  repliedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  User        User      @relation(fields: [userId], references: [id])
+  Store       Store?    @relation(fields: [storeId], references: [id])
+  Order       Order?    @relation(fields: [orderId], references: [id])
+
+  @@index([userId])
+  @@index([storeId])
+  @@index([orderId])
 }
 
 model Notification {
