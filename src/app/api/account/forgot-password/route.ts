@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { sendEmail } from '@/lib/email';
 import { getGlobalSetting } from '@/lib/settings';
+import { verifyRecaptcha } from '@/lib/recaptcha';
 
 // Max 5 requests per 15 minutes per IP
 const RESET_RATE_LIMIT = { maxRequests: 5, windowMs: 15 * 60 * 1000, prefix: 'forgot-password-post' };
@@ -11,11 +12,19 @@ const RESET_RATE_LIMIT = { maxRequests: 5, windowMs: 15 * 60 * 1000, prefix: 'fo
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResponse = checkRateLimit(request, RESET_RATE_LIMIT);
+    const rateLimitResponse = await checkRateLimit(request, RESET_RATE_LIMIT);
     if (rateLimitResponse) return rateLimitResponse;
 
     const body = await request.json();
-    const { email } = body;
+    const { email, recaptchaToken } = body;
+
+    // Verify reCAPTCHA if a token was provided
+    if (recaptchaToken) {
+      const recaptchaResult = await verifyRecaptcha(recaptchaToken);
+      if (!recaptchaResult.success) {
+        return NextResponse.json({ error: 'reCAPTCHA verification failed' }, { status: 400 });
+      }
+    }
 
     if (!email || typeof email !== 'string') {
       return NextResponse.json(

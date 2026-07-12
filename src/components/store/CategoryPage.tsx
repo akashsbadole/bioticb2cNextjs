@@ -30,6 +30,8 @@ interface CategoryPageProps {
   ctaDescription: null,
   ctaBulkText: null,
   ctaBulkLink: null,
+  ctaPrivateLabelText: null,
+  ctaPrivateLabelLink: null,
   ctaBackgroundColor: null,
   processTitle: null,
   processSubtitle: null,

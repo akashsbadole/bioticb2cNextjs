@@ -67,7 +67,8 @@ export type Page =
   | { type: "faq" }
   | { type: "compare" }
   | { type: "support" }
-  | { type: "tracking" };
+  | { type: "tracking" }
+  | { type: "bundles" };
 
 interface AdminUser {
   id: string;

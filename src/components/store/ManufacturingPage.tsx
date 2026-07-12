@@ -14,7 +14,11 @@ import {
   Settings,
   ShieldCheck,
 } from "lucide-react";
-import { BLOCK_DEFAULTS, deepMerge, normalizePageBlocks } from "@/lib/page-blocks";
+import {
+  BLOCK_DEFAULTS,
+  deepMerge,
+  normalizePageBlocks,
+} from "@/lib/page-blocks";
 import { useSeo } from "@/lib/use-seo";
 import { StoreHeroBanner } from "@/components/store/StoreHeroBanner";
 import { useContentPage, getPageContentData } from "@/lib/use-page-content";
@@ -54,8 +58,9 @@ export function ManufacturingPage({
   data: externalData,
 }: ManufacturingPageProps) {
   useSeo("manufacturing", {
-    title: "State-of-the-art FMCG contract manufacturing | Purva Bites",
-    description: "From raw material to finished, packaged goods — at scale, with precision, under one roof in Gujarat. FSSAI certified, 100% own manufacturing.",
+    title: "State-of-the-art FMCG contract manufacturing | Biotic Naturals",
+    description:
+      "From raw material to finished, packaged goods — at scale, with precision, under one roof in Gujarat. FSSAI certified, 100% own manufacturing.",
   });
   const [activeLine, setActiveLine] = useState("khakhra");
   const [imgErrors, setImgErrors] = useState<Set<string>>(new Set());
@@ -64,19 +69,19 @@ export function ManufacturingPage({
     queryKey: ["manufacturing-cms"],
     enabled: !externalData,
     queryFn: async () => {
-        const res = await fetch("/api/content-pages?slug=manufacturing");
-        const json = await res.json();
-        const page = (json.contentPages || [])[0];
-        if (page?.blocks) {
-            const blocks = normalizePageBlocks(page.blocks);
-            return getPageContentData(
-                blocks,
-                "manufacturing-content",
-                BLOCK_DEFAULTS["mfg-page-content"].defaultData
-            );
-        }
-        return null;
-    }
+      const res = await fetch("/api/content-pages?slug=manufacturing");
+      const json = await res.json();
+      const page = (json.contentPages || [])[0];
+      if (page?.blocks) {
+        const blocks = normalizePageBlocks(page.blocks);
+        return getPageContentData(
+          blocks,
+          "manufacturing-content",
+          BLOCK_DEFAULTS["mfg-page-content"].defaultData,
+        );
+      }
+      return null;
+    },
   });
 
   const fallbackMfg = BLOCK_DEFAULTS["mfg-page-content"].defaultData;

@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await requireAdminAuth(request);
     if (!auth.success) return auth.response;
-    const rateLimitResponse = checkRateLimit(request, UPLOAD_RATE_LIMIT);
+    const rateLimitResponse = await checkRateLimit(request, UPLOAD_RATE_LIMIT);
     if (rateLimitResponse) return rateLimitResponse;
 
     const formData = await request.formData();

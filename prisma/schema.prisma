@@ -43,6 +43,7 @@ model Store {
   Review        Review[]
   Wishlist      Wishlist[]
   Popup         Popup[]
+  Banner        Banner[]
 
   @@index([ownerUserId])
   @@index([isActive])
@@ -145,6 +146,11 @@ model Product {
   CartItem          CartItem[]
   Review            Review[]
   Wishlist          Wishlist[]
+  FlashSaleProduct  FlashSaleProduct[]
+  StockNotification StockNotification[]
+  ProductAddon      ProductAddon[]
+  CustomerPrice     CustomerPrice[]
+  BundleItem        BundleItem[]
 
 
   @@index([deletedAt])
@@ -460,6 +466,23 @@ model Popup {
   @@index([storeId])
 }
 
+model Banner {
+  id        String   @id @default(cuid())
+  storeId   String?
+  title     String
+  subtitle  String?
+  image     String?
+  link      String?
+  linkText  String?
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Store     Store?   @relation(fields: [storeId], references: [id])
+
+  @@index([storeId])
+}
+
 model Brand {
   id          String    @id @default(cuid())
   storeId     String?
@@ -595,6 +618,7 @@ model User {
   Wishlist                Wishlist[]
   Store                   Store?               @relation("CurrentUserStore", fields: [currentStoreId], references: [id])
   OwnedStores             Store[]              @relation("StoreOwner")
+  CustomerPrice           CustomerPrice[]
 }
 
 model ActivityLog {
@@ -634,6 +658,19 @@ model SupportTicket {
   @@index([orderId])
 }
 
+model RateLimitEntry {
+  id         String   @id @default(cuid())
+  identifier String
+  endpoint   String
+  windowStart DateTime
+  count      Int      @default(1)
+  createdAt  DateTime @default(now())
+
+  @@unique([identifier, endpoint, windowStart])
+  @@index([identifier, endpoint])
+  @@index([windowStart])
+}
+
 model Notification {
   id        String   @id @default(cuid())
   title     String
@@ -646,5 +683,170 @@ model Notification {
 
   @@index([userId])
   @@index([isRead])
+}
+
+// ─── Flash Sales ────────────────────────────────────────────────
+
+model FlashSale {
+  id          String            @id @default(cuid())
+  storeId     String?
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  products    FlashSaleProduct[]
+
+  @@index([storeId])
+  @@index([startDate, endDate])
+}
+
+model FlashSaleProduct {
+  id            String     @id @default(cuid())
+  flashSaleId   String
+  productId     String
+  discountType  String     @default("percentage") // "percentage" | "fixed"
+  discountValue Float
+  FlashSale     FlashSale  @relation(fields: [flashSaleId], references: [id], onDelete: Cascade)
+  Product       Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([flashSaleId, productId])
+  @@index([productId])
+}
+
+// ─── Product Add-ons ───────────────────────────────────────────
+
+model ProductAddon {
+  id          String   @id @default(cuid())
+  productId   String
+  name        String
+  description String?
+  price       Float
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  Product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+// ─── Stock Notifications ────────────────────────────────────────
+
+model StockNotification {
+  id        String    @id @default(cuid())
+  email     String
+  productId String
+  notified  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  notifiedAt DateTime?
+  Product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([email, productId])
+  @@index([productId, notified])
+}
+
+// ─── Plugins ──────────────────────────────────────────────────────
+
+model Plugin {
+  id          String   @id @default(cuid())
+  storeId     String?
+  key         String   @unique
+  name        String
+  description String?
+  version     String   @default("1.0.0")
+  enabled     Boolean  @default(false)
+  config      String   @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([storeId])
+}
+
+// ─── Themes ───────────────────────────────────────────────────────
+
+model Theme {
+  id          String   @id @default(cuid())
+  storeId     String?
+  name        String
+  slug        String   @unique
+  description String?
+  isActive    Boolean  @default(false)
+  config      String   @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([storeId])
+}
+
+// ─── Customer-specific Pricing ─────────────────────────────────────
+
+model CustomerPrice {
+  id        String   @id @default(cuid())
+  storeId   String?
+  productId String
+  userId    String
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId])
+  @@index([userId])
+  @@index([productId])
+}
+
+// ─── Enquiries (Contact Form) ──────────────────────────────────────
+
+model Enquiry {
+  id           String   @id @default(cuid())
+  storeId      String?
+  name         String
+  email        String
+  phone        String?
+  subject      String
+  message      String
+  productId    String?
+  productName  String?
+  type         String   @default("contact")
+  status       String   @default("new")
+  adminNotes   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([storeId])
+  @@index([status])
+}
+
+// ─── Product Bundles ──────────────────────────────────────────────
+
+model Bundle {
+  id          String       @id @default(cuid())
+  storeId     String?
+  name        String
+  slug        String       @unique
+  description String?
+  price       Float
+  image       String?
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  items       BundleItem[]
+
+  @@index([storeId])
+}
+
+model BundleItem {
+  id        String   @id @default(cuid())
+  bundleId  String
+  productId String
+  quantity  Int      @default(1)
+  Bundle    Bundle   @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  Product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([bundleId, productId])
+  @@index([bundleId])
 }
 

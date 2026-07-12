@@ -9,9 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Loader2, Mail, Lock, User as UserIcon, ArrowRight, CheckCircle2 } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const RecaptchaWidget = dynamic(() => import('./RecaptchaWidget').then(m => m.RecaptchaWidget), { ssr: false });
 
 export function RegisterPage() {
-  const { navigate } = useAppStore();
+  const { navigate, settings } = useAppStore();
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -19,6 +22,8 @@ export function RegisterPage() {
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [recaptchaKey, setRecaptchaKey] = useState(0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,12 +31,16 @@ export function RegisterPage() {
       toast.error('Passwords do not match');
       return;
     }
+    if (settings?.recaptcha_site_key && !recaptchaToken) {
+      toast.error('Please complete the reCAPTCHA');
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch('/api/account/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, recaptchaToken }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -154,6 +163,14 @@ export function RegisterPage() {
               />
             </div>
           </div>
+
+          {settings?.recaptcha_site_key && (
+            <RecaptchaWidget
+              key={recaptchaKey}
+              siteKey={settings.recaptcha_site_key}
+              onVerify={setRecaptchaToken}
+            />
+          )}
 
           <Button type="submit" size="lg" className="w-full rounded-xl h-12 font-bold" disabled={loading}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Create Account <ArrowRight className="h-4 w-4 ml-1" /></>}

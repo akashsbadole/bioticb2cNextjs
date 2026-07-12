@@ -7,14 +7,12 @@ test.describe("Platform Production Readiness", () => {
     // 1. Landing Page
     console.log("Navigating to Homepage...");
     await page.goto("/");
-    await expect(page).toHaveTitle(/Purva Bites/i);
+    await expect(page).toHaveTitle(/Biotic Naturals/i);
 
     // 2. Catalogue Browsing
     console.log("Navigating to Catalogue...");
     // Attempt navigation via button if it exists
-    const browseBtn = page
-      .locator('button:has-text("Browse Shop")')
-      .first();
+    const browseBtn = page.locator('button:has-text("Browse Shop")').first();
     if (await browseBtn.isVisible()) {
       await browseBtn.click();
       await expect(page.getByText(/Shop/i)).toBeVisible();

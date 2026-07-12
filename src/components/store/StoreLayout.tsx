@@ -46,18 +46,18 @@ export function StoreLayout({
     queryKey: ["wishlist-ids"],
     enabled: !!auth.user,
     queryFn: async () => {
-        const res = await fetch("/api/wishlist");
-        const data = await res.json();
-        const ids = (data.items || []).map((i: any) => i.productId);
-        setWishlistIds(ids);
-        return ids;
-    }
+      const res = await fetch("/api/wishlist");
+      const data = await res.json();
+      const ids = (data.items || []).map((i: any) => i.productId);
+      setWishlistIds(ids);
+      return ids;
+    },
   });
 
   useEffect(() => {
     if (!settings) return;
 
-    const siteName = settings.site_name || "Purva Bites";
+    const siteName = settings.site_name || "Biotic Naturals";
     const siteDesc =
       settings.site_description || "Premium Products for Your Home & Business";
     const contactEmail = settings.contact_email || "";
@@ -107,16 +107,18 @@ export function StoreLayout({
 
   useEffect(() => {
     if (settings?.chat_widget_id) {
-        const script = document.createElement("script");
-        script.async = true;
-        script.src = `https://embed.tawk.to/${settings.chat_widget_id}/default`;
-        script.charset = "UTF-8";
-        script.setAttribute("crossorigin", "*");
-        document.body.appendChild(script);
-        return () => {
-            const currentScript = document.querySelector(`script[src="https://embed.tawk.to/${settings.chat_widget_id}/default"]`);
-            if (currentScript) document.body.removeChild(currentScript);
-        };
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = `https://embed.tawk.to/${settings.chat_widget_id}/default`;
+      script.charset = "UTF-8";
+      script.setAttribute("crossorigin", "*");
+      document.body.appendChild(script);
+      return () => {
+        const currentScript = document.querySelector(
+          `script[src="https://embed.tawk.to/${settings.chat_widget_id}/default"]`,
+        );
+        if (currentScript) document.body.removeChild(currentScript);
+      };
     }
   }, [settings?.chat_widget_id]);
 

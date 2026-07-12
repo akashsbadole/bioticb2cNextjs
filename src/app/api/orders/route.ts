@@ -34,7 +34,7 @@ const orderSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const rateLimitResponse = checkRateLimit(request, ORDER_RATE_LIMIT);
+    const rateLimitResponse = await checkRateLimit(request, ORDER_RATE_LIMIT);
     if (rateLimitResponse) return rateLimitResponse;
 
     const auth = await requireAuth(request).catch(() => ({ success: false } as const));
@@ -178,12 +178,12 @@ export async function POST(request: NextRequest) {
     // Create order in transaction
     const order = await db.$transaction(async (tx) => {
       // 1. Create the order
-      const orderCount = await tx.order.count();
+      const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
       const newOrder = await tx.order.create({
         data: {
           storeId,
           userId: auth.success ? auth.payload.userId : null,
-          orderNumber: `ORD-${String(orderCount + 1).padStart(6, '0')}`,
+          orderNumber,
           totalAmount: calculatedTotal,
           subtotal: calculatedSubtotal,
           tax: taxAmount,
@@ -230,8 +230,14 @@ export async function POST(request: NextRequest) {
 
     // Handle Payment Integration (PayU)
     if (paymentMethod === 'payu') {
-       const payuKey = process.env.PAYU_MERCHANT_KEY || 'test_key';
-       const payuSalt = process.env.PAYU_MERCHANT_SALT || 'test_salt';
+       const payuKey = process.env.PAYU_MERCHANT_KEY;
+       const payuSalt = process.env.PAYU_MERCHANT_SALT;
+       if (!payuKey || !payuSalt) {
+         return NextResponse.json(
+           { error: 'Payment gateway not configured (PAYU_MERCHANT_KEY / PAYU_MERCHANT_SALT missing)' },
+           { status: 500 },
+         );
+       }
         const isProd =
           process.env.PAYU_TEST_MODE === 'false' ||
           process.env.NODE_ENV === 'production';

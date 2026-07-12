@@ -67,7 +67,9 @@ interface MenuItem {
   children?: MenuItem[];
 }
 
-const mainNavLinks: NavItem[] = [];
+const mainNavLinks: NavItem[] = [
+  { label: "Bundles", page: "bundles" },
+];
 
 export function StoreHeader({ onNavigate }: StoreHeaderProps) {
   const { currentPage, settings, cart, wishlistIds } = useAppStore();

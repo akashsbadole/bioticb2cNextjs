@@ -4,11 +4,13 @@ import { AboutClientPage } from "./client";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "About Us | Purva Bites",
-  description: "Learn about Purva Bites - our story, mission, vision, and the team behind India's trusted FMCG manufacturer.",
+  title: "About Us | Biotic Naturals",
+  description:
+    "Learn about Biotic Naturals - our story, mission, vision, and the team behind India's trusted FMCG manufacturer.",
   openGraph: {
-    title: "About Us | Purva Bites",
-    description: "Learn about Purva Bites - our story, mission, vision, and team.",
+    title: "About Us | Biotic Naturals",
+    description:
+      "Learn about Biotic Naturals - our story, mission, vision, and team.",
   },
 };
 

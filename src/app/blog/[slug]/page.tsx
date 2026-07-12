@@ -10,7 +10,10 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   return {
-    title: `${slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")} | Purva Bites Blog`,
+    title: `${slug
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ")} | Biotic Naturals Blog`,
     description: `Read our latest blog post about ${slug.replace(/-/g, " ")}.`,
   };
 }

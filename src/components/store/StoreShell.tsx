@@ -28,6 +28,7 @@ import { FaqPage } from "./FaqPage";
 import { ComparisonPage } from "./ComparisonPage";
 import { SupportPage } from "./SupportPage";
 import { TrackingPage } from "./TrackingPage";
+import { BundlesPage } from "./BundlesPage";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 interface StoreShellProps {
@@ -198,6 +199,8 @@ export function StoreShell({ initialPage, children }: StoreShellProps) {
         return <SupportPage />;
       case "tracking":
         return <TrackingPage />;
+      case "bundles":
+        return <BundlesPage />;
       default:
         return (
           <div className="flex flex-col items-center justify-center py-20 text-center">

@@ -199,7 +199,7 @@ JWT_SECRET="<openssl rand -hex 32>"
 
 ```
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
-NEXT_PUBLIC_SITE_NAME="Purva Bites"
+NEXT_PUBLIC_SITE_NAME="Biotic Naturals"
 NEXT_PUBLIC_PLATFORM_DOMAIN="wcommerce.com"
 JWT_EXPIRES_IN="7d"
 ```

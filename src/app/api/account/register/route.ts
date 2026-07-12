@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { createUser } from "@/lib/auth";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 const REGISTER_RATE_LIMIT = { maxRequests: 5, windowMs: 60 * 60 * 1000, prefix: "auth-register" };
 
@@ -16,10 +17,11 @@ const schema = z.object({
     .regex(/[a-z]/, 'Password must contain a lowercase letter')
     .regex(/[0-9]/, 'Password must contain a number'),
   phone: z.string().optional(),
+  recaptchaToken: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
-  const rateLimitResponse = checkRateLimit(request, REGISTER_RATE_LIMIT);
+  const rateLimitResponse = await checkRateLimit(request, REGISTER_RATE_LIMIT);
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
@@ -32,7 +34,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, email, password, phone } = parsed.data;
+    const { name, email, password, phone, recaptchaToken } = parsed.data;
+
+    // Verify reCAPTCHA if a token was provided
+    if (recaptchaToken) {
+      const recaptchaResult = await verifyRecaptcha(recaptchaToken);
+      if (!recaptchaResult.success) {
+        return NextResponse.json({ error: "reCAPTCHA verification failed" }, { status: 400 });
+      }
+    }
     const normalized = email.trim().toLowerCase();
 
     const existing = await db.user.findUnique({ where: { email: normalized } });

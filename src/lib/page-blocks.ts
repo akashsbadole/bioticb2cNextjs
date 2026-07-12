@@ -693,7 +693,7 @@ export const BLOCK_DEFAULTS: Record<
       hero: {
         title: "Built on trust. Driven by quality.",
         subtitle:
-          "From a distribution background to a full-scale FMCG manufacturing company — the Purva Bites story is one of conviction and craft",
+          "From a distribution background to a full-scale FMCG manufacturing company — the Biotic Naturals story is one of conviction and craft",
         estYear: "Est. 2010 · Gujarat, India",
         backgroundImage: "",
         backgroundColor: "#3d6f08",
@@ -714,8 +714,8 @@ export const BLOCK_DEFAULTS: Record<
           "A business built from the ground up — from distribution to manufacturing",
         narrative: [
           "The founders began their journey in FMCG distribution — supplying established snack brands across Gujarat and building deep knowledge of what retailers, distributors and consumers actually want from a product.",
-          "That ground-level experience became the foundation for Purva Bites. Rather than representing other manufacturers, they built their own — starting with a single Khakhra line and methodically expanding to 5 production categories over 15 years.",
-          "Today, Purva Bites manufactures for brands, private label clients and distributors who want the reliability of a proven partner — not just a contract factory.",
+          "That ground-level experience became the foundation for Biotic Naturals. Rather than representing other manufacturers, they built their own — starting with a single Khakhra line and methodically expanding to 5 production categories over 15 years.",
+          "Today, Biotic Naturals manufactures for brands, private label clients and distributors who want the reliability of a proven partner — not just a contract factory.",
         ],
         ctaText: "Meet the founders →",
         ctaPage: "manufacturing",
@@ -995,7 +995,7 @@ export const BLOCK_DEFAULTS: Record<
           icon: "Package",
           color: "bg-blue-50 text-blue-600",
           title: "Packaging",
-          desc: "Auto-fill, seal, label — Purva Bites or custom private label pack",
+          desc: "Auto-fill, seal, label — Biotic Naturals or custom private label pack",
         },
         {
           icon: "Truck",
@@ -1168,7 +1168,7 @@ export const BLOCK_DEFAULTS: Record<
       },
       packagingOptions: [
         {
-          title: "Purva Bites branded",
+          title: "Biotic Naturals branded",
           desc: "Ready-branded packs for distributors, modern trade and retail buyers",
           tag: "Distributor friendly",
           highlight: false,
@@ -1395,10 +1395,7 @@ export function deepMerge<T extends Record<string, unknown>>(
           (m) => (m as Record<string, unknown>)?.id === item.id,
         );
         if (idx >= 0) {
-          merged[idx] = deepMerge(
-            merged[idx] as Record<string, unknown>,
-            item,
-          );
+          merged[idx] = deepMerge(merged[idx] as Record<string, unknown>, item);
         } else {
           merged.push(item);
         }

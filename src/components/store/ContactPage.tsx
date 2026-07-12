@@ -46,13 +46,11 @@ function ResolvedIcon({
   return null;
 }
 
-export function ContactPage({
-  onNavigate,
-  data: _data,
-}: ContactPageProps) {
+export function ContactPage({ onNavigate, data: _data }: ContactPageProps) {
   useSeo("contact", {
-    title: "Contact Us | Purva Bites",
-    description: "Get in touch with Purva Bites. Send us your enquiry for orders, partnerships, or any questions.",
+    title: "Contact Us | Biotic Naturals",
+    description:
+      "Get in touch with Biotic Naturals. Send us your enquiry for orders, partnerships, or any questions.",
   });
 
   const [selectedType, setSelectedType] = useState<string>("bulk");
@@ -93,19 +91,19 @@ export function ContactPage({
   const promiseItems =
     (responsePromise.items as Array<{ label: string; time: string }>) || [];
   const locations = (data.locations as Record<string, unknown>) || {};
-      const locationCards =
-        (locations.cards as Array<{
-          type: string;
-          title: string;
-          subtitle?: string;
-          address?: string;
-          accessibility?: string;
-          description?: string;
-          highlights?: string[];
-          cta?: string;
-          link?: string;
-          buttons?: Array<{ text: string; icon: string; link?: string }>;
-        }>) || [];
+  const locationCards =
+    (locations.cards as Array<{
+      type: string;
+      title: string;
+      subtitle?: string;
+      address?: string;
+      accessibility?: string;
+      description?: string;
+      highlights?: string[];
+      cta?: string;
+      link?: string;
+      buttons?: Array<{ text: string; icon: string; link?: string }>;
+    }>) || [];
 
   return (
     <div className="flex flex-col">
@@ -120,7 +118,10 @@ export function ContactPage({
       {/* CT1: Contact Form */}
       <ContactFormSection
         title={(formSection.title as string) || "Send us your requirement"}
-        subtitle={(formSection.subtitle as string) || "Fields marked * are required. We respond within 24 working hours."}
+        subtitle={
+          (formSection.subtitle as string) ||
+          "Fields marked * are required. We respond within 24 working hours."
+        }
       />
 
       {/* Response promise */}
@@ -212,8 +213,9 @@ export function ContactPage({
                   {card.buttons && (
                     <div className="flex gap-2">
                       {card.buttons.map((btn) => {
-                        const isVisitButton =
-                          /book|schedule|visit/i.test(btn.text || "");
+                        const isVisitButton = /book|schedule|visit/i.test(
+                          btn.text || "",
+                        );
                         const fallbackLink =
                           btn.text === "Get directions"
                             ? card.address
@@ -230,10 +232,15 @@ export function ContactPage({
                               key={btn.text}
                               href={href}
                               target={isExternal ? "_blank" : undefined}
-                              rel={isExternal ? "noopener noreferrer" : undefined}
+                              rel={
+                                isExternal ? "noopener noreferrer" : undefined
+                              }
                               className="text-[10px] border rounded px-2 py-1 flex items-center gap-1 hover:bg-muted"
                             >
-                              <ResolvedIcon name={btn.icon} className="h-3 w-3" />{" "}
+                              <ResolvedIcon
+                                name={btn.icon}
+                                className="h-3 w-3"
+                              />{" "}
                               {btn.text}
                             </a>
                           );
@@ -262,8 +269,10 @@ export function ContactPage({
                       ) : (
                         <button
                           onClick={() => {
-                            const form = document.getElementById("contact-form");
-                            if (form) form.scrollIntoView({ behavior: "smooth" });
+                            const form =
+                              document.getElementById("contact-form");
+                            if (form)
+                              form.scrollIntoView({ behavior: "smooth" });
                           }}
                           className="w-full bg-primary text-primary-foreground text-xs font-medium rounded py-2.5 hover:bg-primary/90 transition-colors"
                         >

@@ -7,6 +7,7 @@ const SENSITIVE_KEYS = [
   'smtp_pass', 'smtp_user', 'smtp_host', 'smtp_port',
   'jwt_secret', 'payment_razorpay_key_secret',
   'smtp_password', 'api_key', 'secret_key', 'access_token', 'private_key',
+  'recaptcha_secret_key',
 ];
 
 export async function GET(request: NextRequest) {
@@ -39,7 +40,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ settings: settingsMap });
+    const response = NextResponse.json({ settings: settingsMap });
+    response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+    return response;
   } catch (error) {
     console.error('Get public settings error:', error);
     return NextResponse.json(

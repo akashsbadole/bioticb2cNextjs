@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SessionProvider } from "next-auth/react";
 import { QueryProvider } from "@/providers/QueryProvider";
+import { ThemeInjectorWrapper } from "@/components/store/ThemeInjectorWrapper";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -20,7 +21,7 @@ export const viewport: Viewport = {
   themeColor: "#FFFFFF",
 };
 
-const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Purva Bites";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Biotic Naturals";
 const siteDesc =
   process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
   "Premium products and exceptional service.";
@@ -86,6 +87,10 @@ export default function RootLayout({
         <meta name="format-detection" content="telephone=yes" />
         <meta name="format-detection" content="email=yes" />
         <meta name="format-detection" content="address=yes" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//www.google.com" />
+        <link rel="dns-prefetch" href="//www.gstatic.com" />
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
       </head>
       <body
         className={`${poppins.variable} antialiased bg-background text-foreground`}
@@ -95,6 +100,7 @@ export default function RootLayout({
             <ThemeProvider>
               {children}
               <Toaster position="top-right" richColors closeButton />
+              <ThemeInjectorWrapper />
             </ThemeProvider>
           </QueryProvider>
         </SessionProvider>

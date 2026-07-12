@@ -9,11 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const RecaptchaWidget = dynamic(() => import("./RecaptchaWidget").then((m) => m.RecaptchaWidget), { ssr: false });
 
 type Mode = "password" | "otp";
 
 export function LoginPage() {
-  const { navigate } = useAppStore();
+  const { navigate, settings } = useAppStore();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("password");
   const [email, setEmail] = useState("");
@@ -21,6 +24,8 @@ export function LoginPage() {
   const [code, setCode] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [recaptchaKey, setRecaptchaKey] = useState(0);
 
   const finishLogin = async () => {
     router.push("/account");
@@ -29,9 +34,13 @@ export function LoginPage() {
 
   const handlePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (settings?.recaptcha_site_key && !recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA");
+      return;
+    }
     setLoading(true);
     try {
-      const res = await signIn("credentials", { email, password, redirect: false });
+      const res = await signIn("credentials", { email, password, recaptchaToken, redirect: false });
       if (!res || res.error) {
         toast.error("Invalid email or password");
         return;
@@ -48,12 +57,16 @@ export function LoginPage() {
       toast.error("Enter your email first");
       return;
     }
+    if (settings?.recaptcha_site_key && !recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/account/request-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, channel: "email" }),
+        body: JSON.stringify({ email, channel: "email", recaptchaToken }),
       });
       const data = await res.json();
       if (!res.ok && data.error) {
@@ -88,11 +101,15 @@ export function LoginPage() {
       toast.error("Enter your email first to reset your password");
       return;
     }
+    if (settings?.recaptcha_site_key && !recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA");
+      return;
+    }
     try {
       await fetch("/api/account/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, recaptchaToken }),
       });
       toast.success("If that email exists, a reset link has been sent");
     } catch {
@@ -132,6 +149,14 @@ export function LoginPage() {
                 <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-12 pl-10 rounded-xl" placeholder="••••••••" required />
               </div>
             </div>
+            {settings?.recaptcha_site_key && (
+              <RecaptchaWidget
+                key={recaptchaKey}
+                siteKey={settings.recaptcha_site_key}
+                onVerify={setRecaptchaToken}
+              />
+            )}
+
             <Button type="submit" size="lg" className="w-full rounded-xl h-12 font-bold" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Sign In <ArrowRight className="h-4 w-4 ml-1" /></>}
             </Button>
@@ -146,9 +171,18 @@ export function LoginPage() {
               </div>
             </div>
             {!otpSent ? (
-              <Button onClick={handleRequestOtp} size="lg" className="w-full rounded-xl h-12 font-bold" disabled={loading}>
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send code"}
-              </Button>
+              <>
+                {settings?.recaptcha_site_key && (
+                  <RecaptchaWidget
+                    key={recaptchaKey}
+                    siteKey={settings.recaptcha_site_key}
+                    onVerify={setRecaptchaToken}
+                  />
+                )}
+                <Button onClick={handleRequestOtp} size="lg" className="w-full rounded-xl h-12 font-bold" disabled={loading}>
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send code"}
+                </Button>
+              </>
             ) : (
               <form onSubmit={handleOtp} className="space-y-4">
                 <div className="space-y-2">

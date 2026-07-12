@@ -1,13 +1,29 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useAppStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Trash2, Plus, Minus, ArrowRight } from "lucide-react";
+import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, Package } from "lucide-react";
 import { formatPrice } from "@/lib/pricing";
+import { getFirstImage } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function CartPage() {
-  const { cart, updateCartQuantity, removeFromCart, navigate, settings } = useAppStore();
+  const { cart, updateCartQuantity, removeFromCart, addToCart, navigate, settings } = useAppStore();
   const currency = settings?.currency || "INR";
+  const [crossSells, setCrossSells] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (cart.items.length === 0) return;
+    const cartIds = cart.items.map((i) => i.productId);
+    fetch(`/api/products?limit=8&inStock=true`)
+      .then((r) => r.json())
+      .then((data) => {
+        const products = (data.products || []).filter((p: any) => !cartIds.includes(p.id));
+        setCrossSells(products.slice(0, 4));
+      })
+      .catch(() => {});
+  }, [cart.items.length]);
 
   const subtotal = cart.items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -146,6 +162,38 @@ export function CartPage() {
           </div>
         </div>
       </div>
+
+      {crossSells.length > 0 && (
+        <section className="mt-16">
+          <h2 className="text-xl font-bold mb-6">You Might Also Like</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {crossSells.map((p: any) => {
+              const img = getFirstImage(p.images);
+              return (
+                <div key={p.id} className="bg-card border rounded-xl p-3 hover:shadow-md transition-all group">
+                  <div className="aspect-square bg-muted rounded-lg overflow-hidden mb-3 cursor-pointer" onClick={() => navigate("product-page", p.slug)}>
+                    {img ? (
+                      <img src={img} alt={p.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform" />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center text-muted-foreground"><Package className="h-8 w-8" /></div>
+                    )}
+                  </div>
+                  <h3 className="font-bold text-sm truncate mb-1 cursor-pointer hover:text-primary" onClick={() => navigate("product-page", p.slug)}>{p.name}</h3>
+                  <div className="flex items-center justify-between">
+                    <span className="text-primary font-bold text-sm">{formatPrice(p.price, currency)}</span>
+                    <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => {
+                      addToCart({ productId: p.id, name: p.name, price: p.price, quantity: 1, image: img || undefined });
+                      toast.success("Added to cart");
+                    }}>
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

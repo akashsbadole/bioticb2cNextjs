@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search, X, Check, Heart, Eye, ShoppingCart, Filter, ChevronRight, ArrowRightLeft, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/lib/store";
 import { formatPrice } from "@/lib/pricing";
 import { getFirstImage } from "@/lib/utils";
+import { useActiveFlashSales, getFlashSalePrice } from "@/lib/flash-sales";
+import { useCustomerPrices } from "@/lib/customer-pricing";
 import { toast } from "sonner";
 import {
   Select,
@@ -22,9 +24,12 @@ import { Separator } from "@/components/ui/separator";
 import { QuickViewModal } from "./QuickViewModal";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { StoreLoading } from "./StoreLoading";
+import { FlashSaleBadge } from "./FlashSaleBadge";
 
 export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
   const { auth, settings, navigate, addToCart, addToCompare, wishlistIds, toggleWishlistId } = useAppStore();
+  const { productMap: flashProductMap } = useActiveFlashSales();
+  const { getPrice: getCustomerPrice, prices: customerPrices } = useCustomerPrices();
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
     categoryId: "all",
@@ -269,6 +274,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
                           <img
                             src={image}
                             alt={product.name}
+                            loading="lazy"
                             className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
                           />
                         )}
@@ -277,11 +283,21 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
                                 <Badge className="bg-white text-black font-bold">OUT OF STOCK</Badge>
                             </div>
                         )}
-                        {product.comparePrice && (
-                            <div className="absolute top-3 left-3">
+                        <div className="absolute top-3 left-3 flex flex-col gap-1">
+                            <FlashSaleBadge productId={product.id} />
+                            {product.comparePrice && (
                                 <Badge className="bg-rose-500 text-white border-none">SALE</Badge>
-                            </div>
-                        )}
+                            )}
+                            {product.createdAt && Date.now() - new Date(product.createdAt).getTime() < 30 * 24 * 60 * 60 * 1000 && (
+                                <Badge className="bg-emerald-500 text-white border-none">NEW</Badge>
+                            )}
+                            {product.isFeatured && (
+                                <Badge className="bg-primary text-white border-none">FEATURED</Badge>
+                            )}
+                            {product.isBestSeller && (
+                                <Badge className="bg-amber-500 text-white border-none">BEST SELLER</Badge>
+                            )}
+                        </div>
 
                         {/* Action Overlay */}
                         <div className="absolute top-3 right-3 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
@@ -312,15 +328,37 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
                             <h3 className="font-bold text-sm md:text-base mb-1 line-clamp-2 hover:text-primary transition-colors cursor-pointer" onClick={() => navigate("product-page", product.slug)}>
                                 {product.name}
                             </h3>
-                            <div className="flex items-center gap-2 mb-4">
-                                <span className="text-primary font-black text-base md:text-lg">
-                                    {product.ProductVariant?.length > 0 ? 'From ' : ''}
-                                    {formatPrice(product.price, currency)}
-                                </span>
-                                {product.comparePrice && (
-                                    <span className="text-xs text-muted-foreground line-through">{formatPrice(product.comparePrice, currency)}</span>
-                                )}
-                            </div>
+                            {(() => {
+                                const custPrice = getCustomerPrice(product.price, product.id);
+                                const flashDisc = flashProductMap[product.id];
+                                if (flashDisc) {
+                                    const { salePrice, discountPercent } = getFlashSalePrice(custPrice, flashDisc);
+                                    return (
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <span className="text-primary font-black text-base md:text-lg">
+                                                {product.ProductVariant?.length > 0 ? 'From ' : ''}
+                                                {formatPrice(salePrice, currency)}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground line-through">{formatPrice(custPrice, currency)}</span>
+                                            <Badge className="bg-orange-500 text-white border-none text-[10px]">-{discountPercent}%</Badge>
+                                        </div>
+                                    );
+                                }
+                                return (
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <span className="text-primary font-black text-base md:text-lg">
+                                            {product.ProductVariant?.length > 0 ? 'From ' : ''}
+                                            {formatPrice(custPrice, currency)}
+                                        </span>
+                                        {customerPrices[product.id] !== undefined && (
+                                            <span className="text-xs text-muted-foreground line-through">{formatPrice(product.price, currency)}</span>
+                                        )}
+                                        {!customerPrices[product.id] && product.comparePrice && (
+                                            <span className="text-xs text-muted-foreground line-through">{formatPrice(product.comparePrice, currency)}</span>
+                                        )}
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         <Button

@@ -39,7 +39,7 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
   const companyPhone = settings?.site_phone || settings?.contact_phone || "";
   const companyAddress =
     settings?.site_address || settings?.contact_address || "";
-  const siteName = settings?.site_name || "Purva Bites";
+  const siteName = settings?.site_name || "Biotic Naturals";
 
   const [footerMenus, setFooterMenus] = useState<FooterMenuData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,13 +86,17 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
               if (item.url) {
                 if (item.url.startsWith("/")) {
                   const segs = item.url.split("/").filter(Boolean);
-                  if (segs[0] === "products" && segs[1]) onNavigate("product-page", segs[1]);
-                  else if (segs[0] === "shop" && segs[1]) onNavigate("category", segs[1]);
+                  if (segs[0] === "products" && segs[1])
+                    onNavigate("product-page", segs[1]);
+                  else if (segs[0] === "shop" && segs[1])
+                    onNavigate("category", segs[1]);
                   else if (segs[0] === "shop") onNavigate("shop");
-                  else if (segs[0] === "blog" && segs[1]) onNavigate("blog-post", segs[1]);
+                  else if (segs[0] === "blog" && segs[1])
+                    onNavigate("blog-post", segs[1]);
                   else if (segs[0] === "blog") onNavigate("blog");
                   else if (segs[0] === "about") onNavigate("about");
-                  else if (segs[0] === "manufacturing") onNavigate("manufacturing");
+                  else if (segs[0] === "manufacturing")
+                    onNavigate("manufacturing");
                   else if (segs[0] === "contact") onNavigate("contact");
                   else if (segs[0] === "products") onNavigate("products");
                   else onNavigate("content-page", segs.join("/"));
@@ -121,7 +125,7 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
     <footer className="border-t bg-muted/30" role="contentinfo">
       <div className="container mx-auto px-4 py-12">
         <div className="mb-12 max-w-2xl">
-            <Newsletter />
+          <Newsletter />
         </div>
         <Separator className="mb-12" />
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -265,10 +269,16 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
 
         <Separator className="my-8" />
 
-        {(settings?.company_gstin || settings?.company_fssai || settings?.company_cin) && (
+        {(settings?.company_gstin ||
+          settings?.company_fssai ||
+          settings?.company_cin) && (
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 mb-6 text-xs text-muted-foreground">
-            {settings.company_gstin && <span>GSTIN: {settings.company_gstin}</span>}
-            {settings.company_fssai && <span>FSSAI: {settings.company_fssai}</span>}
+            {settings.company_gstin && (
+              <span>GSTIN: {settings.company_gstin}</span>
+            )}
+            {settings.company_fssai && (
+              <span>FSSAI: {settings.company_fssai}</span>
+            )}
             {settings.company_cin && <span>CIN: {settings.company_cin}</span>}
           </div>
         )}

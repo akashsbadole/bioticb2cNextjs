@@ -20,6 +20,8 @@ import {
   KeyRound,
   BookOpen,
   Megaphone,
+  Puzzle,
+  Palette,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -54,10 +56,15 @@ import { AdminNewsletter } from "@/components/admin/AdminNewsletter";
 import { AdminAbandonedCarts } from "@/components/admin/AdminAbandonedCarts";
 import { AdminPopups } from "@/components/admin/AdminPopups";
 import { AdminBlog } from "@/components/admin/AdminBlog";
+import { AdminFlashSales } from "@/components/admin/AdminFlashSales";
 import { AdminSupport } from "@/components/admin/AdminSupport";
+import { AdminPlugins } from "@/components/admin/AdminPlugins";
+import { AdminThemeCustomizer } from "@/components/admin/AdminThemeCustomizer";
+import { AdminCustomerPrices } from "@/components/admin/AdminCustomerPrices";
+import { AdminBundles } from "@/components/admin/AdminBundles";
 import { NotificationBell } from "@/components/admin/NotificationBell";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Ticket, Star, Headphones } from "lucide-react";
+import { Ticket, Star, Headphones, Clock, DollarSign, Gift } from "lucide-react";
 
 interface AdminDashboardProps {
   user: { id: string; email: string; name: string; role: string } | null;
@@ -80,9 +87,14 @@ const sidebarItems = [
   { id: "media", label: "Media", icon: ImageIcon },
   { id: "pages", label: "Pages", icon: FileText },
   { id: "popups", label: "Popups", icon: Megaphone },
+  { id: "flash-sales", label: "Flash Sales", icon: Clock },
   { id: "newsletter", label: "Newsletter", icon: Mail },
   { id: "support", label: "Support", icon: Headphones },
   { id: "menus", label: "Menus", icon: Menu },
+  { id: "customer-pricing", label: "Customer Pricing", icon: DollarSign },
+  { id: "bundles", label: "Bundles", icon: Gift },
+  { id: "plugins", label: "Plugins", icon: Puzzle },
+  { id: "themes", label: "Themes", icon: Palette },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -328,8 +340,18 @@ export function AdminDashboard({
         return <AdminMenus />;
       case "newsletter":
         return <AdminNewsletter />;
+      case "flash-sales":
+        return <AdminFlashSales />;
       case "support":
         return <AdminSupport />;
+      case "customer-pricing":
+        return <AdminCustomerPrices />;
+      case "bundles":
+        return <AdminBundles />;
+      case "plugins":
+        return <AdminPlugins />;
+      case "themes":
+        return <AdminThemeCustomizer />;
       case "settings":
         return <AdminSettings />;
       default:

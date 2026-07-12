@@ -128,3 +128,72 @@ export async function sendTrackingUpdate(order: {
     emailWrapper(siteName, content)
   );
 }
+
+// ── Enquiry / Contact notifications ──
+
+export async function sendEnquiryNotificationToAdmin(enquiry: {
+  name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+  type: string;
+  productName?: string;
+}) {
+  const getSetting = await getSiteSettings();
+  const siteEmail = getSetting('site_email') || 'admin@store.com';
+  const siteName = getSetting('site_name') || 'Store';
+
+  let content = `<h2 style="margin-top:0">New ${enquiry.type === 'rfq' ? 'RFQ' : 'Enquiry'} Received</h2>`;
+  content += `<p>A new ${enquiry.type === 'rfq' ? 'Request for Quote' : 'enquiry'} has been submitted on your website.</p>`;
+  content += `<div class="field-label">Contact Name</div><div class="field-value">${enquiry.name}</div>`;
+  content += `<div class="field-label">Email</div><div class="field-value">${enquiry.email}</div>`;
+  if (enquiry.phone) content += `<div class="field-label">Phone</div><div class="field-value">${enquiry.phone}</div>`;
+  if (enquiry.productName) content += `<div class="field-label">Product</div><div class="field-value">${enquiry.productName}</div>`;
+  content += `<div class="field-label">Subject</div><div class="field-value">${enquiry.subject}</div>`;
+  content += `<div class="field-label">Message</div><div class="field-value">${enquiry.message.replace(/\n/g, '<br>')}</div>`;
+
+  return sendEmail(
+    siteEmail,
+    `[${siteName}] New ${enquiry.type === 'rfq' ? 'RFQ' : 'Enquiry'}: ${enquiry.subject}`,
+    emailWrapper(siteName, content)
+  );
+}
+
+export async function sendEnquiryConfirmation(enquiry: {
+  name: string;
+  email: string;
+  subject: string;
+  type: string;
+  productName?: string;
+}) {
+  const getSetting = await getSiteSettings();
+  const siteName = getSetting('site_name') || 'Store';
+
+  let content = `<h2 style="margin-top:0">Thank You for Your Enquiry!</h2>`;
+  content += `<p>Dear ${enquiry.name},</p>`;
+  content += `<p>Thank you for your interest in ${enquiry.productName ? `<strong>${enquiry.productName}</strong>` : 'our products'}. We have received your ${enquiry.type === 'rfq' ? 'Request for Quote' : 'enquiry'} and our team will get back to you within 24 hours.</p>`;
+  content += `<h3>Your Enquiry Details</h3>`;
+  content += `<p><strong>Subject:</strong> ${enquiry.subject}</p>`;
+  content += `<p><strong>Reference:</strong> #${Date.now().toString(36).toUpperCase()}</p>`;
+  content += `<div style="margin-top:24px;padding:16px;background:#f0fdf4;border-radius:8px;border-left:4px solid #059669">`;
+  content += `<p style="margin:0;color:#065f46"><strong>What happens next?</strong></p>`;
+  content += `<p style="margin:8px 0 0;color:#065f46">Our team will review your enquiry and respond within 24 business hours. If your matter is urgent, please contact us directly.</p>`;
+  content += `</div>`;
+
+  return sendEmail(
+    enquiry.email,
+    `Thank you for your enquiry - ${siteName}`,
+    emailWrapper(siteName, content)
+  );
+}
+
+export async function sendEnquiryNotification(enquiry: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  type: string;
+}) {
+  return sendEnquiryNotificationToAdmin(enquiry);
+}

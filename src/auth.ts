@@ -12,8 +12,15 @@ const config: NextAuthConfig = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        recaptchaToken: { label: "reCAPTCHA", type: "text" },
       },
       async authorize(credentials) {
+        const recaptchaToken = String(credentials?.recaptchaToken ?? "");
+        if (recaptchaToken) {
+          const { verifyRecaptcha } = await import("@/lib/recaptcha");
+          const valid = await verifyRecaptcha(recaptchaToken);
+          if (!valid.success) return null;
+        }
         const { authenticateUser } = await import("@/lib/auth");
         const email = String(credentials?.email ?? "").trim().toLowerCase();
         const password = String(credentials?.password ?? "");

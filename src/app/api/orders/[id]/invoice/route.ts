@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAuth } from '@/lib/admin-auth';
-import PDFDocument from 'pdfkit';
+
+const getPdfModule = new Function('mod', 'return require(mod)') as (mod: string) => any;
 
 export async function GET(
   _request: NextRequest,
@@ -44,6 +45,12 @@ export async function GET(
       shippingAddress = JSON.parse(order.shippingAddress || '{}');
     } catch {}
 
+    let PDFDocument: any;
+    try {
+      PDFDocument = getPdfModule('pdfkit');
+    } catch {
+      return NextResponse.json({ error: 'PDF generation unavailable' }, { status: 503 });
+    }
     const doc = new PDFDocument({ margin: 50 });
 
     const chunks: Buffer[] = [];

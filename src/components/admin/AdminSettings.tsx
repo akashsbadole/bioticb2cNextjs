@@ -18,6 +18,7 @@ import {
   Users,
   Trash2,
   MessageCircle,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -89,6 +90,8 @@ const defaultSettings: Settings = {
   cod_enabled: "false",
   cod_fee: "0",
   chat_widget_id: "",
+  recaptcha_site_key: "",
+  recaptcha_secret_key: "",
 };
 
 export function AdminSettings() {
@@ -99,41 +102,41 @@ export function AdminSettings() {
   const { isLoading: loading } = useQuery({
     queryKey: ["admin-store-settings"],
     queryFn: async () => {
-        const res = await adminFetch("/api/store/settings");
-        if (!res.ok) throw new Error("Failed");
-        const data = await res.json();
-        const merged: Settings = { ...defaultSettings };
-        for (const key of Object.keys(data.settings)) {
-            merged[key] = data.settings[key] ?? "";
-        }
-        setSettings(merged);
-        return data.settings;
-    }
+      const res = await adminFetch("/api/store/settings");
+      if (!res.ok) throw new Error("Failed");
+      const data = await res.json();
+      const merged: Settings = { ...defaultSettings };
+      for (const key of Object.keys(data.settings)) {
+        merged[key] = data.settings[key] ?? "";
+      }
+      setSettings(merged);
+      return data.settings;
+    },
   });
 
   const saveMutation = useMutation({
     mutationFn: async (newSettings: Settings) => {
-        const res = await adminFetch("/api/store/settings", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ settings: newSettings }),
-        });
-        if (!res.ok) throw new Error("Failed");
-        return res.json();
+      const res = await adminFetch("/api/store/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ settings: newSettings }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
     },
     onSuccess: () => {
-        toast.success("Settings saved");
-        fetchGlobalSettings();
-        queryClient.invalidateQueries({ queryKey: ["admin-store-settings"] });
-    }
+      toast.success("Settings saved");
+      fetchGlobalSettings();
+      queryClient.invalidateQueries({ queryKey: ["admin-store-settings"] });
+    },
   });
 
   const testEmailMutation = useMutation({
     mutationFn: async () => {
-        const res = await adminFetch("/api/settings", { method: "POST" });
-        if (!res.ok) throw new Error("Failed");
+      const res = await adminFetch("/api/settings", { method: "POST" });
+      if (!res.ok) throw new Error("Failed");
     },
-    onSuccess: () => toast.success("Test email sent")
+    onSuccess: () => toast.success("Test email sent"),
   });
 
   const handleSettingChange = (key: string, value: string) => {
@@ -219,7 +222,7 @@ export function AdminSettings() {
               id="site_name"
               value={settings.site_name}
               onChange={(e) => handleSettingChange("site_name", e.target.value)}
-              placeholder="Purva Bites"
+              placeholder="Biotic Naturals"
             />
           </div>
           <div className="space-y-2">
@@ -443,20 +446,43 @@ export function AdminSettings() {
             <MessageCircle className="h-4 w-4" />
             Support & Business
           </CardTitle>
-          <CardDescription>Configure tax, shipping and live chat</CardDescription>
+          <CardDescription>
+            Configure tax, shipping and live chat
+          </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="gst">GST Rate (%)</Label>
-            <Input id="gst" type="number" value={settings.tax_rate_gst} onChange={(e) => handleSettingChange("tax_rate_gst", e.target.value)} />
+            <Input
+              id="gst"
+              type="number"
+              value={settings.tax_rate_gst}
+              onChange={(e) =>
+                handleSettingChange("tax_rate_gst", e.target.value)
+              }
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="ship">Flat Shipping Cost</Label>
-            <Input id="ship" type="number" value={settings.shipping_fixed_cost} onChange={(e) => handleSettingChange("shipping_fixed_cost", e.target.value)} />
+            <Input
+              id="ship"
+              type="number"
+              value={settings.shipping_fixed_cost}
+              onChange={(e) =>
+                handleSettingChange("shipping_fixed_cost", e.target.value)
+              }
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="free">Free Shipping Min Amount</Label>
-            <Input id="free" type="number" value={settings.shipping_free_threshold} onChange={(e) => handleSettingChange("shipping_free_threshold", e.target.value)} />
+            <Input
+              id="free"
+              type="number"
+              value={settings.shipping_free_threshold}
+              onChange={(e) =>
+                handleSettingChange("shipping_free_threshold", e.target.value)
+              }
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="cod_enabled">Cash on Delivery</Label>
@@ -464,20 +490,83 @@ export function AdminSettings() {
               <Switch
                 id="cod_enabled"
                 checked={settings.cod_enabled === "true"}
-                onCheckedChange={(checked) => handleSettingChange("cod_enabled", checked ? "true" : "false")}
+                onCheckedChange={(checked) =>
+                  handleSettingChange("cod_enabled", checked ? "true" : "false")
+                }
               />
-              <span className="text-sm text-muted-foreground">{settings.cod_enabled === "true" ? "Enabled" : "Disabled"}</span>
+              <span className="text-sm text-muted-foreground">
+                {settings.cod_enabled === "true" ? "Enabled" : "Disabled"}
+              </span>
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="cod_fee">COD Convenience Fee (₹)</Label>
-            <Input id="cod_fee" type="number" min="0" step="1" value={settings.cod_fee} onChange={(e) => handleSettingChange("cod_fee", e.target.value)} />
-            <p className="text-xs text-muted-foreground">Additional fee charged on COD orders</p>
+            <Input
+              id="cod_fee"
+              type="number"
+              min="0"
+              step="1"
+              value={settings.cod_fee}
+              onChange={(e) => handleSettingChange("cod_fee", e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Additional fee charged on COD orders
+            </p>
           </div>
           <div className="space-y-2 sm:col-span-3">
             <Label htmlFor="chat">Tawk.to Chat Widget ID</Label>
-            <Input id="chat" placeholder="6789..." value={settings.chat_widget_id} onChange={(e) => handleSettingChange("chat_widget_id", e.target.value)} />
-            <p className="text-xs text-muted-foreground">Found in your Tawk.to dashboard property settings.</p>
+            <Input
+              id="chat"
+              placeholder="6789..."
+              value={settings.chat_widget_id}
+              onChange={(e) =>
+                handleSettingChange("chat_widget_id", e.target.value)
+              }
+            />
+            <p className="text-xs text-muted-foreground">
+              Found in your Tawk.to dashboard property settings.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* reCAPTCHA Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <ShieldCheck className="h-4 w-4" />
+            reCAPTCHA
+          </CardTitle>
+          <CardDescription>
+            Google reCAPTCHA v2 protects your forms from spam. Get keys at{" "}
+            <a href="https://www.google.com/recaptcha/admin" target="_blank" rel="noopener noreferrer" className="underline">google.com/recaptcha/admin</a>.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="recaptcha_site_key">Site Key</Label>
+            <Input
+              id="recaptcha_site_key"
+              value={settings.recaptcha_site_key}
+              onChange={(e) => handleSettingChange("recaptcha_site_key", e.target.value)}
+              placeholder="6Lc..._U"
+            />
+            <p className="text-xs text-muted-foreground">
+              Public site key — exposed to the frontend.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="recaptcha_secret_key">Secret Key</Label>
+            <Input
+              id="recaptcha_secret_key"
+              type="password"
+              value={settings.recaptcha_secret_key}
+              onChange={(e) => handleSettingChange("recaptcha_secret_key", e.target.value)}
+              placeholder="6Lc..._s"
+            />
+            <p className="text-xs text-muted-foreground">
+              Private key — never exposed to the frontend.
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -574,7 +663,7 @@ export function AdminSettings() {
               onChange={(e) =>
                 handleSettingChange("seo_default_title", e.target.value)
               }
-              placeholder="Purva Bites - Premium Products"
+              placeholder="Biotic Naturals - Premium Products"
             />
             <p className="text-xs text-muted-foreground">
               Used as the default page title across the site. Best practice:
@@ -652,13 +741,16 @@ export function AdminSettings() {
             <Textarea
               id="header_scripts"
               value={settings.header_scripts}
-              onChange={(e) => handleSettingChange("header_scripts", e.target.value)}
+              onChange={(e) =>
+                handleSettingChange("header_scripts", e.target.value)
+              }
               placeholder={`<script>\n  console.log("Custom header script");\n</script>`}
               rows={4}
               className="font-mono text-xs resize-y"
             />
             <p className="text-xs text-muted-foreground">
-              Custom scripts injected into the {"<head>"} of every page (analytics, tracking pixels, etc.)
+              Custom scripts injected into the {"<head>"} of every page
+              (analytics, tracking pixels, etc.)
             </p>
           </div>
           <div className="space-y-2 sm:col-span-2">
@@ -666,13 +758,16 @@ export function AdminSettings() {
             <Textarea
               id="footer_scripts"
               value={settings.footer_scripts}
-              onChange={(e) => handleSettingChange("footer_scripts", e.target.value)}
+              onChange={(e) =>
+                handleSettingChange("footer_scripts", e.target.value)
+              }
               placeholder={`<script>\n  console.log("Custom footer script");\n</script>`}
               rows={4}
               className="font-mono text-xs resize-y"
             />
             <p className="text-xs text-muted-foreground">
-              Custom scripts injected before the closing {"</body>"} tag (chat widgets, etc.)
+              Custom scripts injected before the closing {"</body>"} tag (chat
+              widgets, etc.)
             </p>
           </div>
 
@@ -732,8 +827,8 @@ export function AdminSettings() {
                   SMTP not configured
                 </p>
                 <p className="text-amber-700 dark:text-amber-300 mt-1">
-                   Email notifications (password resets)
-                  will not be sent until SMTP is configured.
+                  Email notifications (password resets) will not be sent until
+                  SMTP is configured.
                 </p>
               </div>
             </div>
@@ -858,13 +953,13 @@ function AuthorProfiles() {
 
   async function fetchUsers() {
     try {
-      const res = await adminFetch('/api/users?all=true');
+      const res = await adminFetch("/api/users?all=true");
       if (res.ok) {
         const data = await res.json();
         setUsers(data.users || data);
       }
     } catch {
-      toast.error('Failed to load users');
+      toast.error("Failed to load users");
     }
   }
 
@@ -876,24 +971,26 @@ function AuthorProfiles() {
     setSavingId(userId);
     try {
       const fd = new FormData();
-      fd.append('file', file);
-      const res = await adminFetch('/api/upload', { method: 'POST', body: fd });
+      fd.append("file", file);
+      const res = await adminFetch("/api/upload", { method: "POST", body: fd });
       if (res.ok) {
         const data = await res.json();
         const updateRes = await adminFetch(`/api/users/${userId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ avatar: data.url }),
         });
         if (updateRes.ok) {
-          setUsers(prev => prev.map(u => u.id === userId ? { ...u, avatar: data.url } : u));
-          toast.success('Avatar uploaded');
+          setUsers((prev) =>
+            prev.map((u) => (u.id === userId ? { ...u, avatar: data.url } : u)),
+          );
+          toast.success("Avatar uploaded");
         }
       } else {
-        toast.error('Upload failed');
+        toast.error("Upload failed");
       }
     } catch {
-      toast.error('Upload failed');
+      toast.error("Upload failed");
     } finally {
       setSavingId(null);
     }
@@ -901,16 +998,18 @@ function AuthorProfiles() {
 
   const deleteUser = async (userId: string) => {
     try {
-      const res = await adminFetch(`/api/users/${userId}`, { method: 'DELETE' });
+      const res = await adminFetch(`/api/users/${userId}`, {
+        method: "DELETE",
+      });
       if (res.ok) {
-        setUsers(prev => prev.filter(u => u.id !== userId));
-        toast.success('User deleted');
+        setUsers((prev) => prev.filter((u) => u.id !== userId));
+        toast.success("User deleted");
       } else {
         const err = await res.json();
-        toast.error(err.error || 'Failed to delete user');
+        toast.error(err.error || "Failed to delete user");
       }
     } catch {
-      toast.error('Failed to delete user');
+      toast.error("Failed to delete user");
     }
   };
 
@@ -918,17 +1017,17 @@ function AuthorProfiles() {
     setSavingId(userId);
     try {
       const res = await adminFetch(`/api/users/${userId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bio: bio.trim() || null }),
       });
       if (res.ok) {
-        toast.success('Bio saved');
+        toast.success("Bio saved");
       } else {
-        toast.error('Failed to save bio');
+        toast.error("Failed to save bio");
       }
     } catch {
-      toast.error('Failed to save bio');
+      toast.error("Failed to save bio");
     } finally {
       setSavingId(null);
     }
@@ -972,18 +1071,24 @@ function AuthorRow({
   onSaveBio,
   onDelete,
 }: {
-  user: { id: string; name: string; email: string; avatar: string | null; bio: string | null };
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    avatar: string | null;
+    bio: string | null;
+  };
   savingId: string | null;
   onUploadAvatar: (file: File, userId: string) => void;
   onSaveBio: (userId: string, bio: string) => void;
   onDelete: (userId: string) => void;
 }) {
-  const [bio, setBio] = useState(user.bio || '');
+  const [bio, setBio] = useState(user.bio || "");
   const [dirty, setDirty] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
-    setBio(user.bio || '');
+    setBio(user.bio || "");
     setDirty(false);
   }, [user.bio]);
 
@@ -1017,10 +1122,16 @@ function AuthorRow({
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) onUploadAvatar(file, user.id);
-                e.target.value = '';
+                e.target.value = "";
               }}
             />
-            <Button type="button" variant="outline" size="sm" asChild disabled={isSaving}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              asChild
+              disabled={isSaving}
+            >
               <span>
                 {isSaving ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -1045,7 +1156,10 @@ function AuthorRow({
         <Textarea
           placeholder="Short bio for blog posts..."
           value={bio}
-          onChange={(e) => { setBio(e.target.value); setDirty(true); }}
+          onChange={(e) => {
+            setBio(e.target.value);
+            setDirty(true);
+          }}
           rows={2}
           className="text-sm"
         />
@@ -1070,14 +1184,18 @@ function AuthorRow({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete User</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {user.name}? This action cannot be undone.
+              Are you sure you want to delete {user.name}? This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => { onDelete(user.id); setConfirmDelete(false); }}
+              onClick={() => {
+                onDelete(user.id);
+                setConfirmDelete(false);
+              }}
             >
               Delete
             </AlertDialogAction>

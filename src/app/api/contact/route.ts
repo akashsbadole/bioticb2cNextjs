@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { sendEnquiryNotificationToAdmin, sendEnquiryConfirmation } from '@/lib/email';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { isHoneypotFilled } from '@/lib/honeypot';
+import { verifyRecaptcha } from '@/lib/recaptcha';
 
 // Max 10 contact form submissions per hour per IP
 const CONTACT_RATE_LIMIT = { maxRequests: 10, windowMs: 60 * 60 * 1000, prefix: 'contact' };
@@ -10,7 +11,7 @@ const CONTACT_RATE_LIMIT = { maxRequests: 10, windowMs: 60 * 60 * 1000, prefix: 
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResponse = checkRateLimit(request, CONTACT_RATE_LIMIT);
+    const rateLimitResponse = await checkRateLimit(request, CONTACT_RATE_LIMIT);
     if (rateLimitResponse) return rateLimitResponse;
     const body = await request.json();
 
@@ -27,7 +28,16 @@ export async function POST(request: NextRequest) {
       message,
       productId,
       type,
+      recaptchaToken,
     } = body;
+
+    // Verify reCAPTCHA if a token was provided
+    if (recaptchaToken) {
+      const recaptchaResult = await verifyRecaptcha(recaptchaToken);
+      if (!recaptchaResult.success) {
+        return NextResponse.json({ error: 'reCAPTCHA verification failed' }, { status: 400 });
+      }
+    }
 
     if (!name || !email || !subject || !message) {
       return NextResponse.json(
@@ -54,6 +64,7 @@ export async function POST(request: NextRequest) {
         subject,
         message,
         productId: productId || null,
+        productName: productName || null,
         status: 'new',
       },
     });

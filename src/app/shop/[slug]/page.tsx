@@ -10,7 +10,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   return {
-    title: `${slug.charAt(0).toUpperCase() + slug.slice(1)} | Purva Bites`,
+    title: `${slug.charAt(0).toUpperCase() + slug.slice(1)} | Biotic Naturals`,
     description: `Explore our ${slug} product range. Premium quality FMCG products with fast delivery and great prices for retail customers.`,
   };
 }

@@ -67,13 +67,9 @@ async function main() {
   });
   console.log(`   ✅ ${pages.count} content pages migrated\n`);
 
-  // 7. Migrate enquiries
-  console.log("7. Migrating enquiries...");
-  const enquiries = await prisma.enquiry.updateMany({
-    where: { storeId: null },
-    data: { storeId: defaultStore.id },
-  });
-  console.log(`   ✅ ${enquiries.count} enquiries migrated\n`);
+  // 7. Migrate enquiries (model may not exist in current schema)
+  // Skipping - model removed
+  console.log("7. Skipping enquiries migration (model removed)\n");
 
   // 8. Migrate media
   console.log("8. Migrating media...");

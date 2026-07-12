@@ -26,6 +26,7 @@ import {
   X,
 } from "lucide-react";
 import { AdminProductVariants } from "./AdminProductVariants";
+import { AdminProductAddons } from "./AdminProductAddons";
 import { formatPrice as libFormatPrice } from "@/lib/pricing";
 import type { PageBlock } from "@/lib/page-blocks";
 import { normalizePageBlocks } from "@/lib/page-blocks";
@@ -287,125 +288,128 @@ export function AdminProducts() {
   const { data: products = [], isLoading: loading } = useQuery({
     queryKey: ["admin-products", activeTab, searchTerm, categoryFilter],
     queryFn: async () => {
-        const params = new URLSearchParams({ all: "true" });
-        if (activeTab === "trashed") params.set("trashed", "true");
-        if (searchTerm) params.set("search", searchTerm);
-        if (categoryFilter && categoryFilter !== "all")
-            params.set("categoryId", categoryFilter);
-        const res = await adminFetch(`/api/products?${params.toString()}`);
-        if (!res.ok) throw new Error("Failed to load products");
-        return (await res.json()).products || [];
-    }
+      const params = new URLSearchParams({ all: "true" });
+      if (activeTab === "trashed") params.set("trashed", "true");
+      if (searchTerm) params.set("search", searchTerm);
+      if (categoryFilter && categoryFilter !== "all")
+        params.set("categoryId", categoryFilter);
+      const res = await adminFetch(`/api/products?${params.toString()}`);
+      if (!res.ok) throw new Error("Failed to load products");
+      return (await res.json()).products || [];
+    },
   });
 
   const { data: categories = [] } = useQuery({
     queryKey: ["admin-categories"],
     queryFn: async () => {
-        const res = await adminFetch("/api/categories?all=true");
-        return (await res.json()).categories || [];
-    }
+      const res = await adminFetch("/api/categories?all=true");
+      return (await res.json()).categories || [];
+    },
   });
 
   const { data: settings = {} } = useQuery({
     queryKey: ["admin-settings"],
     queryFn: async () => {
-        const res = await adminFetch("/api/store/settings");
-        return (await res.json()).settings || {};
-    }
+      const res = await adminFetch("/api/store/settings");
+      return (await res.json()).settings || {};
+    },
   });
 
   const currency = (settings as Record<string, string>).currency || "INR";
 
   // Mutations
   const saveMutation = useMutation({
-    mutationFn: async ({ id, data }: { id?: string, data: any }) => {
-        const url = id ? `/api/products/${id}` : "/api/products";
-        const res = await adminFetch(url, {
-            method: id ? "PUT" : "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
-        if (!res.ok) throw new Error((await res.json()).error || "Failed to save");
-        return res.json();
+    mutationFn: async ({ id, data }: { id?: string; data: any }) => {
+      const url = id ? `/api/products/${id}` : "/api/products";
+      const res = await adminFetch(url, {
+        method: id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok)
+        throw new Error((await res.json()).error || "Failed to save");
+      return res.json();
     },
     onSuccess: () => {
-        toast.success(editingProduct ? "Product updated" : "Product created");
-        setFormOpen(false);
-        queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      toast.success(editingProduct ? "Product updated" : "Product created");
+      setFormOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
     },
-    onError: (err: any) => toast.error(err.message)
+    onError: (err: any) => toast.error(err.message),
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-        const res = await adminFetch(`/api/products/${id}`, { method: "DELETE" });
-        if (!res.ok) throw new Error("Failed");
+      const res = await adminFetch(`/api/products/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed");
     },
     onSuccess: () => {
-        toast.success("Product moved to trash");
-        queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-        setDeleteId(null);
-    }
+      toast.success("Product moved to trash");
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      setDeleteId(null);
+    },
   });
 
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-        const res = await adminFetch(`/api/products/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ restore: true }),
-        });
-        if (!res.ok) throw new Error("Failed");
+      const res = await adminFetch(`/api/products/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ restore: true }),
+      });
+      if (!res.ok) throw new Error("Failed");
     },
     onSuccess: () => {
-        toast.success("Product restored");
-        queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-    }
+      toast.success("Product restored");
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+    },
   });
 
   const permanentDeleteMutation = useMutation({
     mutationFn: async (id: string) => {
-        const res = await adminFetch(`/api/products/${id}?permanent=true`, { method: "DELETE" });
-        if (!res.ok) throw new Error("Failed");
+      const res = await adminFetch(`/api/products/${id}?permanent=true`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed");
     },
     onSuccess: () => {
-        toast.success("Product permanently deleted");
-        queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-        setPermanentDeleteId(null);
-    }
+      toast.success("Product permanently deleted");
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      setPermanentDeleteId(null);
+    },
   });
 
   const bulkMutation = useMutation({
-    mutationFn: async ({ ids, action }: { ids: string[], action: string }) => {
-        const res = await adminFetch("/api/products/bulk", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ids, action }),
-        });
-        if (!res.ok) throw new Error("Failed");
+    mutationFn: async ({ ids, action }: { ids: string[]; action: string }) => {
+      const res = await adminFetch("/api/products/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids, action }),
+      });
+      if (!res.ok) throw new Error("Failed");
     },
     onSuccess: (_, variables) => {
-        toast.success(`Bulk action ${variables.action} successful`);
-        setSelectedIds([]);
-        setBulkAction(null);
-        queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-    }
+      toast.success(`Bulk action ${variables.action} successful`);
+      setSelectedIds([]);
+      setBulkAction(null);
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+    },
   });
 
   const inlineStockMutation = useMutation({
-    mutationFn: async ({ id, stock }: { id: string, stock: number }) => {
-        const res = await adminFetch(`/api/products/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ stock }),
-        });
-        if (!res.ok) throw new Error("Failed");
+    mutationFn: async ({ id, stock }: { id: string; stock: number }) => {
+      const res = await adminFetch(`/api/products/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stock }),
+      });
+      if (!res.ok) throw new Error("Failed");
     },
     onSuccess: () => {
-        toast.success("Stock updated");
-        setEditingStockId(null);
-        queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-    }
+      toast.success("Stock updated");
+      setEditingStockId(null);
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+    },
   });
 
   const handleOpenAdd = () => {
@@ -485,40 +489,40 @@ export function AdminProducts() {
     }
 
     const imagesArray = form.images
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
 
     const payload = {
-        name: form.name.trim(),
-        slug: form.slug.trim() || generateSlug(form.name),
-        description: form.description.trim() || null,
-        shortDescription: form.shortDescription.trim() || null,
-        price: Number(form.price),
-        comparePrice: form.comparePrice ? Number(form.comparePrice) : null,
-        sku: form.sku.trim() || null,
-        barcode: form.barcode.trim() || null,
-        hsnCode: form.hsnCode.trim() || null,
-        images: imagesArray,
-        categoryId: form.categoryId || null,
-        isFeatured: form.isFeatured,
-        isBestSeller: form.isBestSeller,
-        isActive: form.isActive,
-        isDigital: form.isDigital,
-        downloadUrl: form.downloadUrl.trim() || null,
-        videoUrl: form.videoUrl.trim() || null,
-        sortOrder: parseInt(form.sortOrder) || 0,
-        specifications: form.specifications.trim() || null,
-        metaTitle: form.metaTitle.trim() || null,
-        metaDescription: form.metaDescription.trim() || null,
-        ogImage: form.ogImage.trim() || null,
-        customSchema: form.customSchema.trim() || null,
-        whatsappNumber: form.whatsappNumber.trim() || null,
-        tags: form.tags.trim() || null,
-        attributes: form.attributes.trim() || "{}",
-        stock: parseInt(form.stock) || 0,
-        lowStockThreshold: parseInt(form.lowStockThreshold) || 10,
-        relatedProductIds: JSON.stringify(selectedRelatedIds),
+      name: form.name.trim(),
+      slug: form.slug.trim() || generateSlug(form.name),
+      description: form.description.trim() || null,
+      shortDescription: form.shortDescription.trim() || null,
+      price: Number(form.price),
+      comparePrice: form.comparePrice ? Number(form.comparePrice) : null,
+      sku: form.sku.trim() || null,
+      barcode: form.barcode.trim() || null,
+      hsnCode: form.hsnCode.trim() || null,
+      images: imagesArray,
+      categoryId: form.categoryId || null,
+      isFeatured: form.isFeatured,
+      isBestSeller: form.isBestSeller,
+      isActive: form.isActive,
+      isDigital: form.isDigital,
+      downloadUrl: form.downloadUrl.trim() || null,
+      videoUrl: form.videoUrl.trim() || null,
+      sortOrder: parseInt(form.sortOrder) || 0,
+      specifications: form.specifications.trim() || null,
+      metaTitle: form.metaTitle.trim() || null,
+      metaDescription: form.metaDescription.trim() || null,
+      ogImage: form.ogImage.trim() || null,
+      customSchema: form.customSchema.trim() || null,
+      whatsappNumber: form.whatsappNumber.trim() || null,
+      tags: form.tags.trim() || null,
+      attributes: form.attributes.trim() || "{}",
+      stock: parseInt(form.stock) || 0,
+      lowStockThreshold: parseInt(form.lowStockThreshold) || 10,
+      relatedProductIds: JSON.stringify(selectedRelatedIds),
     };
 
     saveMutation.mutate({ id: editingProduct?.id, data: payload });
@@ -759,9 +763,7 @@ export function AdminProducts() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Products</h2>
-          <p className="text-muted-foreground mt-1">
-            Manage your products
-          </p>
+          <p className="text-muted-foreground mt-1">Manage your products</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Button
@@ -958,6 +960,9 @@ export function AdminProducts() {
                   <TableHead className="hidden lg:table-cell">
                     Featured
                   </TableHead>
+                  <TableHead className="hidden xl:table-cell">
+                    Best Seller
+                  </TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -1086,6 +1091,18 @@ export function AdminProducts() {
                           <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
+                      <TableCell className="hidden xl:table-cell">
+                        {product.isBestSeller ? (
+                          <Badge
+                            variant="secondary"
+                            className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                          >
+                            Best Seller
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
                           {activeTab === "trashed" ? (
@@ -1156,10 +1173,11 @@ export function AdminProducts() {
           </DialogHeader>
           {editingProduct && (
             <Tabs value={editTab} onValueChange={setEditTab}>
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="general">General</TabsTrigger>
                 <TabsTrigger value="variants">Variants</TabsTrigger>
                 <TabsTrigger value="related">Related</TabsTrigger>
+                <TabsTrigger value="addons">Add-ons</TabsTrigger>
               </TabsList>
             </Tabs>
           )}
@@ -1298,11 +1316,25 @@ export function AdminProducts() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="prod-tags">Tags (comma separated)</Label>
-                    <Input id="prod-tags" placeholder="new, summer, popular" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
+                    <Input
+                      id="prod-tags"
+                      placeholder="new, summer, popular"
+                      value={form.tags}
+                      onChange={(e) =>
+                        setForm({ ...form, tags: e.target.value })
+                      }
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="prod-attrs">Attributes (JSON)</Label>
-                    <Input id="prod-attrs" placeholder='{"Material": "Wood"}' value={form.attributes} onChange={(e) => setForm({ ...form, attributes: e.target.value })} />
+                    <Input
+                      id="prod-attrs"
+                      placeholder='{"Material": "Wood"}'
+                      value={form.attributes}
+                      onChange={(e) =>
+                        setForm({ ...form, attributes: e.target.value })
+                      }
+                    />
                   </div>
                 </div>
 
@@ -1326,7 +1358,10 @@ export function AdminProducts() {
                       placeholder="123456789"
                       value={form.barcode}
                       onChange={(e) =>
-                        setForm((prev) => ({ ...prev, barcode: e.target.value }))
+                        setForm((prev) => ({
+                          ...prev,
+                          barcode: e.target.value,
+                        }))
                       }
                     />
                   </div>
@@ -1337,10 +1372,15 @@ export function AdminProducts() {
                       placeholder="2106 90 99"
                       value={form.hsnCode}
                       onChange={(e) =>
-                        setForm((prev) => ({ ...prev, hsnCode: e.target.value }))
+                        setForm((prev) => ({
+                          ...prev,
+                          hsnCode: e.target.value,
+                        }))
                       }
                     />
-                    <p className="text-xs text-muted-foreground">For GST invoice compliance</p>
+                    <p className="text-xs text-muted-foreground">
+                      For GST invoice compliance
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label>Category</Label>
@@ -1454,14 +1494,30 @@ export function AdminProducts() {
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                        <Label htmlFor="prod-video">Video URL</Label>
-                        <Input id="prod-video" placeholder="YouTube/Vimeo link" value={form.videoUrl} onChange={(e) => setForm({ ...form, videoUrl: e.target.value })} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="prod-download">Download URL (Digital)</Label>
-                        <Input id="prod-download" placeholder="External link to file" value={form.downloadUrl} onChange={(e) => setForm({ ...form, downloadUrl: e.target.value })} />
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="prod-video">Video URL</Label>
+                    <Input
+                      id="prod-video"
+                      placeholder="YouTube/Vimeo link"
+                      value={form.videoUrl}
+                      onChange={(e) =>
+                        setForm({ ...form, videoUrl: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="prod-download">
+                      Download URL (Digital)
+                    </Label>
+                    <Input
+                      id="prod-download"
+                      placeholder="External link to file"
+                      value={form.downloadUrl}
+                      onChange={(e) =>
+                        setForm({ ...form, downloadUrl: e.target.value })
+                      }
+                    />
+                  </div>
                 </div>
 
                 {/* Switches */}
@@ -1623,7 +1679,7 @@ export function AdminProducts() {
                         }
                       />
                       <p className="text-xs text-muted-foreground">
-                        Leave empty to use: Product Name | Purva Bites
+                        Leave empty to use: Product Name | Biotic Naturals
                       </p>
                     </div>
                     <div className="space-y-2">
@@ -1666,27 +1722,37 @@ export function AdminProducts() {
                         placeholder="https://example.com/og-image.jpg"
                         value={form.ogImage}
                         onChange={(e) =>
-                          setForm(prev => ({ ...prev, ogImage: e.target.value }))
+                          setForm((prev) => ({
+                            ...prev,
+                            ogImage: e.target.value,
+                          }))
                         }
                       />
                       <p className="text-xs text-muted-foreground">
-                        Image shown when this product is shared on social media (recommended 1200×630px)
+                        Image shown when this product is shared on social media
+                        (recommended 1200×630px)
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="prod-custom-schema">Custom JSON-LD Schema (optional)</Label>
+                      <Label htmlFor="prod-custom-schema">
+                        Custom JSON-LD Schema (optional)
+                      </Label>
                       <Textarea
                         id="prod-custom-schema"
                         placeholder='{"@type": "Product", ...}'
                         value={form.customSchema}
                         onChange={(e) =>
-                          setForm(prev => ({ ...prev, customSchema: e.target.value }))
+                          setForm((prev) => ({
+                            ...prev,
+                            customSchema: e.target.value,
+                          }))
                         }
                         rows={3}
                         className="font-mono text-xs"
                       />
                       <p className="text-xs text-muted-foreground">
-                        Override or extend the default Product schema. Must be valid JSON.
+                        Override or extend the default Product schema. Must be
+                        valid JSON.
                       </p>
                     </div>
                   </CollapsibleContent>
@@ -1701,6 +1767,13 @@ export function AdminProducts() {
                   productId={editingProduct.id}
                   lowStockThreshold={parseInt(form.lowStockThreshold) || 10}
                 />
+              </div>
+            )}
+
+            {/* Add-ons Tab */}
+            {editingProduct && editTab === "addons" && (
+              <div className="py-4">
+                <AdminProductAddons productId={editingProduct.id} />
               </div>
             )}
 
@@ -1785,8 +1858,6 @@ export function AdminProducts() {
                 )}
               </div>
             )}
-
-
           </ScrollArea>
           <DialogFooter>
             <Button variant="outline" onClick={() => setFormOpen(false)}>
@@ -1922,7 +1993,9 @@ export function AdminProducts() {
               disabled={permanentDeleteMutation.isPending}
               className="bg-rose-600 hover:bg-rose-700"
             >
-              {permanentDeleteMutation.isPending ? "Deleting..." : "Permanent Delete"}
+              {permanentDeleteMutation.isPending
+                ? "Deleting..."
+                : "Permanent Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

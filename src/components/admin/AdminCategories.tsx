@@ -200,10 +200,10 @@ export function AdminCategories() {
   const { data: categories = [], isLoading: loading } = useQuery({
     queryKey: ["admin-categories"],
     queryFn: async () => {
-        const res = await adminFetch("/api/categories?all=true");
-        if (!res.ok) throw new Error("Failed");
-        return (await res.json()).categories || [];
-    }
+      const res = await adminFetch("/api/categories?all=true");
+      if (!res.ok) throw new Error("Failed");
+      return (await res.json()).categories || [];
+    },
   });
 
   const resetCategoryFields = () => {
@@ -250,11 +250,14 @@ export function AdminCategories() {
   const { data: allProducts = [] } = useQuery({
     queryKey: ["admin-products-minimal"],
     queryFn: async () => {
-        const res = await fetch("/api/products?limit=1000");
-        const data = await res.json();
-        return (data.products || []).map((p: any) => ({ id: p.id, name: p.name }));
+      const res = await fetch("/api/products?limit=1000");
+      const data = await res.json();
+      return (data.products || []).map((p: any) => ({
+        id: p.id,
+        name: p.name,
+      }));
     },
-    enabled: formOpen
+    enabled: formOpen,
   });
 
   const handleOpenEdit = async (cat: Category) => {
@@ -336,22 +339,22 @@ export function AdminCategories() {
   };
 
   const saveMutation = useMutation({
-    mutationFn: async ({ id, data }: { id?: string, data: any }) => {
-        const url = id ? `/api/categories/${id}` : "/api/categories";
-        const res = await adminFetch(url, {
-            method: id ? "PUT" : "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
-        if (!res.ok) throw new Error((await res.json()).error || "Failed");
-        return res.json();
+    mutationFn: async ({ id, data }: { id?: string; data: any }) => {
+      const url = id ? `/api/categories/${id}` : "/api/categories";
+      const res = await adminFetch(url, {
+        method: id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error((await res.json()).error || "Failed");
+      return res.json();
     },
     onSuccess: () => {
-        toast.success(editingCategory ? "Category updated" : "Category created");
-        setFormOpen(false);
-        queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
+      toast.success(editingCategory ? "Category updated" : "Category created");
+      setFormOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
     },
-    onError: (err: any) => toast.error(err.message)
+    onError: (err: any) => toast.error(err.message),
   });
 
   const handleSave = async () => {
@@ -361,20 +364,20 @@ export function AdminCategories() {
     }
 
     const payload = {
-        name: form.name.trim(),
-        slug: form.slug.trim() || generateSlug(form.name),
-        description: form.description.trim() || null,
-        image: form.image.trim() || null,
-        sortOrder: parseInt(form.sortOrder) || 0,
-        isActive: form.isActive,
-        metaTitle: form.metaTitle.trim() || null,
-        metaDescription: form.metaDescription.trim() || null,
-        ogImage: form.ogImage.trim() || null,
-        customSchema: form.customSchema.trim() || null,
-        parentId: form.parentId || null,
-        productIds: form.productIds,
-        // Category page fields
-        ...categoryFields
+      name: form.name.trim(),
+      slug: form.slug.trim() || generateSlug(form.name),
+      description: form.description.trim() || null,
+      image: form.image.trim() || null,
+      sortOrder: parseInt(form.sortOrder) || 0,
+      isActive: form.isActive,
+      metaTitle: form.metaTitle.trim() || null,
+      metaDescription: form.metaDescription.trim() || null,
+      ogImage: form.ogImage.trim() || null,
+      customSchema: form.customSchema.trim() || null,
+      parentId: form.parentId || null,
+      productIds: form.productIds,
+      // Category page fields
+      ...categoryFields,
     };
 
     saveMutation.mutate({ id: editingCategory?.id, data: payload });
@@ -395,20 +398,20 @@ export function AdminCategories() {
   };
 
   const bulkMutation = useMutation({
-    mutationFn: async ({ ids, action }: { ids: string[], action: string }) => {
-        const res = await adminFetch("/api/categories/bulk", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ids, action }),
-        });
-        if (!res.ok) throw new Error("Failed");
+    mutationFn: async ({ ids, action }: { ids: string[]; action: string }) => {
+      const res = await adminFetch("/api/categories/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids, action }),
+      });
+      if (!res.ok) throw new Error("Failed");
     },
     onSuccess: (_, variables) => {
-        toast.success(`Bulk action successful`);
-        setSelectedIds([]);
-        setBulkAction(null);
-        queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
-    }
+      toast.success(`Bulk action successful`);
+      setSelectedIds([]);
+      setBulkAction(null);
+      queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
+    },
   });
 
   const handleBulkAction = (action: string) => {
@@ -484,15 +487,17 @@ export function AdminCategories() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-        const res = await adminFetch(`/api/categories/${id}`, { method: "DELETE" });
-        if (!res.ok) throw new Error("Failed");
+      const res = await adminFetch(`/api/categories/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed");
     },
     onSuccess: () => {
-        toast.success("Category deleted");
-        queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
-        setDeleteId(null);
-        setDeleteCategory(null);
-    }
+      toast.success("Category deleted");
+      queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
+      setDeleteId(null);
+      setDeleteCategory(null);
+    },
   });
 
   const handleDelete = () => {
@@ -715,165 +720,168 @@ export function AdminCategories() {
               {editingCategory ? "Edit Category" : "Add Category"}
             </DialogTitle>
           </DialogHeader>
-          <Tabs value={activeSectionTab} onValueChange={setActiveSectionTab} className="w-full">
+          <Tabs
+            value={activeSectionTab}
+            onValueChange={setActiveSectionTab}
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="sections">Sections</TabsTrigger>
             </TabsList>
-            <TabsContent value="details" className="grid gap-4 py-4 max-h-[calc(90vh-210px)] overflow-y-auto">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="cat-name">
-                  Name <span className="text-rose-500">*</span>
-                </Label>
-                <Input
-                  id="cat-name"
-                  placeholder="Category name"
-                  value={form.name}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                />
+            <TabsContent
+              value="details"
+              className="grid gap-4 py-4 max-h-[calc(90vh-210px)] overflow-y-auto"
+            >
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="cat-name">
+                    Name <span className="text-rose-500">*</span>
+                  </Label>
+                  <Input
+                    id="cat-name"
+                    placeholder="Category name"
+                    value={form.name}
+                    onChange={(e) => handleNameChange(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cat-slug">Slug</Label>
+                  <Input
+                    id="cat-slug"
+                    placeholder="category-slug"
+                    value={form.slug}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, slug: e.target.value }))
+                    }
+                  />
+                </div>
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="cat-slug">Slug</Label>
-                <Input
-                  id="cat-slug"
-                  placeholder="category-slug"
-                  value={form.slug}
+                <Label htmlFor="cat-desc">Description</Label>
+                <Textarea
+                  id="cat-desc"
+                  placeholder="Category description"
+                  value={form.description}
                   onChange={(e) =>
-                    setForm((prev) => ({ ...prev, slug: e.target.value }))
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cat-desc">Description</Label>
-              <Textarea
-                id="cat-desc"
-                placeholder="Category description"
-                value={form.description}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, description: e.target.value }))
-                }
-                rows={3}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cat-image">Image URL</Label>
-              <Input
-                id="cat-image"
-                placeholder="https://example.com/image.jpg"
-                value={form.image}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, image: e.target.value }))
-                }
-              />
-              {form.image && (
-                <img
-                  src={form.image}
-                  alt="Preview"
-                  className="h-16 w-16 rounded-md object-cover bg-muted"
-                />
-              )}
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="cat-sort">Sort Order</Label>
-                <Input
-                  id="cat-sort"
-                  type="number"
-                  placeholder="0"
-                  value={form.sortOrder}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, sortOrder: e.target.value }))
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cat-parent">Parent Category</Label>
-                <Select
-                  value={form.parentId || "__none__"}
-                  onValueChange={(val) =>
                     setForm((prev) => ({
                       ...prev,
-                      parentId: val === "__none__" ? "" : val,
+                      description: e.target.value,
                     }))
                   }
-                >
-                  <SelectTrigger id="cat-parent">
-                    <SelectValue placeholder="No Parent" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">No Parent</SelectItem>
-                    {categories
-                      .filter((c) => c.id !== editingCategory?.id)
-                      .map((c) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.name}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
+                  rows={3}
+                />
               </div>
-            </div>
 
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={form.isActive}
-                onCheckedChange={(checked) =>
-                  setForm((prev) => ({ ...prev, isActive: checked }))
-                }
-              />
-              <Label
-                className="cursor-pointer"
-                onClick={() =>
-                  setForm((prev) => ({ ...prev, isActive: !prev.isActive }))
-                }
-              >
-                Active
-              </Label>
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="cat-image">Image URL</Label>
+                <Input
+                  id="cat-image"
+                  placeholder="https://example.com/image.jpg"
+                  value={form.image}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, image: e.target.value }))
+                  }
+                />
+                {form.image && (
+                  <img
+                    src={form.image}
+                    alt="Preview"
+                    className="h-16 w-16 rounded-md object-cover bg-muted"
+                  />
+                )}
+              </div>
 
-            {/* Products Picker */}
-            <div className="space-y-2">
-              <Label>Products in this Category</Label>
-              <Popover
-                open={productPickerOpen}
-                onOpenChange={setProductPickerOpen}
-              >
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal h-auto min-h-10"
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="cat-sort">Sort Order</Label>
+                  <Input
+                    id="cat-sort"
+                    type="number"
+                    placeholder="0"
+                    value={form.sortOrder}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        sortOrder: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cat-parent">Parent Category</Label>
+                  <Select
+                    value={form.parentId || "__none__"}
+                    onValueChange={(val) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        parentId: val === "__none__" ? "" : val,
+                      }))
+                    }
                   >
-                    {form.productIds.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {form.productIds.slice(0, 5).map((id) => {
-                          const p = allProducts.find((ap) => ap.id === id);
-                          return p ? (
-                            <Badge
-                              key={id}
-                              variant="secondary"
-                              className="text-xs"
-                            >
-                              {p.name}
-                              <span
-                                role="button"
-                                tabIndex={0}
-                                className="ml-1 hover:text-rose-500 cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setForm((prev) => ({
-                                    ...prev,
-                                    productIds: prev.productIds.filter(
-                                      (pid) => pid !== id,
-                                    ),
-                                  }));
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter' || e.key === ' ') {
+                    <SelectTrigger id="cat-parent">
+                      <SelectValue placeholder="No Parent" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">No Parent</SelectItem>
+                      {categories
+                        .filter((c) => c.id !== editingCategory?.id)
+                        .map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={form.isActive}
+                  onCheckedChange={(checked) =>
+                    setForm((prev) => ({ ...prev, isActive: checked }))
+                  }
+                />
+                <Label
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setForm((prev) => ({ ...prev, isActive: !prev.isActive }))
+                  }
+                >
+                  Active
+                </Label>
+              </div>
+
+              {/* Products Picker */}
+              <div className="space-y-2">
+                <Label>Products in this Category</Label>
+                <Popover
+                  open={productPickerOpen}
+                  onOpenChange={setProductPickerOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal h-auto min-h-10"
+                    >
+                      {form.productIds.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {form.productIds.slice(0, 5).map((id) => {
+                            const p = allProducts.find((ap) => ap.id === id);
+                            return p ? (
+                              <Badge
+                                key={id}
+                                variant="secondary"
+                                className="text-xs"
+                              >
+                                {p.name}
+                                <span
+                                  role="button"
+                                  tabIndex={0}
+                                  className="ml-1 hover:text-rose-500 cursor-pointer"
+                                  onClick={(e) => {
                                     e.stopPropagation();
                                     setForm((prev) => ({
                                       ...prev,
@@ -881,193 +889,207 @@ export function AdminCategories() {
                                         (pid) => pid !== id,
                                       ),
                                     }));
-                                  }
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                      e.stopPropagation();
+                                      setForm((prev) => ({
+                                        ...prev,
+                                        productIds: prev.productIds.filter(
+                                          (pid) => pid !== id,
+                                        ),
+                                      }));
+                                    }
+                                  }}
+                                >
+                                  ×
+                                </span>
+                              </Badge>
+                            ) : null;
+                          })}
+                          {form.productIds.length > 5 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{form.productIds.length - 5} more
+                            </Badge>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          Select products...
+                        </span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80 p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Search products..." />
+                      <CommandList>
+                        <CommandEmpty>No products found.</CommandEmpty>
+                        <CommandGroup className="max-h-48 overflow-y-auto">
+                          {allProducts.map((p) => {
+                            const selected = form.productIds.includes(p.id);
+                            return (
+                              <CommandItem
+                                key={p.id}
+                                onSelect={() => {
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    productIds: selected
+                                      ? prev.productIds.filter(
+                                          (id) => id !== p.id,
+                                        )
+                                      : [...prev.productIds, p.id],
+                                  }));
                                 }}
                               >
-                                ×
-                              </span>
-                            </Badge>
-                          ) : null;
-                        })}
-                        {form.productIds.length > 5 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{form.productIds.length - 5} more
-                          </Badge>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground">
-                        Select products...
-                      </span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80 p-0" align="start">
-                  <Command>
-                    <CommandInput placeholder="Search products..." />
-                    <CommandList>
-                      <CommandEmpty>No products found.</CommandEmpty>
-                      <CommandGroup className="max-h-48 overflow-y-auto">
-                        {allProducts.map((p) => {
-                          const selected = form.productIds.includes(p.id);
-                          return (
-                            <CommandItem
-                              key={p.id}
-                              onSelect={() => {
-                                setForm((prev) => ({
-                                  ...prev,
-                                  productIds: selected
-                                    ? prev.productIds.filter(
-                                        (id) => id !== p.id,
-                                      )
-                                    : [...prev.productIds, p.id],
-                                }));
-                              }}
-                            >
-                              <Checkbox checked={selected} className="mr-2" />
-                              {p.name}
-                            </CommandItem>
-                          );
-                        })}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              {allProducts.length === 0 && (
-                <p className="text-xs text-muted-foreground">
-                  No products available. Create products first.
-                </p>
-              )}
-            </div>
-
-            <Separator />
-
-            {/* SEO Section (Collapsible) */}
-            <Collapsible open={seoOpen} onOpenChange={setSeoOpen}>
-              <CollapsibleTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full justify-between"
-                >
-                  <span className="flex items-center gap-2">
-                    <SearchCode className="h-4 w-4" />
-                    SEO Settings
-                    {(form.metaTitle || form.metaDescription) && (
-                      <span className="text-xs text-emerald-600 font-normal">
-                        (configured)
-                      </span>
-                    )}
-                  </span>
-                  <ChevronDown className="h-4 w-4 transition-transform duration-200" />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-4 pt-3">
-                <div className="space-y-2">
-                  <Label htmlFor="cat-meta-title">Meta Title</Label>
-                  <Input
-                    id="cat-meta-title"
-                    placeholder="Category Name | Store Name"
-                    value={form.metaTitle}
-                    onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        metaTitle: e.target.value,
-                      }))
-                    }
-                  />
+                                <Checkbox checked={selected} className="mr-2" />
+                                {p.name}
+                              </CommandItem>
+                            );
+                          })}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                {allProducts.length === 0 && (
                   <p className="text-xs text-muted-foreground">
-                    Leave empty to use: Category Name | Purva Bites
+                    No products available. Create products first.
                   </p>
-                </div>
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="cat-meta-desc"
-                    className="flex items-center justify-between"
+                )}
+              </div>
+
+              <Separator />
+
+              {/* SEO Section (Collapsible) */}
+              <Collapsible open={seoOpen} onOpenChange={setSeoOpen}>
+                <CollapsibleTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full justify-between"
                   >
-                    <span>Meta Description</span>
-                    <span className="text-xs text-muted-foreground font-normal">
-                      {form.metaDescription.length}/160
+                    <span className="flex items-center gap-2">
+                      <SearchCode className="h-4 w-4" />
+                      SEO Settings
+                      {(form.metaTitle || form.metaDescription) && (
+                        <span className="text-xs text-emerald-600 font-normal">
+                          (configured)
+                        </span>
+                      )}
                     </span>
-                  </Label>
-                  <Textarea
-                    id="cat-meta-desc"
-                    placeholder="A brief description for search engines..."
-                    value={form.metaDescription}
-                    onChange={(e) => {
-                      if (e.target.value.length <= 160) {
+                    <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-4 pt-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="cat-meta-title">Meta Title</Label>
+                    <Input
+                      id="cat-meta-title"
+                      placeholder="Category Name | Store Name"
+                      value={form.metaTitle}
+                      onChange={(e) =>
                         setForm((prev) => ({
                           ...prev,
-                          metaDescription: e.target.value,
-                        }));
+                          metaTitle: e.target.value,
+                        }))
                       }
-                    }}
-                    rows={3}
-                    className={
-                      form.metaDescription.length >= 150
-                        ? "border-amber-400"
-                        : ""
-                    }
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Recommended: 150-160 characters for optimal SEO
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cat-og-image">OG Image URL</Label>
-                  <Input
-                    id="cat-og-image"
-                    placeholder="https://example.com/og-image.jpg"
-                    value={form.ogImage}
-                    onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        ogImage: e.target.value,
-                      }))
-                    }
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Image shown when this category is shared on social media (recommended 1200×630px)
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cat-custom-schema">
-                    Custom JSON-LD Schema
-                  </Label>
-                  <Textarea
-                    id="cat-custom-schema"
-                    placeholder='{"@context": "https://schema.org", "@type": "CollectionPage", ...}'
-                    value={form.customSchema}
-                    onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        customSchema: e.target.value,
-                      }))
-                    }
-                    rows={3}
-                    className="font-mono text-xs"
-                  />
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          </TabsContent>
-          <TabsContent value="sections" className="py-4 max-h-[calc(90vh-210px)] overflow-y-auto">
-            <AdminCategoryFields
-              values={categoryFields}
-              onChange={setCategoryFields}
-              onSave={async () => {
-                setSavingSections(true);
-                try {
-                  await handleSave();
-                } finally {
-                  setSavingSections(false);
-                }
-              }}
-              saving={savingSections}
-            />
-          </TabsContent>
-        </Tabs>
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Leave empty to use: Category Name | Biotic Naturals
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="cat-meta-desc"
+                      className="flex items-center justify-between"
+                    >
+                      <span>Meta Description</span>
+                      <span className="text-xs text-muted-foreground font-normal">
+                        {form.metaDescription.length}/160
+                      </span>
+                    </Label>
+                    <Textarea
+                      id="cat-meta-desc"
+                      placeholder="A brief description for search engines..."
+                      value={form.metaDescription}
+                      onChange={(e) => {
+                        if (e.target.value.length <= 160) {
+                          setForm((prev) => ({
+                            ...prev,
+                            metaDescription: e.target.value,
+                          }));
+                        }
+                      }}
+                      rows={3}
+                      className={
+                        form.metaDescription.length >= 150
+                          ? "border-amber-400"
+                          : ""
+                      }
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Recommended: 150-160 characters for optimal SEO
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cat-og-image">OG Image URL</Label>
+                    <Input
+                      id="cat-og-image"
+                      placeholder="https://example.com/og-image.jpg"
+                      value={form.ogImage}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          ogImage: e.target.value,
+                        }))
+                      }
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Image shown when this category is shared on social media
+                      (recommended 1200×630px)
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cat-custom-schema">
+                      Custom JSON-LD Schema
+                    </Label>
+                    <Textarea
+                      id="cat-custom-schema"
+                      placeholder='{"@context": "https://schema.org", "@type": "CollectionPage", ...}'
+                      value={form.customSchema}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          customSchema: e.target.value,
+                        }))
+                      }
+                      rows={3}
+                      className="font-mono text-xs"
+                    />
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </TabsContent>
+            <TabsContent
+              value="sections"
+              className="py-4 max-h-[calc(90vh-210px)] overflow-y-auto"
+            >
+              <AdminCategoryFields
+                values={categoryFields}
+                onChange={setCategoryFields}
+                onSave={async () => {
+                  setSavingSections(true);
+                  try {
+                    await handleSave();
+                  } finally {
+                    setSavingSections(false);
+                  }
+                }}
+                saving={savingSections}
+              />
+            </TabsContent>
+          </Tabs>
           <DialogFooter>
             <Button variant="outline" onClick={() => setFormOpen(false)}>
               Cancel

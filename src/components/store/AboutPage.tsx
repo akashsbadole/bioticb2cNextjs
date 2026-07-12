@@ -15,7 +15,11 @@ import {
   MapPin,
   Linkedin,
 } from "lucide-react";
-import { BLOCK_DEFAULTS, deepMerge, normalizePageBlocks } from "@/lib/page-blocks";
+import {
+  BLOCK_DEFAULTS,
+  deepMerge,
+  normalizePageBlocks,
+} from "@/lib/page-blocks";
 import { useSeo } from "@/lib/use-seo";
 import { StoreHeroBanner } from "@/components/store/StoreHeroBanner";
 import { useContentPage, getPageContentData } from "@/lib/use-page-content";
@@ -54,28 +58,28 @@ function ResolvedIcon({
 
 export function AboutPage({ onNavigate, data: externalData }: AboutPageProps) {
   useSeo("about", {
-    title: "About Us | Purva Bites",
+    title: "About Us | Biotic Naturals",
     description:
-      "Built on trust. Driven by quality. From a distribution background to a full-scale FMCG manufacturing company — the Purva Bites story is one of conviction and craft.",
+      "Built on trust. Driven by quality. From a distribution background to a full-scale FMCG manufacturing company — the Biotic Naturals story is one of conviction and craft.",
   });
 
   const { data: cmsData } = useQuery({
     queryKey: ["about-cms"],
     enabled: !externalData,
     queryFn: async () => {
-        const res = await fetch("/api/content-pages?slug=about");
-        const json = await res.json();
-        const page = (json.contentPages || [])[0];
-        if (page?.blocks) {
-            const blocks = normalizePageBlocks(page.blocks);
-            return getPageContentData(
-                blocks,
-                "about-page-content",
-                BLOCK_DEFAULTS["about-page-content"].defaultData
-            );
-        }
-        return null;
-    }
+      const res = await fetch("/api/content-pages?slug=about");
+      const json = await res.json();
+      const page = (json.contentPages || [])[0];
+      if (page?.blocks) {
+        const blocks = normalizePageBlocks(page.blocks);
+        return getPageContentData(
+          blocks,
+          "about-page-content",
+          BLOCK_DEFAULTS["about-page-content"].defaultData,
+        );
+      }
+      return null;
+    },
   });
 
   const fallbackAbout = BLOCK_DEFAULTS["about-page-content"].defaultData;
@@ -237,7 +241,7 @@ export function AboutPage({ onNavigate, data: externalData }: AboutPageProps) {
             Leadership
           </p>
           <h2 className="text-2xl font-bold mb-2">
-            The people behind Purva Bites
+            The people behind Biotic Naturals
           </h2>
           <p className="text-sm text-muted-foreground mb-10">
             Built by people who understand FMCG from the ground up
@@ -426,7 +430,9 @@ export function AboutPage({ onNavigate, data: externalData }: AboutPageProps) {
             <div className="flex-[1.4]">
               {location.googleMapsEmbedUrl ? (
                 <iframe
-                  src={getGoogleMapsEmbedUrl(location.googleMapsEmbedUrl as string)}
+                  src={getGoogleMapsEmbedUrl(
+                    location.googleMapsEmbedUrl as string,
+                  )}
                   width="100%"
                   height="100%"
                   className="rounded-lg min-h-[300px] border"
@@ -440,7 +446,9 @@ export function AboutPage({ onNavigate, data: externalData }: AboutPageProps) {
                 <div className="bg-muted border rounded-lg h-full min-h-[300px] flex items-center justify-center text-muted-foreground text-sm flex-col gap-2">
                   <MapPin className="h-8 w-8" />
                   <p>Google Maps embed</p>
-                  <p className="text-xs">Factory pin marked with brand marker</p>
+                  <p className="text-xs">
+                    Factory pin marked with brand marker
+                  </p>
                 </div>
               )}
             </div>
@@ -470,18 +478,17 @@ export function AboutPage({ onNavigate, data: externalData }: AboutPageProps) {
                 <p className="text-xs text-white/70 mb-5 leading-relaxed">
                   {item.desc}
                 </p>
-                  <button
-                    onClick={() => onNavigate(item.page || "contact")}
-                    className="w-full text-xs font-medium bg-white text-primary rounded-md py-2.5 hover:bg-white/90 transition-colors"
-                  >
-                    {item.cta || "Get in Touch"}
-                  </button>
+                <button
+                  onClick={() => onNavigate(item.page || "contact")}
+                  className="w-full text-xs font-medium bg-white text-primary rounded-md py-2.5 hover:bg-white/90 transition-colors"
+                >
+                  {item.cta || "Get in Touch"}
+                </button>
               </div>
             ))}
           </div>
         </div>
       </section>
-
     </div>
   );
 }

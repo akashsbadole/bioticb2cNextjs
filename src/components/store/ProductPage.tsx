@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { Package, Send, ChevronDown, ShoppingCart, Heart, ShieldCheck, Truck, RefreshCw, ZoomIn, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Package, Send, ChevronDown, ShoppingCart, Heart, ShieldCheck, Truck, RefreshCw, ZoomIn, X, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getFirstImage } from "@/lib/utils";
 import { formatPrice as libFormatPrice } from "@/lib/pricing";
@@ -17,6 +18,9 @@ import { RecentlyViewed } from "./RecentlyViewed";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { FlashSaleBadge } from "./FlashSaleBadge";
+import { useActiveFlashSales, getFlashSalePrice, formatTimeRemaining } from "@/lib/flash-sales";
+import { useCustomerPrices } from "@/lib/customer-pricing";
 
 interface ProductPageProps {
   slug: string;
@@ -28,8 +32,15 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(null);
+  const [flashTime, setFlashTime] = useState("");
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const [notifySent, setNotifySent] = useState(false);
+  const [notifyLoading, setNotifyLoading] = useState(false);
+  const [productAddons, setProductAddons] = useState<any[]>([]);
+  const [selectedAddons, setSelectedAddons] = useState<Record<string, boolean>>({});
 
   const { auth, settings, addToCart, addToRecentlyViewed, wishlistIds, toggleWishlistId } = useAppStore();
+  const { productMap: flashProductMap } = useActiveFlashSales();
   const currency = settings?.currency || "INR";
   const { data: product, isLoading: loading } = useQuery({
     queryKey: ["product", slug],
@@ -46,7 +57,7 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
                 price: prod.price
             });
         }
-        return prod;
+        return prod || null;
     }
   });
 
@@ -67,6 +78,26 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
     }
   }, [product, activeImage]);
 
+  useEffect(() => {
+    if (!product) return;
+    fetch(`/api/products/${product.id}/addons`)
+      .then((r) => r.json())
+      .then((data) => setProductAddons(data.addons?.filter((a: any) => a.isActive) || []))
+      .catch(() => {});
+  }, [product?.id]);
+
+  const flashDisc = product ? flashProductMap[product.id] : undefined;
+  const flashPrice = flashDisc ? getFlashSalePrice(product.price, flashDisc) : null;
+
+  useEffect(() => {
+    if (!flashDisc) return;
+    setFlashTime(formatTimeRemaining(flashDisc.endDate));
+    const interval = setInterval(() => {
+      setFlashTime(formatTimeRemaining(flashDisc.endDate));
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [flashDisc]);
+
   useSeo(`product-${slug}`, {
     title: product?.metaTitle || product?.name,
     description: product?.metaDescription || product?.shortDescription,
@@ -83,15 +114,37 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
     } catch { return []; }
   })();
 
+  const { getPrice: getCustomerPrice } = useCustomerPrices();
+
   const selectedVariant = product.ProductVariant?.find((v: any) => v.id === selectedVariantId);
-  const currentPrice = selectedVariant?.price ?? product.price;
+  const basePrice = selectedVariant?.price ?? product.price;
+  const currentPrice = getCustomerPrice(basePrice, product.id);
+
+  const handleNotify = async () => {
+    if (!notifyEmail) { toast.error("Enter your email"); return; }
+    setNotifyLoading(true);
+    try {
+      const res = await fetch("/api/stock-notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: notifyEmail, productId: product.id }),
+      });
+      const data = await res.json();
+      if (res.ok) { setNotifySent(true); toast.success(data.message); }
+      else toast.error(data.error || "Failed to subscribe");
+    } catch { toast.error("Network error"); }
+    finally { setNotifyLoading(false); }
+  };
 
   const handleAddToCart = () => {
+    const activeAddons = productAddons.filter((a: any) => selectedAddons[a.id]);
+    const addonTotal = activeAddons.reduce((sum: number, a: any) => sum + a.price, 0);
+    const addonNames = activeAddons.map((a: any) => a.name).join(" + ");
     addToCart({
       productId: product.id,
       variantId: selectedVariantId || undefined,
-      name: selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name,
-      price: currentPrice,
+      name: addonNames ? `${product.name} + ${addonNames}` : (selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name),
+      price: currentPrice + addonTotal,
       quantity: 1,
       image: activeImage || undefined,
     });
@@ -146,9 +199,18 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
                 <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-md p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10">
                     <ZoomIn className="h-5 w-5" />
                 </div>
-                {product.comparePrice && (
-                    <Badge className="absolute top-6 left-6 bg-rose-500 text-white border-none px-3 py-1">SALE</Badge>
-                )}
+                <div className="absolute top-6 left-6 flex flex-col gap-2 z-10">
+                    <FlashSaleBadge productId={product.id} />
+                    {product.comparePrice && (
+                        <Badge className="bg-rose-500 text-white border-none px-3 py-1">SALE</Badge>
+                    )}
+                    {product.createdAt && Date.now() - new Date(product.createdAt).getTime() < 30 * 24 * 60 * 60 * 1000 && (
+                        <Badge className="bg-emerald-500 text-white border-none px-3 py-1">NEW</Badge>
+                    )}
+                    {product.isBestSeller && (
+                        <Badge className="bg-amber-500 text-white border-none px-3 py-1">BEST SELLER</Badge>
+                    )}
+                </div>
             </div>
 
             {images.length > 1 && (
@@ -170,16 +232,37 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
           <div className="flex flex-col">
             <div className="flex-1 space-y-6">
                 <div>
-                    <Badge variant="outline" className="mb-4 text-primary border-primary/20 bg-primary/5">{product.Category?.name || 'General'}</Badge>
+                    <div className="flex flex-wrap items-center gap-2 mb-4">
+                        <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5">{product.Category?.name || 'General'}</Badge>
+                        <FlashSaleBadge productId={product.id} />
+                        {product.isFeatured && (
+                            <Badge className="bg-primary text-white border-none">FEATURED</Badge>
+                        )}
+                        {product.isBestSeller && (
+                            <Badge className="bg-amber-500 text-white border-none">BEST SELLER</Badge>
+                        )}
+                        {product.createdAt && Date.now() - new Date(product.createdAt).getTime() < 30 * 24 * 60 * 60 * 1000 && (
+                            <Badge className="bg-emerald-500 text-white border-none">NEW</Badge>
+                        )}
+                    </div>
                     <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-4">{product.name}</h1>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
-                            <span className="text-3xl font-black text-primary">{libFormatPrice(currentPrice, currency)}</span>
-                            {product.comparePrice && (
-                                <span className="text-lg text-muted-foreground line-through decoration-rose-500/50">{libFormatPrice(product.comparePrice, currency)}</span>
+                            <span className="text-3xl font-black text-primary">
+                                {flashPrice ? libFormatPrice(flashPrice.salePrice, currency) : libFormatPrice(currentPrice, currency)}
+                            </span>
+                            {(flashPrice || product.comparePrice) && (
+                                <span className="text-lg text-muted-foreground line-through decoration-rose-500/50">
+                                    {libFormatPrice(flashPrice ? product.price : (product.comparePrice || 0), currency)}
+                                </span>
                             )}
                         </div>
-                        {product.comparePrice && (
+                        {flashPrice && (
+                            <Badge className="bg-orange-500 text-white border-none text-[10px] font-bold animate-pulse">
+                                -{flashPrice.discountPercent}% · {flashTime}
+                            </Badge>
+                        )}
+                        {!flashPrice && product.comparePrice && (
                             <Badge className="bg-emerald-500 border-none text-[10px] font-bold">
                                 {Math.round((1 - product.price / product.comparePrice) * 100)}% OFF
                             </Badge>
@@ -207,6 +290,68 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
                                 </button>
                             ))}
                         </div>
+                    </div>
+                )}
+
+                {productAddons.length > 0 && (
+                    <div className="space-y-3 border-t pt-6">
+                        <Label className="text-xs uppercase font-black tracking-widest text-muted-foreground">Available Add-ons</Label>
+                        <div className="space-y-2">
+                            {productAddons.map((addon: any) => (
+                                <label
+                                    key={addon.id}
+                                    className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={!!selectedAddons[addon.id]}
+                                        onChange={(e) => setSelectedAddons((prev) => ({ ...prev, [addon.id]: e.target.checked }))}
+                                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                    />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium">{addon.name}</p>
+                                        {addon.description && <p className="text-xs text-muted-foreground">{addon.description}</p>}
+                                    </div>
+                                    <span className="text-sm font-bold text-primary">+{libFormatPrice(addon.price, currency)}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {flashDisc && (
+                    <div className="bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-2xl p-4 flex items-center gap-3 shadow-lg">
+                        <div className="text-2xl">⚡</div>
+                        <div className="flex-1">
+                            <p className="font-bold text-sm">{flashDisc.flashSaleName}</p>
+                            <p className="text-xs opacity-90">Sale ends in {flashTime}</p>
+                        </div>
+                        <div className="text-right">
+                            <p className="font-black text-lg">{libFormatPrice(flashPrice!.salePrice, currency)}</p>
+                            <p className="text-xs line-through opacity-70">{libFormatPrice(product.price, currency)}</p>
+                        </div>
+                    </div>
+                )}
+
+                {product.stock <= 0 && (
+                    <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 space-y-3">
+                        <p className="text-sm font-bold text-amber-800 dark:text-amber-200">Out of stock</p>
+                        {notifySent ? (
+                            <p className="text-sm text-amber-700 dark:text-amber-300">You'll be notified when this product is back in stock.</p>
+                        ) : (
+                            <div className="flex gap-2">
+                                <Input
+                                    type="email"
+                                    placeholder="your@email.com"
+                                    value={notifyEmail}
+                                    onChange={(e) => setNotifyEmail(e.target.value)}
+                                    className="h-10"
+                                />
+                                <Button variant="outline" className="shrink-0 h-10" onClick={handleNotify} disabled={notifyLoading}>
+                                    {notifyLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Notify Me"}
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 )}
 
