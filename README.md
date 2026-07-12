@@ -288,3 +288,9 @@ Field Value
 Email admin@example.com
 Password admin123
 Role admin
+================================
+
+You can now test customer login:
+
+- OTP tab — enter customer@store.com, check terminal for [OTP DEV] Code XXXX...
+- Password tab — customer@store.com / customer123
