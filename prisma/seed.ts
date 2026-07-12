@@ -19,6 +19,22 @@ async function main() {
   });
   console.log('Created admin:', admin.email);
 
+  // Create test customer
+  const customerPassword = await hash('customer123', 12);
+  const customer = await db.user.upsert({
+    where: { email: 'customer@store.com' },
+    update: {},
+    create: {
+      email: 'customer@store.com',
+      name: 'Test Customer',
+      password: customerPassword,
+      role: 'customer',
+      isActive: true,
+      isVerified: true,
+    },
+  });
+  console.log('Created customer:', customer.email);
+
   // Create electronics category
   const electronics = await db.category.findFirst({ where: { slug: 'electronics' } });
   let electronicsId = electronics?.id;

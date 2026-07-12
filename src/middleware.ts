@@ -80,7 +80,9 @@ async function resolveDefaultStoreId(): Promise<string | null> {
       defaultStoreId = data.id || null;
       defaultStoreCacheExpiry = now + DEFAULT_STORE_TTL;
     }
-  } catch { /* ignore */ }
+  } catch (err) {
+    console.warn("[middleware] Failed to resolve default store:", err);
+  }
   return defaultStoreId;
 }
 

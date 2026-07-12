@@ -23,6 +23,7 @@
     "seed:products:csv": "npx tsx scripts/seed-products-from-csv.ts",
     "seed:blog": "npx tsx scripts/seed-blog-posts.ts",
     "seed:blog:csv": "npx tsx scripts/seed-blog-from-csv.ts",
+    "migrate:turso": "npx tsx scripts/migrate-to-turso.ts",
     "build:prod": "prisma generate --schema=prisma/schema.postgres.prisma && next build"
   },
   "dependencies": {
@@ -32,7 +33,9 @@
     "@hookform/resolvers": "^5.1.1",
     "@mdxeditor/editor": "^3.39.1",
     "@neondatabase/serverless": "^1.1.0",
+    "@prisma/adapter-libsql": "^7.8.0",
     "@prisma/adapter-neon": "^7.8.0",
+    "@libsql/client": "^0.17.4",
     "@prisma/client": "^6.11.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",

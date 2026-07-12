@@ -121,7 +121,7 @@ export function AccountPage() {
             </div>
             <h1 className="text-3xl font-black mb-4">Account Access</h1>
             <p className="text-muted-foreground mb-8 max-w-md mx-auto">Please sign in to your account to manage your orders, addresses and profile settings.</p>
-            <Button size="lg" className="rounded-full px-12" onClick={() => navigate("home")}>Back to Shop</Button>
+            <Button size="lg" className="rounded-full px-12" onClick={() => navigate("login")}>Sign In</Button>
         </div>
     );
   }

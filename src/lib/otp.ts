@@ -54,11 +54,14 @@ export async function requestOtp(
       user.phone,
       `Your verification code is ${code}. It expires in 10 minutes.`,
     );
+    if (!result.success) {
+      console.log(`[OTP DEV] Code ${code} would have been sent via SMS to ${user.phone}`);
+    }
     return { success: result.success, error: result.error };
   }
 
   const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Store";
-  await sendEmail(
+  const emailSent = await sendEmail(
     normalized,
     `Your ${siteName} verification code`,
     `<div style="font-family:sans-serif;max-width:480px;margin:auto;padding:24px">
@@ -68,6 +71,9 @@ export async function requestOtp(
        <p style="color:#6b7280;font-size:13px">This code expires in 10 minutes. If you did not request this, you can ignore this email.</p>
      </div>`,
   );
+  if (!emailSent) {
+    console.log(`[OTP DEV] Code ${code} would have been sent via email to ${normalized}`);
+  }
 
   return { success: true };
 }
