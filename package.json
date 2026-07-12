@@ -16,6 +16,13 @@
     "db:migrate:prod": "prisma migrate deploy --schema=prisma/schema.postgres.prisma",
     "db:generate:prod": "prisma generate --schema=prisma/schema.postgres.prisma",
     "db:seed:prod": "prisma db seed --schema=prisma/schema.postgres.prisma",
+    "seed:pages": "npx tsx scripts/seed-content-pages.ts",
+    "seed:categories": "npx tsx scripts/seed-categories.ts",
+    "seed:settings": "npx tsx scripts/seed-settings.ts",
+    "seed:all": "npx tsx scripts/seed-settings.ts && npx tsx scripts/seed-categories.ts && npx tsx scripts/seed-content-pages.ts",
+    "seed:products:csv": "npx tsx scripts/seed-products-from-csv.ts",
+    "seed:blog": "npx tsx scripts/seed-blog-posts.ts",
+    "seed:blog:csv": "npx tsx scripts/seed-blog-from-csv.ts",
     "build:prod": "prisma generate --schema=prisma/schema.postgres.prisma && next build"
   },
   "dependencies": {

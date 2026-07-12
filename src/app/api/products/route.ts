@@ -60,10 +60,13 @@ export async function GET(request: NextRequest) {
       const lte = parseFloat(maxPrice);
       where.price = typeof where.price === 'object' ? { ...where.price, lte } : { lte };
     }
+    // Default to in-stock for public requests; admin uses all=true to bypass
     if (inStock === 'true' || stockStatus === 'in_stock') {
       where.stock = { gt: 0 };
     } else if (stockStatus === 'out_of_stock') {
       where.stock = { lte: 0 };
+    } else if (!all && stockStatus !== 'all') {
+      where.stock = { gt: 0 };
     }
 
     if (featured !== null && featured !== undefined) {

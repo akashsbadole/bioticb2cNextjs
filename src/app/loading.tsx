@@ -13,7 +13,7 @@ export default function Loading() {
         {/* Site Name */}
         <div className="text-center">
           <h1 className="text-xl font-bold tracking-tight">
-            Purva<span className="text-emerald-600">Bites</span>
+            Biotic<span className="text-emerald-600">Naturals</span>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">Loading...</p>
         </div>

@@ -53,57 +53,6 @@ const categoryInfo: Record<
   },
 };
 
-const products = [
-  {
-    name: "Plain Khakhra",
-    category: "khakhra",
-    tags: ["Khakhra", "PL ready"],
-    sizes: "80g · 200g · 500g · bulk",
-  },
-  {
-    name: "Methi Khakhra",
-    category: "khakhra",
-    tags: ["Khakhra", "Custom flavour"],
-    sizes: "80g · 200g · bulk",
-  },
-  {
-    name: "Masala Makhana",
-    category: "makhana",
-    tags: ["Makhana", "PL ready"],
-    sizes: "30g · 80g · 200g · bulk",
-  },
-  {
-    name: "Jeera Khakhra",
-    category: "khakhra",
-    tags: ["Khakhra", "PL ready"],
-    sizes: "80g · 200g · bulk",
-  },
-  {
-    name: "Bajra Bhakhri",
-    category: "bhakhri",
-    tags: ["Bhakhri"],
-    sizes: "80g · 200g · bulk",
-  },
-  {
-    name: "Spicy Makhana",
-    category: "makhana",
-    tags: ["Makhana", "Custom flavour"],
-    sizes: "30g · 80g · 200g · bulk",
-  },
-  {
-    name: "Corn Rings",
-    category: "extruder",
-    tags: ["Extruder"],
-    sizes: "30g · 80g · 200g · bulk",
-  },
-  {
-    name: "Digestive Biscuits",
-    category: "digestive",
-    tags: ["Digestive"],
-    sizes: "80g · 200g · bulk",
-  },
-];
-
 export function ProductsPage({
   onNavigate,
   data: externalData,
@@ -132,10 +81,6 @@ export function ProductsPage({
     );
   }
 
-  const filtered =
-    activeCategory === "all"
-      ? products
-      : products.filter((p) => p.category === activeCategory);
   const currentCat = categoryInfo[activeCategory];
 
   return (
@@ -215,12 +160,6 @@ export function ProductsPage({
               )}
             </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-3">
-            Showing {filtered.length} products
-            {activeCategory !== "all"
-              ? ` in ${currentCat?.name || activeCategory}`
-              : " across all categories"}
-          </p>
         </div>
       </section>
 
@@ -256,54 +195,6 @@ export function ProductsPage({
           </div>
         </section>
       )}
-
-      {/* Product Grid */}
-      <section className="py-10 px-4">
-        <div className="container mx-auto max-w-5xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {filtered.map((product) => (
-              <div
-                key={product.name}
-                className="border rounded-xl overflow-hidden bg-background"
-              >
-                <div className="h-32 bg-muted flex items-center justify-center text-xs text-muted-foreground">
-                  Product photo
-                </div>
-                <div className="p-3">
-                  <div className="flex gap-1.5 mb-2 flex-wrap">
-                    {product.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className={`text-[10px] px-1.5 py-0.5 rounded ${tag === "PL ready" ? "bg-emerald-50 text-emerald-700" : tag === "Custom flavour" ? "bg-amber-50 text-amber-700" : "bg-primary/10 text-primary"}`}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <h3 className="text-sm font-semibold mb-1">{product.name}</h3>
-                  <p className="text-xs text-muted-foreground mb-1">
-                    Available: {product.sizes}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground mb-3">
-                    Ships in 2–4 business days
-                  </p>
-                  <button
-                    onClick={() => onNavigate("contact")}
-                    className="w-full bg-primary text-primary-foreground text-xs font-medium rounded py-2 hover:bg-primary/90 transition-colors"
-                  >
-                    Enquire
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <button className="bg-primary text-primary-foreground border-primary rounded-full px-6 py-2.5 text-sm font-medium hover:bg-primary/90 transition-colors">
-              Load more products ↓
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* Packaging Showcase */}
       <section className="bg-muted/40 py-12 px-4">

@@ -18,7 +18,7 @@ interface ProductSliderProps {
 export function ProductSlider({
   title = "Featured Products",
   icon,
-  queryParams = "featured=true&limit=10",
+  queryParams = "featured=true&inStock=true&limit=10",
   viewAllPage = "products",
   currency = "INR",
   onNavigate,

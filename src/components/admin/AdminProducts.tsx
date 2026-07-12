@@ -83,6 +83,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
+import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -276,6 +285,15 @@ export function AdminProducts() {
   const [relatedResults, setRelatedResults] = useState<Product[]>([]);
   const [selectedRelatedIds, setSelectedRelatedIds] = useState<string[]>([]);
 
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 50;
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, categoryFilter, activeTab]);
+
   // Edit dialog tab
   const [editTab, setEditTab] = useState("general");
 
@@ -285,19 +303,24 @@ export function AdminProducts() {
   const [builderSaving, setBuilderSaving] = useState(false);
 
   // Queries
-  const { data: products = [], isLoading: loading } = useQuery({
-    queryKey: ["admin-products", activeTab, searchTerm, categoryFilter],
+  const { data: queryResult, isLoading: loading } = useQuery({
+    queryKey: ["admin-products", activeTab, searchTerm, categoryFilter, page],
     queryFn: async () => {
-      const params = new URLSearchParams({ all: "true" });
+      const params = new URLSearchParams();
       if (activeTab === "trashed") params.set("trashed", "true");
       if (searchTerm) params.set("search", searchTerm);
       if (categoryFilter && categoryFilter !== "all")
         params.set("categoryId", categoryFilter);
+      params.set("page", String(page));
+      params.set("limit", String(PAGE_SIZE));
       const res = await adminFetch(`/api/products?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to load products");
-      return (await res.json()).products || [];
+      return await res.json();
     },
   });
+  const products = queryResult?.products || [];
+  const totalItems = queryResult?.pagination?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
 
   const { data: categories = [] } = useQuery({
     queryKey: ["admin-categories"],
@@ -950,20 +973,20 @@ export function AdminProducts() {
                     />
                   </TableHead>
                   <TableHead className="w-16">Image</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="hidden md:table-cell">
+                  <TableHead className="w-full min-w-[200px]">Name</TableHead>
+                  <TableHead className="hidden md:table-cell w-36">
                     Category
                   </TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead className="hidden sm:table-cell">Stock</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden lg:table-cell">
+                  <TableHead className="w-24">Price</TableHead>
+                  <TableHead className="hidden sm:table-cell w-20">Stock</TableHead>
+                  <TableHead className="w-20">Status</TableHead>
+                  <TableHead className="hidden lg:table-cell w-24">
                     Featured
                   </TableHead>
-                  <TableHead className="hidden xl:table-cell">
+                  <TableHead className="hidden xl:table-cell w-24">
                     Best Seller
                   </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-right w-20">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -996,10 +1019,10 @@ export function AdminProducts() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{product.name}</p>
-                          <p className="text-xs text-muted-foreground">
+                      <TableCell className="max-w-0">
+                        <div className="truncate">
+                          <p className="font-medium truncate">{product.name}</p>
+                          <p className="text-xs text-muted-foreground truncate">
                             /{product.slug}
                           </p>
                         </div>
@@ -1156,6 +1179,68 @@ export function AdminProducts() {
           </div>
         )}
       </Card>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            {totalItems} product{totalItems !== 1 ? "s" : ""} — Page {page} of{" "}
+            {totalPages}
+          </p>
+          <Pagination className="w-auto mx-0">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPage((p) => Math.max(1, p - 1));
+                  }}
+                  className={page <= 1 ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => {
+                  if (totalPages <= 7) return true;
+                  if (p === 1 || p === totalPages) return true;
+                  if (Math.abs(p - page) <= 1) return true;
+                  return false;
+                })
+                .map((p, idx, arr) => {
+                  const showEllipsis =
+                    idx > 0 && p - arr[idx - 1] > 1;
+                  return (
+                    <PaginationItem key={p}>
+                      {showEllipsis && <PaginationEllipsis />}
+                      <PaginationLink
+                        href="#"
+                        isActive={p === page}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage(p);
+                        }}
+                      >
+                        {p}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPage((p) => Math.min(totalPages, p + 1));
+                  }}
+                  className={
+                    page >= totalPages ? "pointer-events-none opacity-50" : ""
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
 
       {/* Add/Edit Product Dialog */}
       <Dialog

@@ -1,30 +1,16 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, X, Check, Heart, Eye, ShoppingCart, Filter, ChevronRight, ArrowRightLeft, Package } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/lib/store";
 import { formatPrice } from "@/lib/pricing";
 import { getFirstImage } from "@/lib/utils";
 import { useActiveFlashSales, getFlashSalePrice } from "@/lib/flash-sales";
 import { useCustomerPrices } from "@/lib/customer-pricing";
 import { toast } from "sonner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { QuickViewModal } from "./QuickViewModal";
-import { Breadcrumbs } from "./Breadcrumbs";
-import { StoreLoading } from "./StoreLoading";
-import { FlashSaleBadge } from "./FlashSaleBadge";
+import { VedikaFilterSidebar, VedikaFilterGroup } from "./vedika-components";
 
 export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
   const { auth, settings, navigate, addToCart, addToCompare, wishlistIds, toggleWishlistId } = useAppStore();
@@ -37,7 +23,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
     minPrice: "",
     maxPrice: "",
     sortBy: "featured",
-    stockStatus: "all"
+    stockStatus: "in_stock"
   });
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
   const [visibleCount, setVisibleCount] = useState(12);
@@ -70,7 +56,8 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
         if (filters.minPrice) params.set("minPrice", filters.minPrice);
         if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
         if (filters.sortBy !== "featured") params.set("sort", filters.sortBy);
-        if (filters.stockStatus !== "all") params.set("stockStatus", filters.stockStatus);
+        if (filters.stockStatus === "in_stock") params.set("inStock", "true");
+        else if (filters.stockStatus === "out_of_stock") params.set("stockStatus", "out_of_stock");
 
         const res = await fetch(`/api/products?${params.toString()}`);
         return (await res.json()).products || [];
@@ -111,294 +98,212 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
     } catch { /* ignore */ }
   };
 
-  const renderFilterSidebar = () => (
-    <div className="space-y-8">
-      <div className="space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider">Categories</h3>
-        <div className="flex flex-col gap-2">
-            <button
-                onClick={() => setFilters({ ...filters, categoryId: "all" })}
-                className={`text-sm text-left px-3 py-2 rounded-lg transition-colors ${filters.categoryId === 'all' ? 'bg-primary text-white font-bold' : 'hover:bg-muted'}`}
-            >
-                All Products
-            </button>
-            {categories.map((cat: any) => (
-                <button
-                    key={cat.id}
-                    onClick={() => setFilters({ ...filters, categoryId: cat.id })}
-                    className={`text-sm text-left px-3 py-2 rounded-lg transition-colors ${filters.categoryId === cat.id ? 'bg-primary text-white font-bold' : 'hover:bg-muted'}`}
-                >
-                    {cat.name}
-                </button>
-            ))}
+  const filterContent = (
+    <div>
+      <VedikaFilterGroup title="Categories">
+        <button onClick={() => setFilters({ ...filters, categoryId: "all" })}
+          style={{ display: "flex", alignItems: "center", gap: 10, fontSize: ".88rem", color: "var(--vedika-ink-soft)", marginBottom: 12, cursor: "pointer", background: "none", border: "none", font: "inherit", fontWeight: filters.categoryId === "all" ? 700 : 400 }}>
+          <input type="checkbox" checked={filters.categoryId === "all"} onChange={() => {}} style={{ accentColor: "var(--vedika-green)", width: 15, height: 15 }} />
+          All Products
+        </button>
+        {categories.map((cat: any) => (
+          <button key={cat.id} onClick={() => setFilters({ ...filters, categoryId: cat.id })}
+            style={{ display: "flex", alignItems: "center", gap: 10, fontSize: ".88rem", color: "var(--vedika-ink-soft)", marginBottom: 12, cursor: "pointer", background: "none", border: "none", font: "inherit", fontWeight: filters.categoryId === cat.id ? 700 : 400 }}>
+            <input type="checkbox" checked={filters.categoryId === cat.id} onChange={() => {}} style={{ accentColor: "var(--vedika-green)", width: 15, height: 15 }} />
+            {cat.name}
+          </button>
+        ))}
+      </VedikaFilterGroup>
+
+      <VedikaFilterGroup title="Brands">
+        <select value={filters.brandId} onChange={(e) => setFilters({ ...filters, brandId: e.target.value })}
+          style={{ width: "100%", border: "1px solid var(--vedika-line)", borderRadius: "100px", padding: "10px 16px", background: "var(--vedika-paper)", font: "inherit", color: "var(--vedika-ink)", fontSize: ".88rem" }}>
+          <option value="all">All Brands</option>
+          {brands.map((b: any) => <option key={b.id} value={b.id}>{b.name}</option>)}
+        </select>
+      </VedikaFilterGroup>
+
+      <VedikaFilterGroup title="Availability">
+        <select value={filters.stockStatus} onChange={(e) => setFilters({ ...filters, stockStatus: e.target.value })}
+          style={{ width: "100%", border: "1px solid var(--vedika-line)", borderRadius: "100px", padding: "10px 16px", background: "var(--vedika-paper)", font: "inherit", color: "var(--vedika-ink)", fontSize: ".88rem" }}>
+          <option value="all">All Items</option>
+          <option value="in_stock">In Stock</option>
+          <option value="out_of_stock">Out of Stock</option>
+        </select>
+      </VedikaFilterGroup>
+
+      <VedikaFilterGroup title="Price Range">
+        <div className="price-range" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <input type="number" placeholder="Min" value={filters.minPrice} onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
+            style={{ width: "50%", border: "1px solid var(--vedika-line)", borderRadius: "100px", padding: "10px 14px", background: "var(--vedika-paper)", font: "inherit", fontSize: ".84rem" }} />
+          <input type="number" placeholder="Max" value={filters.maxPrice} onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
+            style={{ width: "50%", border: "1px solid var(--vedika-line)", borderRadius: "100px", padding: "10px 14px", background: "var(--vedika-paper)", font: "inherit", fontSize: ".84rem" }} />
         </div>
-      </div>
+      </VedikaFilterGroup>
 
-      <Separator />
-
-      <div className="space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider">Brands</h3>
-        <Select value={filters.brandId} onValueChange={(v) => setFilters({ ...filters, brandId: v })}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Brand" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Brands</SelectItem>
-            {brands.map((b: any) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Separator />
-
-      <div className="space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider">Availability</h3>
-        <Select value={filters.stockStatus} onValueChange={(v) => setFilters({ ...filters, stockStatus: v })}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Items</SelectItem>
-            <SelectItem value="in_stock">In Stock</SelectItem>
-            <SelectItem value="out_of_stock">Out of Stock</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Separator />
-
-      <div className="space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider">Price Range</h3>
-        <div className="grid grid-cols-2 gap-2">
-            <Input
-                placeholder="Min"
-                type="number"
-                value={filters.minPrice}
-                onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
-                className="h-9"
-            />
-            <Input
-                placeholder="Max"
-                type="number"
-                value={filters.maxPrice}
-                onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-                className="h-9"
-            />
-        </div>
-      </div>
-
-      <Button
-        variant="outline"
-        className="w-full text-xs uppercase font-bold"
-        onClick={() => {
-            setFilters({ categoryId: "all", brandId: "all", minPrice: "", maxPrice: "", sortBy: "featured", stockStatus: "all" });
-            setSearchQuery("");
-        }}
-      >
+      <button onClick={() => { setFilters({ categoryId: "all", brandId: "all", minPrice: "", maxPrice: "", sortBy: "featured", stockStatus: "in_stock" }); setSearchQuery(""); }}
+        className="vedika-btn vedika-btn-outline vedika-btn-sm" style={{ width: "100%", marginTop: 8 }}>
         Reset Filters
-      </Button>
+      </button>
     </div>
   );
 
-  return (
-    <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        <Breadcrumbs items={[{ label: "Shop" }]} />
+  const shopToolbarSx: React.CSSProperties = {
+    display: "flex", justifyContent: "space-between", alignItems: "center",
+    marginBottom: 28, flexWrap: "wrap", gap: 14,
+  };
 
-        <div className="flex flex-col lg:flex-row gap-8">
+  const renderProductCard = (product: any) => {
+    const custPrice = getCustomerPrice(product.price, product.id);
+    const flashDisc = flashProductMap[product.id];
+    let displayPrice = custPrice;
+    let displayCompare = customerPrices[product.id] !== undefined ? product.price : product.comparePrice || null;
+    let discountLabel: string | null = null;
+    if (flashDisc) {
+      const { salePrice, discountPercent } = getFlashSalePrice(custPrice, flashDisc);
+      displayPrice = salePrice;
+      displayCompare = custPrice;
+      discountLabel = `-${discountPercent}%`;
+    }
+    const image = getFirstImage(product.images);
+    return (
+      <div key={product.id} className="product-card" style={{ background: "var(--vedika-paper)", borderRadius: "14px", border: "1px solid var(--vedika-line)", overflow: "hidden", transition: "transform .3s ease, box-shadow .3s ease", position: "relative" }}
+        onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 12px 30px -14px rgba(28,44,35,.28)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+      >
+        <div className="product-media" style={{ aspectRatio: "1/1.05", background: image ? "var(--vedika-bg-alt)" : "linear-gradient(160deg, var(--vedika-bg-alt), var(--vedika-green-tint))", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden", cursor: "pointer" }}
+          onClick={() => navigate("product-page", product.slug)}>
+          {image ? (
+            <img src={image} alt={product.name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
+              className="group-hover:scale-110 transition-transform duration-500" />
+          ) : (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: "56%", height: "56%", color: "var(--vedika-green)", opacity: 0.3 }}>
+              <path d="M12 22V10M12 10c-3 0-6 1-6 5s3 5 6 5 6-1 6-5-3-5-6-5z"/>
+            </svg>
+          )}
+          {discountLabel && <span className="product-tag" style={{ position: "absolute", top: 14, left: 14, background: "var(--vedika-red)", color: "#fff", fontSize: ".66rem", fontWeight: 700, letterSpacing: ".04em", padding: "5px 10px", borderRadius: 100, textTransform: "uppercase" }}>{discountLabel}</span>}
+          {product.stock <= 0 && (
+            <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ background: "#fff", color: "#000", fontWeight: 700, fontSize: ".76rem", padding: "6px 14px", borderRadius: 100 }}>OUT OF STOCK</span>
+            </div>
+          )}
+          <button onClick={(e) => { e.stopPropagation(); handleWishlist(product.id); }} className="product-wish" style={{ position: "absolute", top: 12, right: 12, width: 34, height: 34, borderRadius: "50%", background: "rgba(255,253,246,.9)", display: "flex", alignItems: "center", justifyContent: "center", color: wishlistIds.includes(product.id) ? "var(--vedika-red)" : "var(--vedika-green-dark)", border: "none", cursor: "pointer", zIndex: 2 }}>
+            <svg viewBox="0 0 24 24" fill={wishlistIds.includes(product.id) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.6" style={{ width: 16, height: 16 }}>
+              <path d="M12 21s-7-4.5-9.5-9C1 8.5 3 5 6.5 5c2 0 3.3 1.1 4 2 .7-.9 2-2 4-2C18 5 20 8.5 18.5 12 16 16.5 12 21 12 21z"/>
+            </svg>
+          </button>
+        </div>
+        <div className="product-info" style={{ padding: 20 }}>
+          {product.Category && <div className="cat-label" style={{ fontSize: ".74rem", color: "var(--vedika-ink-soft)", marginBottom: 8 }}>{product.Category.name}</div>}
+          <h4 style={{ fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "1.05rem", marginBottom: 4, color: "var(--vedika-green-dark)", cursor: "pointer" }} onClick={() => navigate("product-page", product.slug)}>{product.name}</h4>
+          <div className="price-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
+            <div className="price" style={{ fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "1.15rem", fontWeight: 600, color: "var(--vedika-green-dark)" }}>
+              {product.ProductVariant?.length > 0 ? "From " : ""}{formatPrice(displayPrice, currency)}
+              {displayCompare && <span className="was" style={{ fontSize: ".82rem", color: "var(--vedika-sand)", textDecoration: "line-through", marginLeft: 6, fontFamily: "var(--font-work-sans), sans-serif" }}>{formatPrice(displayCompare, currency)}</span>}
+            </div>
+            {product.stock > 0 && (
+              <button onClick={() => handleAddToCart(product)} className="add-btn" style={{ width: 38, height: 38, borderRadius: "50%", background: "var(--vedika-green)", color: "var(--vedika-paper)", display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer" }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 16, height: 16 }}><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <section className="page-hero" style={{ background: "var(--vedika-green-dark)", color: "var(--vedika-bg)", padding: "70px 0 60px", position: "relative", overflow: "hidden" }}>
+        <div className="vedika-container" style={{ position: "relative", zIndex: 1 }}>
+          <div className="vedika-eyebrow" style={{ color: "var(--vedika-gold)" }}>Our Collection</div>
+          <h1 style={{ color: "#fff", fontSize: "clamp(2.4rem,4.5vw,3.8rem)", lineHeight: 1.05, maxWidth: 640 }}>Ayurvedic formulations for every dosha</h1>
+          <p style={{ color: "#B7C0B4", maxWidth: 560, marginTop: 12 }}>Shop by category, ingredient, or dosha — every product is lab-tested and made in small batches.</p>
+        </div>
+        <svg viewBox="0 0 200 200" fill="none" style={{ position: "absolute", right: -60, top: -60, width: 320, height: 320, opacity: 0.12, pointerEvents: "none" }}>
+          <path d="M100 20c-20 40-50 50-50 90s30 60 50 70c20-10 50-30 50-70s-30-50-50-90z" stroke="currentColor" strokeWidth=".6" fill="currentColor" fillOpacity=".06"/>
+        </svg>
+      </section>
+
+      <div className="vedika-container">
+        <div className="breadcrumb" style={{ padding: "20px 0", fontSize: ".82rem", color: "var(--vedika-ink-soft)", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+          <button onClick={() => navigate("home")} style={{ background: "none", border: "none", cursor: "pointer", font: "inherit", color: "inherit" }}>Home</button>
+          <span style={{ color: "var(--vedika-sand)" }}>/</span>
+          <span style={{ color: "var(--vedika-red)" }}>Shop</span>
+        </div>
+      </div>
+
+      <div className="vedika-container" style={{ paddingBottom: 96 }}>
+        <div className="shop-layout" style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 44, alignItems: "start" }}>
           {/* Desktop Sidebar */}
-          <aside className="hidden lg:block w-64 shrink-0">
-            <div className="sticky top-24">
-                {renderFilterSidebar()}
+          <aside className="hidden lg:block">
+            <div style={{ position: "sticky", top: 120 }}>
+              <VedikaFilterSidebar>{filterContent}</VedikaFilterSidebar>
             </div>
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 space-y-6">
-            <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-card p-4 border rounded-2xl">
-              <div className="relative w-full sm:max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                    placeholder="Search products..."
-                    className="pl-10 h-10 bg-muted/50 border-transparent focus:bg-background"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
+          <main>
+            <div style={shopToolbarSx}>
+              <div style={{ position: "relative", flex: 1, maxWidth: 400 }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: "var(--vedika-ink-soft)", pointerEvents: "none" }}>
+                  <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+                </svg>
+                <input type="text" placeholder="Search products..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ width: "100%", border: "1px solid var(--vedika-line)", borderRadius: "100px", padding: "10px 16px 10px 40px", background: "var(--vedika-paper)", font: "inherit", fontSize: ".88rem", color: "var(--vedika-ink)" }} />
               </div>
-
-              <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <Sheet>
-                    <SheetTrigger asChild>
-                        <Button variant="outline" className="lg:hidden shrink-0 h-10 px-4">
-                            <Filter className="mr-2 h-4 w-4" /> Filters
-                        </Button>
-                    </SheetTrigger>
-                    <SheetContent side="left" className="w-[300px]">
-                        <SheetHeader className="mb-6">
-                            <SheetTitle>Filter Products</SheetTitle>
-                        </SheetHeader>
-                        {renderFilterSidebar()}
-                    </SheetContent>
+                  <SheetTrigger asChild>
+                    <button className="vedika-btn vedika-btn-outline vedika-btn-sm lg-hidden" style={{ display: "none", fontSize: ".82rem" }}
+                      onClick={() => {}}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 14, height: 14, marginRight: 6 }}><path d="M4 6h16M8 12h8M11 18h2"/></svg>
+                      Filters
+                    </button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-[300px]" style={{ background: "var(--vedika-paper)" }}>
+                    <SheetHeader><SheetTitle style={{ fontFamily: "var(--font-fraunces), Georgia, serif", color: "var(--vedika-green-dark)" }}>Filter Products</SheetTitle></SheetHeader>
+                    <div style={{ marginTop: 24 }}>{filterContent}</div>
+                  </SheetContent>
                 </Sheet>
-
-                <Select value={filters.sortBy} onValueChange={(v) => setFilters({ ...filters, sortBy: v })}>
-                    <SelectTrigger className="h-10 w-full sm:w-[180px]">
-                        <SelectValue placeholder="Sort By" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="featured">Featured</SelectItem>
-                        <SelectItem value="newest">Newest First</SelectItem>
-                        <SelectItem value="price_asc">Price: Low to High</SelectItem>
-                        <SelectItem value="price_desc">Price: High to Low</SelectItem>
-                    </SelectContent>
-                </Select>
+                <select value={filters.sortBy} onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
+                  style={{ border: "1px solid var(--vedika-line)", borderRadius: "100px", padding: "10px 16px", background: "var(--vedika-paper)", font: "inherit", color: "var(--vedika-ink)", fontSize: ".88rem" }}>
+                  <option value="featured">Featured</option>
+                  <option value="newest">Newest First</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                </select>
               </div>
             </div>
 
             {loading ? (
-              <StoreLoading />
+              <div style={{ textAlign: "center", padding: "80px 0", color: "var(--vedika-ink-soft)" }}>Loading products...</div>
             ) : products.length === 0 ? (
-              <div className="text-center py-32 bg-card border border-dashed rounded-3xl">
-                <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-20" />
-                <h3 className="text-xl font-bold">No products found</h3>
-                <p className="text-muted-foreground">Try clearing some filters or searching for something else.</p>
+              <div style={{ textAlign: "center", padding: "80px 0" }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" style={{ width: 64, height: 64, margin: "0 auto 16px", color: "var(--vedika-sand)" }}>
+                  <rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/>
+                </svg>
+                <h3 style={{ marginBottom: 8 }}>No products found</h3>
+                <p style={{ color: "var(--vedika-ink-soft)" }}>Try clearing some filters or searching for something else.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {products.slice(0, visibleCount).map((product) => {
-                  const image = getFirstImage(product.images);
-                  return (
-                    <div key={product.id} className="group bg-card border rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full">
-                      <div className="relative aspect-[4/5] overflow-hidden bg-muted cursor-pointer" onClick={() => navigate("product-page", product.slug)}>
-                        {image && (
-                          <img
-                            src={image}
-                            alt={product.name}
-                            loading="lazy"
-                            className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        )}
-                        {product.stock <= 0 && (
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px]">
-                                <Badge className="bg-white text-black font-bold">OUT OF STOCK</Badge>
-                            </div>
-                        )}
-                        <div className="absolute top-3 left-3 flex flex-col gap-1">
-                            <FlashSaleBadge productId={product.id} />
-                            {product.comparePrice && (
-                                <Badge className="bg-rose-500 text-white border-none">SALE</Badge>
-                            )}
-                            {product.createdAt && Date.now() - new Date(product.createdAt).getTime() < 30 * 24 * 60 * 60 * 1000 && (
-                                <Badge className="bg-emerald-500 text-white border-none">NEW</Badge>
-                            )}
-                            {product.isFeatured && (
-                                <Badge className="bg-primary text-white border-none">FEATURED</Badge>
-                            )}
-                            {product.isBestSeller && (
-                                <Badge className="bg-amber-500 text-white border-none">BEST SELLER</Badge>
-                            )}
-                        </div>
-
-                        {/* Action Overlay */}
-                        <div className="absolute top-3 right-3 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
-                            <button
-                                onClick={(e) => { e.stopPropagation(); handleWishlist(product.id); }}
-                                className={`h-9 w-9 rounded-full flex items-center justify-center shadow-lg transition-colors ${wishlistIds.includes(product.id) ? 'bg-rose-50 text-rose-500' : 'bg-white hover:bg-rose-50 hover:text-rose-500'}`}
-                            >
-                                <Heart className={`h-4 w-4 ${wishlistIds.includes(product.id) ? 'fill-current' : ''}`} />
-                            </button>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); setQuickViewProduct(product); }}
-                                className="h-9 w-9 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-primary hover:text-white transition-colors"
-                            >
-                                <Eye className="h-4 w-4" />
-                            </button>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); addToCompare(product); }}
-                                className="h-9 w-9 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-50 hover:text-blue-500 transition-colors"
-                            >
-                                <ArrowRightLeft className="h-4 w-4" />
-                            </button>
-                        </div>
-                      </div>
-
-                      <div className="p-4 flex-1 flex flex-col">
-                        <div className="flex-1">
-                            <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1">{product.Category?.name || 'General'}</p>
-                            <h3 className="font-bold text-sm md:text-base mb-1 line-clamp-2 hover:text-primary transition-colors cursor-pointer" onClick={() => navigate("product-page", product.slug)}>
-                                {product.name}
-                            </h3>
-                            {(() => {
-                                const custPrice = getCustomerPrice(product.price, product.id);
-                                const flashDisc = flashProductMap[product.id];
-                                if (flashDisc) {
-                                    const { salePrice, discountPercent } = getFlashSalePrice(custPrice, flashDisc);
-                                    return (
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <span className="text-primary font-black text-base md:text-lg">
-                                                {product.ProductVariant?.length > 0 ? 'From ' : ''}
-                                                {formatPrice(salePrice, currency)}
-                                            </span>
-                                            <span className="text-xs text-muted-foreground line-through">{formatPrice(custPrice, currency)}</span>
-                                            <Badge className="bg-orange-500 text-white border-none text-[10px]">-{discountPercent}%</Badge>
-                                        </div>
-                                    );
-                                }
-                                return (
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <span className="text-primary font-black text-base md:text-lg">
-                                            {product.ProductVariant?.length > 0 ? 'From ' : ''}
-                                            {formatPrice(custPrice, currency)}
-                                        </span>
-                                        {customerPrices[product.id] !== undefined && (
-                                            <span className="text-xs text-muted-foreground line-through">{formatPrice(product.price, currency)}</span>
-                                        )}
-                                        {!customerPrices[product.id] && product.comparePrice && (
-                                            <span className="text-xs text-muted-foreground line-through">{formatPrice(product.comparePrice, currency)}</span>
-                                        )}
-                                    </div>
-                                );
-                            })()}
-                        </div>
-
-                        <Button
-                            size="sm"
-                            className="w-full rounded-xl gap-2 font-bold"
-                            disabled={product.stock <= 0}
-                            onClick={() => handleAddToCart(product)}
-                        >
-                            <ShoppingCart className="h-4 w-4" /> Add to Cart
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {products.length > visibleCount && (
-                <div className="text-center pt-12 pb-20">
-                    <Button
-                        variant="outline"
-                        size="lg"
-                        className="rounded-full px-12 h-12 font-bold"
-                        onClick={() => setVisibleCount(prev => prev + 12)}
-                    >
-                        Load More Products
-                    </Button>
+              <>
+                <div className="vedika-product-grid">
+                  {products.slice(0, visibleCount).map((product) => renderProductCard(product))}
                 </div>
+                {products.length > visibleCount && (
+                  <div style={{ textAlign: "center", marginTop: 56 }}>
+                    <button onClick={() => setVisibleCount(prev => prev + 12)} className="vedika-btn vedika-btn-outline">Load More Products</button>
+                  </div>
+                )}
+              </>
             )}
           </main>
         </div>
       </div>
 
       {quickViewProduct && (
-        <QuickViewModal
-          product={quickViewProduct}
-          open={!!quickViewProduct}
-          onOpenChange={(open) => { if (!open) setQuickViewProduct(null); }}
-          onNavigate={navigate}
-        />
+        <QuickViewModal product={quickViewProduct} open={!!quickViewProduct} onOpenChange={(open) => { if (!open) setQuickViewProduct(null); }} onNavigate={navigate} />
       )}
     </div>
   );

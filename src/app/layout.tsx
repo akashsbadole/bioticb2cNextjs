@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Fraunces, Work_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -11,7 +11,22 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   display: "swap",
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"], // Include all weights you need
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
+
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+const workSans = Work_Sans({
+  variable: "--font-work-sans",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const viewport: Viewport = {
@@ -93,7 +108,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
       </head>
       <body
-        className={`${poppins.variable} antialiased bg-background text-foreground`}
+        className={`${poppins.variable} ${fraunces.variable} ${workSans.variable} antialiased bg-background text-foreground`}
       >
         <SessionProvider>
           <QueryProvider>

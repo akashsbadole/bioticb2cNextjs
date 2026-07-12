@@ -65,7 +65,7 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
     queryKey: ["related-products", product?.id],
     enabled: !!product?.categoryId,
     queryFn: async () => {
-        const res = await fetch(`/api/products?categoryId=${product.categoryId}&limit=5`);
+        const res = await fetch(`/api/products?categoryId=${product.categoryId}&inStock=true&limit=5`);
         const data = await res.json();
         return (data.products || []).filter((p: any) => p.id !== product.id).slice(0, 4);
     }
@@ -104,6 +104,8 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
     ogImage: product?.ogImage,
   });
 
+  const { getPrice: getCustomerPrice } = useCustomerPrices();
+
   if (loading) return <ProductSkeleton />;
   if (!product) return <div className="py-20 text-center">Product not found</div>;
 
@@ -113,8 +115,6 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
       return Array.isArray(parsed) ? parsed : [];
     } catch { return []; }
   })();
-
-  const { getPrice: getCustomerPrice } = useCustomerPrices();
 
   const selectedVariant = product.ProductVariant?.find((v: any) => v.id === selectedVariantId);
   const basePrice = selectedVariant?.price ?? product.price;

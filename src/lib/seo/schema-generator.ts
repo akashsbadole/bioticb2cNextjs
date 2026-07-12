@@ -62,9 +62,9 @@ export function generateArticleSchema(
     "@type": "BlogPosting",
     headline: post.metaTitle || post.title,
     description: post.metaDescription || post.excerpt,
-    image: post.coverImage.startsWith("http")
+    image: post.coverImage?.startsWith("http")
       ? post.coverImage
-      : `${siteUrl}${post.coverImage}`,
+      : post.coverImage ? `${siteUrl}${post.coverImage}` : undefined,
     author: {
       "@type": "Organization",
       name,

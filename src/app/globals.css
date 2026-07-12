@@ -40,6 +40,23 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Vedika Ayurveda — design tokens */
+:root {
+  --vedika-bg: #F7F1DE;
+  --vedika-bg-alt: #EFE6C8;
+  --vedika-paper: #FFFDF6;
+  --vedika-ink: #241D14;
+  --vedika-ink-soft: #5B5240;
+  --vedika-green: #2F4A3C;
+  --vedika-green-dark: #1C2C23;
+  --vedika-green-tint: #DCE6DA;
+  --vedika-gold: #C68A2E;
+  --vedika-gold-tint: #F1DFB4;
+  --vedika-red: #A6402F;
+  --vedika-sand: #D9C7A3;
+  --vedika-line: #E1D6B8;
+}
+
 :root {
   --radius: 0.5rem;
   --background: #FFFFFF;
@@ -303,3 +320,201 @@
   background-color: rgb(38, 57, 237) !important;
   color: #FFFFFF !important;
 } */
+
+/* =========================================================
+   VEDIKA AYURVEDA — Store Theme Layer
+   Applied via .vedika-theme on the store wrapper
+   ========================================================= */
+.vedika-theme {
+  --background: var(--vedika-bg);
+  --foreground: var(--vedika-ink);
+  --primary: var(--vedika-green);
+  --primary-foreground: #FFFDF6;
+  --secondary: var(--vedika-gold);
+  --secondary-foreground: #1C2C23;
+  --muted: var(--vedika-bg-alt);
+  --muted-foreground: var(--vedika-ink-soft);
+  --accent: var(--vedika-gold);
+  --accent-foreground: #1C2C23;
+  --destructive: var(--vedika-red);
+  --destructive-foreground: #FFFFFF;
+  --border: var(--vedika-line);
+  --input: var(--vedika-line);
+  --ring: var(--vedika-green);
+  --card: var(--vedika-paper);
+  --card-foreground: var(--vedika-ink);
+  --popover: var(--vedika-paper);
+  --popover-foreground: var(--vedika-ink);
+  --radius: 0.5rem;
+}
+
+.vedika-theme body,
+.vedika-body {
+  background: var(--vedika-bg);
+  color: var(--vedika-ink);
+  font-family: "Work Sans", var(--font-work-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.vedika-theme h1,
+.vedika-theme h2,
+.vedika-theme h3,
+.vedika-theme h4,
+.vedika-theme h5,
+.vedika-theme h6,
+.vedika-heading {
+  font-family: "Fraunces", var(--font-fraunces), Georgia, serif;
+  color: var(--vedika-green-dark);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Paper grain overlay */
+.vedika-grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Vedika eyebrow label */
+.vedika-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--vedika-red);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.vedika-eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: var(--vedika-red);
+  display: inline-block;
+}
+
+/* Vedika buttons */
+.vedika-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 15px 30px;
+  border-radius: 100px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.vedika-btn:active { transform: scale(0.97); }
+.vedika-btn-primary { background: var(--vedika-green); color: var(--vedika-paper); }
+.vedika-btn-primary:hover { background: var(--vedika-green-dark); }
+.vedika-btn-gold { background: var(--vedika-gold); color: var(--vedika-green-dark); }
+.vedika-btn-gold:hover { background: #B57C22; }
+.vedika-btn-outline { background: transparent; color: var(--vedika-green-dark); border-color: var(--vedika-green-dark); }
+.vedika-btn-outline:hover { background: var(--vedika-green-dark); color: var(--vedika-paper); }
+.vedika-btn-sm { padding: 10px 20px; font-size: 0.8rem; }
+
+/* Vedika card */
+.vedika-card {
+  background: var(--vedika-paper);
+  border: 1px solid var(--vedika-line);
+  border-radius: 14px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.vedika-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px -14px rgba(28,44,35,0.28);
+}
+
+/* Vedika container */
+.vedika-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* Vedika section */
+.vedika-section { padding: 96px 0; }
+.vedika-section-tight { padding: 64px 0; }
+
+/* Vedika section heading */
+.vedika-section-head {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 56px;
+}
+.vedika-section-head.left {
+  text-align: left;
+  margin: 0 0 48px;
+}
+
+/* Botanical divider */
+.vedika-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 0 auto 56px;
+  color: var(--vedika-sand);
+}
+.vedika-divider::before,
+.vedika-divider::after {
+  content: "";
+  flex: 1;
+  max-width: 120px;
+  height: 1px;
+  background: var(--vedika-line);
+}
+
+/* Vedika grid helpers */
+.vedika-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.vedika-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.vedika-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+.vedika-product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+
+/* Header responsive */
+.nav-links { display: flex; }
+.menu-toggle { display: none; }
+
+/* Responsive */
+@media (max-width: 1080px) {
+  .vedika-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .vedika-product-grid { grid-template-columns: repeat(2, 1fr); }
+  .shop-layout { grid-template-columns: 1fr; }
+  .contact-layout { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr !important; }
+  .hero .hero-art { order: -1; max-width: 340px; margin: 0 auto; }
+  .spotlight { grid-template-columns: 1fr !important; padding: 40px !important; }
+  .vedika-grid-3 { grid-template-columns: 1fr; }
+  .vedika-grid-2 { grid-template-columns: 1fr; }
+  .ritual { grid-template-columns: 1fr !important; }
+  .blog-featured { grid-template-columns: 1fr !important; }
+  .newsletter { flex-direction: column !important; text-align: center; }
+  .newsletter input { width: 100% !important; }
+  .form-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 680px) {
+  .nav-links { display: none !important; }
+  .menu-toggle { display: block !important; }
+  .vedika-grid-4 { grid-template-columns: 1fr; }
+  .vedika-product-grid { grid-template-columns: 1fr; }
+  .vedika-section { padding: 64px 0 !important; }
+  .trust-row { justify-content: center !important; text-align: center; }
+}
+
+/* Dropdown hover for desktop */
+.nav-links li:hover .dropdown-menu { display: block !important; }

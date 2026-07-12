@@ -1,292 +1,131 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Package,
-  Box,
-  Truck,
-  TrendingUp,
-  Briefcase,
-  MoreHorizontal,
-  MapPin,
-  Factory,
-  Clock,
-} from "lucide-react";
-import { BLOCK_DEFAULTS, deepMerge } from "@/lib/page-blocks";
 import { useSeo } from "@/lib/use-seo";
-import { StoreHeroBanner } from "@/components/store/StoreHeroBanner";
-import { useContentPage, getPageContentData } from "@/lib/use-page-content";
-import { ContactFormSection } from "@/components/store/ContactFormSection";
+import {
+  VedikaSectionTitle,
+  VedikaContactCard,
+  VedikaFAQItem,
+  VedikaNewsletter,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+  LeafIcon,
+} from "./vedika-components";
 
 interface ContactPageProps {
   onNavigate: (page: string, data?: unknown) => void;
   data?: Record<string, unknown>;
 }
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  Package,
-  Box,
-  Truck,
-  TrendingUp,
-  Briefcase,
-  MoreHorizontal,
-  MapPin,
-  Factory,
-};
-
-function ResolvedIcon({
-  name,
-  className,
-}: {
-  name: string;
-  className?: string;
-}) {
-  const Icon = iconMap[name];
-  if (Icon) return <Icon className={className} />;
-  return null;
-}
+const faqItems = [
+  { question: "How long does shipping take within India?", answer: "Standard shipping takes 5–7 business days. Metro cities typically receive orders within 3–5 business days. We ship from our facility in Jaipur." },
+  { question: "Do you ship internationally?", answer: "Yes, we ship to select countries. International delivery takes 10–14 business days. Customs duties, if any, are borne by the customer." },
+  { question: "What is your return policy?", answer: "We accept returns within 15 days of delivery for unopened products in their original packaging. Ayurvedic products are formulated in small batches, so each return helps us improve." },
+  { question: "Can I speak to an Ayurvedic practitioner?", answer: "Absolutely. Our team includes qualified vaidyas who can help with product selection based on your dosha profile. Just mention it in your message and we'll schedule a call." },
+  { question: "Do you offer bulk or wholesale pricing?", answer: "Yes, we work with wellness centres, clinics, and retail partners. Please use the form below with details about your requirements and we'll share a custom quote." },
+];
 
 export function ContactPage({ onNavigate, data: _data }: ContactPageProps) {
   useSeo("contact", {
-    title: "Contact Us | Biotic Naturals",
-    description:
-      "Get in touch with Biotic Naturals. Send us your enquiry for orders, partnerships, or any questions.",
+    title: "Contact Us — Vedika Ayurveda",
+    description: "Get in touch with the Vedika team. Questions on dosha matching, orders, or bulk enquiries — we reply within one business day.",
   });
 
-  const [selectedType, setSelectedType] = useState<string>("bulk");
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
 
-  const slugMap: Record<string, string> = {
-    "about-page-content": "about-us",
-    "mfg-page-content": "manufacturing",
-    "contact-page-content": "contact-us",
-    home: "homepage",
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Form submission logic
   };
 
-  const cmsSlug =
-    (slugMap["contact-page-content"] as string | undefined) ||
-    "contact-page-content";
-
-  const { blocks: contactBlocks } = useContentPage("contact-page-content");
-  const { blocks: fallbackBlocks } = useContentPage(cmsSlug);
-  const effectiveBlocks = contactBlocks ?? fallbackBlocks;
-  const cmsContactData = getPageContentData(
-    effectiveBlocks,
-    "contact-page-content",
-    BLOCK_DEFAULTS["contact-page-content"].defaultData,
-  );
-  const fallbackContact = BLOCK_DEFAULTS["contact-page-content"].defaultData;
-  const data = deepMerge(fallbackContact, cmsContactData);
-
-  const hero = (data.hero as Record<string, unknown>) || {};
-  const requirementTypes =
-    (hero.requirementTypes as Array<{
-      id: string;
-      label: string;
-      icon: string;
-    }>) || [];
-
-  const formSection = (data.formSection as Record<string, string>) || {};
-  const responsePromise =
-    (data.responsePromise as Record<string, unknown>) || {};
-  const promiseItems =
-    (responsePromise.items as Array<{ label: string; time: string }>) || [];
-  const locations = (data.locations as Record<string, unknown>) || {};
-  const locationCards =
-    (locations.cards as Array<{
-      type: string;
-      title: string;
-      subtitle?: string;
-      address?: string;
-      accessibility?: string;
-      description?: string;
-      highlights?: string[];
-      cta?: string;
-      link?: string;
-      buttons?: Array<{ text: string; icon: string; link?: string }>;
-    }>) || [];
-
   return (
-    <div className="flex flex-col">
-      {/* CT0: Hero */}
-      <StoreHeroBanner
-        hero={hero}
-        requirementTypes={requirementTypes}
-        selectedType={selectedType}
-        onSelectType={setSelectedType}
-      />
+    <div>
+      {/* HERO */}
+      <section className="page-hero" style={{ background: "var(--vedika-green-dark)", color: "var(--vedika-bg)", padding: "70px 0 60px", position: "relative", overflow: "hidden" }}>
+        <div className="vedika-container" style={{ position: "relative", zIndex: 1 }}>
+          <div className="vedika-eyebrow" style={{ color: "var(--vedika-gold)" }}>Get in Touch</div>
+          <h1 style={{ color: "#fff", fontSize: "clamp(2.4rem,4.5vw,3.8rem)", lineHeight: 1.05, maxWidth: 640 }}>We reply within one business day.</h1>
+          <p style={{ color: "#B7C0B4", maxWidth: 560, marginTop: 12 }}>Questions on dosha matching, an order, or a bulk/wholesale enquiry — write to us directly, no chatbot in between.</p>
+        </div>
+        <svg viewBox="0 0 200 200" fill="none" style={{ position: "absolute", right: -60, top: -60, width: 320, height: 320, opacity: 0.12 }}>
+          <path d="M100 20c-20 40-50 50-50 90s30 60 50 70c20-10 50-30 50-70s-30-50-50-90z" stroke="currentColor" strokeWidth=".6"/>
+        </svg>
+      </section>
 
-      {/* CT1: Contact Form */}
-      <ContactFormSection
-        title={(formSection.title as string) || "Send us your requirement"}
-        subtitle={
-          (formSection.subtitle as string) ||
-          "Fields marked * are required. We respond within 24 working hours."
-        }
-      />
+      <div className="vedika-container">
+        <div className="breadcrumb" style={{ padding: "20px 0", fontSize: ".82rem", color: "var(--vedika-ink-soft)", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+          <button onClick={() => onNavigate("home")} style={{ background: "none", border: "none", cursor: "pointer", font: "inherit", color: "inherit" }}>Home</button>
+          <span style={{ color: "var(--vedika-sand)" }}>/</span>
+          <span style={{ color: "var(--vedika-red)" }}>Contact Us</span>
+        </div>
+      </div>
 
-      {/* Response promise */}
-      {promiseItems.length > 0 && (
-        <section className="bg-muted/40 py-8 px-4">
-          <div className="container mx-auto max-w-5xl">
-            <div className="bg-primary/5 border border-primary/20 rounded-xl p-5 max-w-md mx-auto">
-              <p className="text-sm font-semibold text-primary mb-4 flex items-center gap-2">
-                <Clock className="h-4 w-4" />{" "}
-                {(responsePromise.title as string) || "Our response commitment"}
-              </p>
-              <div className="space-y-3">
-                {promiseItems.map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex justify-between items-center text-xs border-b pb-2 last:border-0"
-                  >
-                    <span className="text-muted-foreground">{item.label}</span>
-                    <span className="text-primary font-medium">
-                      {item.time}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              {(responsePromise.footer as string) && (
-                <p className="text-[10px] text-muted-foreground mt-3">
-                  {responsePromise.footer as string}
-                </p>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
+      <section className="vedika-container vedika-section-tight">
+        <div className="contact-layout" style={{ display: "grid", gridTemplateColumns: ".9fr 1.1fr", gap: 56 }}>
+          {/* LEFT: Contact Info */}
+          <div>
+            <VedikaContactCard icon={<MailIcon className="w-5 h-5" />} label="Email" value="hello@vedikaayurveda.com" href="mailto:hello@vedikaayurveda.com" />
+            <VedikaContactCard icon={<PhoneIcon className="w-5 h-5" />} label="Phone" value="+91 141 478 9200" href="tel:+911414789200" />
+            <VedikaContactCard icon={<PinIcon className="w-5 h-5" />} label="Address" value="42, Hawa Sadak, Bani Park, Jaipur — 302 016, Rajasthan, India" />
+            <VedikaContactCard icon={<LeafIcon className="w-5 h-5" />} label="Social" value="@vedikaayurveda" />
 
-      {/* CT2: Address Cards */}
-      {locationCards.length > 0 && (
-        <section className="py-12 px-4">
-          <div className="container mx-auto max-w-5xl">
-            {(locations.title as string) && (
-              <h2 className="text-lg font-bold mb-8">
-                {locations.title as string}
-              </h2>
-            )}
-            <div className="grid md:grid-cols-3 gap-6">
-              {locationCards.map((card) => (
-                <div
-                  key={card.title}
-                  className={`bg-background border rounded-xl p-5 border-t-4 ${card.type === "visit" ? "border-t-primary bg-primary/5 border-primary/20" : card.type === "factory" ? "border-t-primary" : "border-t-muted"}`}
-                >
-                  <div className="flex items-center gap-2 mb-4">
-                    <ResolvedIcon
-                      name={card.type === "visit" ? "MapPin" : "Factory"}
-                      className={`h-5 w-5 ${card.type === "factory" || card.type === "visit" ? "text-primary" : "text-muted-foreground"}`}
-                    />
-                    <p className="text-sm font-semibold">{card.title}</p>
-                    {card.subtitle && (
-                      <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded ml-auto">
-                        {card.subtitle}
-                      </span>
-                    )}
-                  </div>
-                  {card.address && (
-                    <p className="text-xs text-muted-foreground leading-relaxed mb-3 whitespace-pre-line">
-                      {card.address}
-                    </p>
-                  )}
-                  {card.accessibility && (
-                    <p className="text-xs text-muted-foreground mb-4">
-                      {card.accessibility}
-                    </p>
-                  )}
-                  {card.description && (
-                    <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-                      {card.description}
-                    </p>
-                  )}
-                  {card.highlights && (
-                    <div className="space-y-2 mb-5">
-                      {card.highlights.map((h) => (
-                        <p
-                          key={h}
-                          className="text-xs text-muted-foreground flex items-center gap-2"
-                        >
-                          <span className="text-primary">✓</span> {h}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                  {card.buttons && (
-                    <div className="flex gap-2">
-                      {card.buttons.map((btn) => {
-                        const isVisitButton = /book|schedule|visit/i.test(
-                          btn.text || "",
-                        );
-                        const fallbackLink =
-                          btn.text === "Get directions"
-                            ? card.address
-                              ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(card.address)}`
-                              : undefined
-                            : isVisitButton
-                              ? "#contact-form"
-                              : undefined;
-                        const href = btn.link || fallbackLink;
-                        if (href) {
-                          const isExternal = href.startsWith("http");
-                          return (
-                            <a
-                              key={btn.text}
-                              href={href}
-                              target={isExternal ? "_blank" : undefined}
-                              rel={
-                                isExternal ? "noopener noreferrer" : undefined
-                              }
-                              className="text-[10px] border rounded px-2 py-1 flex items-center gap-1 hover:bg-muted"
-                            >
-                              <ResolvedIcon
-                                name={btn.icon}
-                                className="h-3 w-3"
-                              />{" "}
-                              {btn.text}
-                            </a>
-                          );
-                        }
-                        return (
-                          <button
-                            key={btn.text}
-                            className="text-[10px] border rounded px-2 py-1 flex items-center gap-1 hover:bg-muted"
-                          >
-                            <ResolvedIcon name={btn.icon} className="h-3 w-3" />{" "}
-                            {btn.text}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                  {card.cta && (
-                    <>
-                      {card.link ? (
-                        <a
-                          href={card.link}
-                          className="w-full bg-primary text-primary-foreground text-xs font-medium rounded py-2.5 hover:bg-primary/90 transition-colors text-center block"
-                        >
-                          {card.cta}
-                        </a>
-                      ) : (
-                        <button
-                          onClick={() => {
-                            const form =
-                              document.getElementById("contact-form");
-                            if (form)
-                              form.scrollIntoView({ behavior: "smooth" });
-                          }}
-                          className="w-full bg-primary text-primary-foreground text-xs font-medium rounded py-2.5 hover:bg-primary/90 transition-colors"
-                        >
-                          {card.cta}
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
+            {/* FAQ */}
+            <div style={{ marginTop: 48 }}>
+              <VedikaSectionTitle eyebrow="Quick Answers" title="FAQs" align="left" />
+              {faqItems.map((item, i) => (
+                <VedikaFAQItem key={i} question={item.question} answer={item.answer} />
               ))}
             </div>
           </div>
-        </section>
-      )}
+
+          {/* RIGHT: Contact Form */}
+          <div>
+            <div style={{ background: "var(--vedika-paper)", border: "1px solid var(--vedika-line)", borderRadius: "14px", padding: "36px" }}>
+              <VedikaSectionTitle eyebrow="Send a Message" title="Write to us" align="left" />
+              <form onSubmit={handleSubmit}>
+                <div className="form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+                  <div className="form-field">
+                    <label style={{ display: "block", fontSize: ".84rem", fontWeight: 600, color: "var(--vedika-green-dark)", marginBottom: 8 }}>Full Name *</label>
+                    <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      style={{ width: "100%", border: "1px solid var(--vedika-line)", borderRadius: "6px", padding: "13px 16px", background: "var(--vedika-paper)", color: "var(--vedika-ink)", font: "inherit", fontSize: ".92rem" }} />
+                  </div>
+                  <div className="form-field">
+                    <label style={{ display: "block", fontSize: ".84rem", fontWeight: 600, color: "var(--vedika-green-dark)", marginBottom: 8 }}>Email *</label>
+                    <input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      style={{ width: "100%", border: "1px solid var(--vedika-line)", borderRadius: "6px", padding: "13px 16px", background: "var(--vedika-paper)", color: "var(--vedika-ink)", font: "inherit", fontSize: ".92rem" }} />
+                  </div>
+                  <div className="form-field full">
+                    <label style={{ display: "block", fontSize: ".84rem", fontWeight: 600, color: "var(--vedika-green-dark)", marginBottom: 8 }}>Subject</label>
+                    <input type="text" value={formData.subject} onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                      style={{ width: "100%", border: "1px solid var(--vedika-line)", borderRadius: "6px", padding: "13px 16px", background: "var(--vedika-paper)", color: "var(--vedika-ink)", font: "inherit", fontSize: ".92rem" }} />
+                  </div>
+                  <div className="form-field full">
+                    <label style={{ display: "block", fontSize: ".84rem", fontWeight: 600, color: "var(--vedika-green-dark)", marginBottom: 8 }}>Message *</label>
+                    <textarea required rows={5} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      style={{ width: "100%", border: "1px solid var(--vedika-line)", borderRadius: "6px", padding: "13px 16px", background: "var(--vedika-paper)", color: "var(--vedika-ink)", font: "inherit", fontSize: ".92rem", resize: "vertical" }} />
+                  </div>
+                </div>
+                <button type="submit" className="vedika-btn vedika-btn-primary" style={{ marginTop: 12 }}>Send Message</button>
+              </form>
+            </div>
+
+            {/* MAP */}
+            <div className="map-box" style={{
+              aspectRatio: "16/8", borderRadius: "14px", overflow: "hidden", marginTop: 40,
+              background: "linear-gradient(var(--vedika-line) 1px, transparent 1px) 0 0/40px 40px, linear-gradient(90deg, var(--vedika-line) 1px, transparent 1px) 0 0/40px 40px, var(--vedika-bg-alt)",
+              display: "flex", alignItems: "center", justifyContent: "center", position: "relative",
+            }}>
+              <PinIcon className="w-[52px] h-[52px]" style={{ color: "var(--vedika-red)" }} />
+              <span style={{ position: "absolute", bottom: 16, left: "50%", transform: "translateX(-50%)", fontSize: ".78rem", color: "var(--vedika-ink-soft)", background: "var(--vedika-paper)", padding: "6px 14px", borderRadius: 100, whiteSpace: "nowrap" }}>
+                42, Hawa Sadak, Bani Park, Jaipur
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <VedikaNewsletter />
     </div>
   );
 }

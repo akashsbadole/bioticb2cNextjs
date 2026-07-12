@@ -3,19 +3,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import {
-  Menu,
   X,
-  User,
   ShoppingBag,
-  Search,
-  ChevronDown,
-  ChevronRight,
+  Search as SearchIcon,
   Clock,
   Trash2,
-  ShoppingCart,
-  Heart,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/lib/store";
 import {
   Sheet,
@@ -23,7 +16,6 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetClose,
 } from "@/components/ui/sheet";
 import {
   Dialog,
@@ -31,9 +23,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, getFirstImage } from "@/lib/utils";
+import { getFirstImage } from "@/lib/utils";
 import { formatPrice as libFormatPrice } from "@/lib/pricing";
 import Link from "next/link";
 
@@ -197,7 +188,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
     setSearchLoading(true);
     try {
       const res = await fetch(
-        `/api/products?search=${encodeURIComponent(query)}`,
+        `/api/products?search=${encodeURIComponent(query)}&inStock=true`,
       );
       if (res.ok) {
         const data = await res.json();
@@ -364,244 +355,234 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
 
   return (
     <>
+      {/* === ANNOUNCEMENT BAR === */}
+      <div className="announce" style={{ background: "var(--vedika-green-dark)", color: "var(--vedika-gold-tint)", textAlign: "center", fontSize: ".78rem", letterSpacing: ".05em", padding: "9px 12px" }}>
+        Free shipping across India on orders above ₹799 &nbsp;•&nbsp; Formulated per classical Ayurvedic texts
+      </div>
+
       {/* === MAIN NAVIGATION BAR === */}
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex h-14 items-center justify-between px-4">
+      <header className="site-header" style={{ position: "sticky", top: 0, zIndex: 500, background: "rgba(247,241,222,.92)", backdropFilter: "blur(10px)", borderBottom: "1px solid var(--vedika-line)" }}>
+        <div className="nav" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 32px", maxWidth: "1240px", margin: "0 auto", gap: "24px" }}>
           {/* Logo */}
-          <Link href={"/"}>
-            <button
-              onClick={() => onNavigate("home")}
-              className="flex items-center gap-2 transition-opacity hover:opacity-80 shrink-0"
-            >
-              {settings?.site_logo ? (
-                <img
-                  src={settings.site_logo}
-                  alt={settings.site_name || "Logo"}
-                  className="h-[50px] w-auto object-contain"
-                />
-              ) : (
-                <img
-                  src="/pruvabites.jpg"
-                  alt="Logo"
-                  className="h-[50px] w-auto object-contain"
-                />
-              )}
-              <span className="text-lg font-bold tracking-tight hidden sm:inline">
-                {settings?.site_name}
-              </span>
+          <Link href={"/"} className="logo" style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "1.5rem", fontWeight: 600, color: "var(--vedika-green-dark)", flexShrink: 0 }}>
+            <button onClick={() => onNavigate("home")} style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer", font: "inherit", color: "inherit" }}>
+              <svg viewBox="0 0 32 32" fill="none" style={{ width: 30, height: 30 }}>
+                <circle cx="16" cy="16" r="15" stroke="#2F4A3C" strokeWidth="1.4"/>
+                <path d="M16 24C16 24 9 20.5 9 13.5C9 9.5 12 7 16 7C20 7 23 9.5 23 13.5C23 20.5 16 24 16 24Z" stroke="#2F4A3C" strokeWidth="1.3" strokeLinejoin="round"/>
+                <path d="M16 24V10" stroke="#2F4A3C" strokeWidth="1.3"/>
+              </svg>
+              {settings?.site_name || "Vedika"}
             </button>
           </Link>
 
           {/* Desktop Navigation - Center */}
-          <nav
-            className="hidden lg:flex items-center gap-0.5"
-            role="navigation"
-            aria-label="Main navigation"
-          >
+          <ul className="nav-links" style={{ display: "flex", alignItems: "center", gap: 36, fontSize: ".92rem", fontWeight: 500, listStyle: "none", margin: 0, padding: 0 }}>
             {menuLoading
               ? Array.from({ length: 5 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-9 w-20 bg-muted animate-pulse rounded"
-                  />
+                  <li key={i}><div style={{ width: 60, height: 16, background: "var(--vedika-sand)", borderRadius: 4, opacity: 0.3 }} /></li>
                 ))
               : primaryMenuItems.length > 0
                 ? primaryMenuItems.map((item) => {
-                    const hasChildren =
-                      item.children && item.children.length > 0;
+                    const hasChildren = item.children && item.children.length > 0;
                     const active = isNavItemActive(item);
                     return (
-                      <div key={item.id} className="relative group">
-                        <Button
-                          variant="ghost"
-                          className={cn(
-                            "relative text-sm font-medium px-3 text-black hover:text-white",
-                            active &&
-                              "after:absolute after:-bottom-[1px] after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full after:content-['']",
-                          )}
+                      <li key={item.id} style={{ position: "relative" }}>
+                        <button
                           onClick={() => navigateOrOpen(item)}
+                          style={{
+                            position: "relative", padding: "4px 0", color: active ? "var(--vedika-red)" : "var(--vedika-ink)",
+                            background: "none", border: "none", cursor: "pointer", font: "inherit",
+                            textDecoration: "none",
+                          }}
+                          onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = "var(--vedika-red)"; }}
+                          onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = "var(--vedika-ink)"; }}
                         >
                           {item.label}
-                          {hasChildren && (
-                            <ChevronDown className="ml-1 h-3 w-3" />
-                          )}
-                        </Button>
+                          {hasChildren && <span style={{ marginLeft: 4, fontSize: ".7rem" }}>▾</span>}
+                          <span style={{
+                            content: "", position: "absolute", left: 0, bottom: -2,
+                            width: active ? "100%" : "0", height: 1.5, background: "var(--vedika-red)",
+                            transition: "width .25s ease", display: "block",
+                          }} />
+                        </button>
                         {hasChildren && (
-                          <div className="absolute top-full left-0 mt-1 w-48 rounded-md bg-popover border shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                          <div style={{
+                            position: "absolute", top: "100%", left: 0, marginTop: 8,
+                            background: "var(--vedika-paper)", border: "1px solid var(--vedika-line)",
+                            borderRadius: 8, boxShadow: "0 12px 30px -14px rgba(28,44,35,.28)",
+                            minWidth: 180, padding: 8, zIndex: 100, display: "none",
+                          }}
+                            className="dropdown-menu"
+                          >
                             {item.children?.map((child) => (
                               <button
                                 key={child.id}
-                                className="w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors"
                                 onClick={() => navigateOrOpen(child)}
+                                style={{
+                                  display: "block", width: "100%", textAlign: "left",
+                                  padding: "8px 12px", fontSize: ".88rem", color: "var(--vedika-ink)",
+                                  background: "none", border: "none", cursor: "pointer", font: "inherit",
+                                  borderRadius: 4,
+                                }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "var(--vedika-bg-alt)"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                               >
                                 {child.label}
                               </button>
                             ))}
                           </div>
                         )}
-                      </div>
+                      </li>
                     );
                   })
                 : allNavLinks.map((link) => {
                     const active = currentPage.type === link.page;
                     return (
-                      <Button
-                        key={link.slug || link.page}
-                        variant="ghost"
-                        className={cn(
-                          "relative text-sm font-medium px-3",
-                          active &&
-                            "after:absolute after:-bottom-[1px] after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full after:content-['']",
-                        )}
-                        onClick={() => onNavigate(link.page, link.slug)}
-                      >
-                        {link.label}
-                      </Button>
+                      <li key={link.slug || link.page}>
+                        <button
+                          onClick={() => onNavigate(link.page, link.slug)}
+                          style={{
+                            position: "relative", padding: "4px 0", color: active ? "var(--vedika-red)" : "var(--vedika-ink)",
+                            background: "none", border: "none", cursor: "pointer", font: "inherit",
+                            textDecoration: "none",
+                          }}
+                          onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = "var(--vedika-red)"; }}
+                          onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = "var(--vedika-ink)"; }}
+                        >
+                          {link.label}
+                          <span style={{
+                            content: "", position: "absolute", left: 0, bottom: -2,
+                            width: active ? "100%" : "0", height: 1.5, background: "var(--vedika-red)",
+                            transition: "width .25s ease", display: "block",
+                          }} />
+                        </button>
+                      </li>
                     );
                   })}
-          </nav>
+          </ul>
 
-          {/* Right: Search + CTA */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          {/* Right: Icon Actions */}
+          <div className="nav-actions" style={{ display: "flex", alignItems: "center", gap: 18 }}>
             {/* Search Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9"
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search products"
+            <button onClick={() => setSearchOpen(true)} className="icon-btn" aria-label="Search"
+              style={{ width: 38, height: 38, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--vedika-green-dark)", position: "relative", background: "none", border: "none", cursor: "pointer", transition: "background .2s ease" }}
+              onMouseEnter={(e) => e.currentTarget.style.background = "var(--vedika-sand)"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
             >
-              <Search className="h-4.5 w-4.5" />
-            </Button>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 19, height: 19 }}>
+                <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+              </svg>
+            </button>
 
             {/* Account Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9"
-              onClick={() => onNavigate("account")}
-              aria-label="Account"
+            <button onClick={() => onNavigate("account")} className="icon-btn" aria-label="Account"
+              style={{ width: 38, height: 38, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--vedika-green-dark)", position: "relative", background: "none", border: "none", cursor: "pointer", transition: "background .2s ease" }}
+              onMouseEnter={(e) => e.currentTarget.style.background = "var(--vedika-sand)"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
             >
-              <User className="h-4.5 w-4.5" />
-            </Button>
-
-            {/* Wishlist Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 relative"
-              onClick={() => onNavigate("wishlist")}
-              aria-label="View wishlist"
-            >
-              <Heart className="h-4.5 w-4.5" />
-              {wishlistIds.length > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">
-                  {wishlistIds.length}
-                </span>
-              )}
-            </Button>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 19, height: 19 }}>
+                <circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
+              </svg>
+            </button>
 
             {/* Cart Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 relative"
-              onClick={() => onNavigate("cart")}
-              aria-label="View cart"
+            <button onClick={() => onNavigate("cart")} className="icon-btn" aria-label="Cart"
+              style={{ width: 38, height: 38, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--vedika-green-dark)", position: "relative", background: "none", border: "none", cursor: "pointer", transition: "background .2s ease" }}
+              onMouseEnter={(e) => e.currentTarget.style.background = "var(--vedika-sand)"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
             >
-              <ShoppingCart className="h-4.5 w-4.5" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 19, height: 19 }}>
+                <path d="M4 6h2l1.6 10.2A2 2 0 0 0 9.6 18h7.8a2 2 0 0 0 2-1.7L21 8H7"/><circle cx="10" cy="21" r="1"/><circle cx="18" cy="21" r="1"/>
+              </svg>
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                <span className="cart-count" style={{
+                  position: "absolute", top: -2, right: -2,
+                  background: "var(--vedika-red)", color: "#fff",
+                  fontSize: ".62rem", fontWeight: 700,
+                  width: 16, height: 16, borderRadius: "50%",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
                   {cartItemCount}
                 </span>
               )}
-            </Button>
+            </button>
 
             {/* Mobile Menu Trigger */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-              <SheetTrigger asChild className="lg:hidden">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9"
-                  aria-label="Open menu"
-                >
-                  <Menu className="h-5 w-5" />
-                </Button>
+              <SheetTrigger asChild>
+                <button className="menu-toggle" aria-label="Menu" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--vedika-green-dark)" }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 26, height: 26 }}>
+                    <path d="M3 6h18M3 12h18M3 18h18"/>
+                  </svg>
+                </button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-72 p-0">
-                <SheetHeader className="border-b px-4 py-3">
-                  <SheetTitle className="flex items-center gap-2 text-base">
-                    {settings?.site_logo ? (
-                      <img
-                        src={settings.site_logo}
-                        alt={settings.site_name || "Logo"}
-                        className="h-6 w-auto object-contain"
-                      />
-                    ) : (
-                      <ShoppingBag className="h-5 w-5 text-primary" />
-                    )}
-                    {settings?.site_name}
+              <SheetContent side="right" className="w-72 p-0" style={{ background: "var(--vedika-paper)", borderLeft: "1px solid var(--vedika-line)" }}>
+                <SheetHeader className="border-b px-4 py-3" style={{ borderBottom: "1px solid var(--vedika-line)" }}>
+                  <SheetTitle className="flex items-center gap-2 text-base" style={{ fontFamily: "var(--font-fraunces), Georgia, serif", color: "var(--vedika-green-dark)", fontSize: "1.2rem" }}>
+                    <svg viewBox="0 0 32 32" fill="none" style={{ width: 24, height: 24 }}>
+                      <circle cx="16" cy="16" r="15" stroke="#2F4A3C" strokeWidth="1.4"/>
+                      <path d="M16 24C16 24 9 20.5 9 13.5C9 9.5 12 7 16 7C20 7 23 9.5 23 13.5C23 20.5 16 24 16 24Z" stroke="#2F4A3C" strokeWidth="1.3" strokeLinejoin="round"/>
+                      <path d="M16 24V10" stroke="#2F4A3C" strokeWidth="1.3"/>
+                    </svg>
+                    {settings?.site_name || "Vedika"}
                   </SheetTitle>
                 </SheetHeader>
-                <nav
-                  className="flex flex-col gap-1 px-3 pt-3"
-                  role="navigation"
-                  aria-label="Mobile navigation"
-                >
+                <nav className="flex flex-col gap-1 px-3 pt-3" role="navigation" aria-label="Mobile navigation">
                   {menuLoading
                     ? Array.from({ length: 5 }).map((_, i) => (
-                        <div
-                          key={i}
-                          className="h-9 w-full bg-muted animate-pulse rounded"
-                        />
+                        <div key={i} style={{ height: 36, background: "var(--vedika-bg-alt)", borderRadius: 4, opacity: 0.3 }} />
                       ))
                     : primaryMenuItems.length > 0
                       ? primaryMenuItems.map((item) => {
-                          const hasChildren =
-                            item.children && item.children.length > 0;
+                          const hasChildren = item.children && item.children.length > 0;
                           const isExpanded = expandedItems.has(item.id);
                           return (
                             <div key={item.id}>
                               {hasChildren ? (
-                                <Button
-                                  variant="ghost"
-                                  className="justify-between text-sm h-9 w-full"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    toggleExpanded(item.id);
+                                <button
+                                  onClick={(e) => { e.preventDefault(); toggleExpanded(item.id); }}
+                                  style={{
+                                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                                    width: "100%", padding: "10px 12px", fontSize: ".92rem",
+                                    fontWeight: 500, color: "var(--vedika-ink)",
+                                    background: "none", border: "none", cursor: "pointer", font: "inherit",
+                                    borderRadius: 6,
                                   }}
                                 >
                                   <span>{item.label}</span>
-                                  {isExpanded ? (
-                                    <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
-                                  ) : (
-                                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-                                  )}
-                                </Button>
+                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 16, height: 16, transform: isExpanded ? "rotate(180deg)" : "rotate(0)", transition: "transform .2s ease" }}>
+                                    <path d="M6 9l6 6 6-6"/>
+                                  </svg>
+                                </button>
                               ) : (
-                                <SheetClose asChild>
-                                  <Button
-                                    variant="ghost"
-                                    className="justify-start text-sm h-9 w-full"
-                                    onClick={() => navigateOrOpen(item)}
-                                  >
-                                    {item.label}
-                                  </Button>
-                                </SheetClose>
+                                <button
+                                  onClick={() => navigateOrOpen(item)}
+                                  style={{
+                                    display: "block", width: "100%", textAlign: "left",
+                                    padding: "10px 12px", fontSize: ".92rem", fontWeight: 500,
+                                    color: "var(--vedika-ink)",
+                                    background: "none", border: "none", cursor: "pointer", font: "inherit",
+                                    borderRadius: 6,
+                                  }}
+                                >
+                                  {item.label}
+                                </button>
                               )}
                               {hasChildren && isExpanded && (
-                                <div className="ml-3 border-l pl-2 space-y-0.5">
+                                <div style={{ marginLeft: 12, borderLeft: "1px solid var(--vedika-line)", paddingLeft: 8 }}>
                                   {item.children?.map((child) => (
-                                    <SheetClose asChild key={child.id}>
-                                      <Button
-                                        variant="ghost"
-                                        className="justify-start text-sm h-9 w-full pl-3"
-                                        onClick={() => navigateOrOpen(child)}
-                                      >
-                                        {child.label}
-                                      </Button>
-                                    </SheetClose>
+                                    <button
+                                      key={child.id}
+                                      onClick={() => navigateOrOpen(child)}
+                                      style={{
+                                        display: "block", width: "100%", textAlign: "left",
+                                        padding: "8px 12px", fontSize: ".86rem", color: "var(--vedika-ink-soft)",
+                                        background: "none", border: "none", cursor: "pointer", font: "inherit",
+                                        borderRadius: 6,
+                                      }}
+                                    >
+                                      {child.label}
+                                    </button>
                                   ))}
                                 </div>
                               )}
@@ -609,54 +590,70 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
                           );
                         })
                       : allNavLinks.map((link) => (
-                          <SheetClose asChild key={link.slug || link.page}>
-                            <Button
-                              variant="ghost"
-                              className="justify-start text-sm h-9"
-                              onClick={() => onNavigate(link.page, link.slug)}
-                            >
-                              {link.label}
-                            </Button>
-                          </SheetClose>
+                          <button
+                            key={link.slug || link.page}
+                            onClick={() => { onNavigate(link.page, link.slug); setMobileOpen(false); }}
+                            style={{
+                              display: "block", width: "100%", textAlign: "left",
+                              padding: "10px 12px", fontSize: ".92rem", fontWeight: 500,
+                              color: currentPage.type === link.page ? "var(--vedika-red)" : "var(--vedika-ink)",
+                              background: "none", border: "none", cursor: "pointer", font: "inherit",
+                              borderRadius: 6,
+                            }}
+                          >
+                            {link.label}
+                          </button>
                         ))}
 
-                  <Separator className="my-2" />
+                  <div style={{ height: 1, background: "var(--vedika-line)", margin: "12px 0" }} />
 
-                  {/* Cart CTA */}
-                  <SheetClose asChild>
-                    <Button
-                      variant="outline"
-                      className="justify-start text-sm h-9 w-full"
-                      onClick={() => onNavigate("cart")}
-                    >
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      View Cart ({cartItemCount})
-                    </Button>
-                  </SheetClose>
+                  <button
+                    onClick={() => { onNavigate("cart"); setMobileOpen(false); }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 10,
+                      width: "100%", textAlign: "left",
+                      padding: "10px 12px", fontSize: ".92rem", color: "var(--vedika-ink)",
+                      background: "none", border: "1px solid var(--vedika-line)", cursor: "pointer", font: "inherit",
+                      borderRadius: 6, fontWeight: 500,
+                    }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 16, height: 16 }}>
+                      <path d="M4 6h2l1.6 10.2A2 2 0 0 0 9.6 18h7.8a2 2 0 0 0 2-1.7L21 8H7"/><circle cx="10" cy="21" r="1"/><circle cx="18" cy="21" r="1"/>
+                    </svg>
+                    View Cart ({cartItemCount})
+                  </button>
 
-                  {/* Account */}
-                  <SheetClose asChild>
-                    <Button
-                      variant="ghost"
-                      className="justify-start text-sm h-9"
-                      onClick={() => onNavigate("account")}
-                    >
-                      <User className="mr-2 h-4 w-4" />
-                      My Account
-                    </Button>
-                  </SheetClose>
+                  <button
+                    onClick={() => { onNavigate("account"); setMobileOpen(false); }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 10,
+                      width: "100%", textAlign: "left",
+                      padding: "10px 12px", fontSize: ".92rem", color: "var(--vedika-ink)",
+                      background: "none", border: "none", cursor: "pointer", font: "inherit",
+                      borderRadius: 6,
+                    }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 16, height: 16 }}>
+                      <circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
+                    </svg>
+                    My Account
+                  </button>
 
-                  {/* Search */}
-                  <SheetClose asChild>
-                    <Button
-                      variant="outline"
-                      className="justify-start text-sm h-9"
-                      onClick={() => setSearchOpen(true)}
-                    >
-                      <Search className="mr-2 h-4 w-4" />
-                      Search Products
-                    </Button>
-                  </SheetClose>
+                  <button
+                    onClick={() => setSearchOpen(true)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 10,
+                      width: "100%", textAlign: "left",
+                      padding: "10px 12px", fontSize: ".92rem", color: "var(--vedika-ink)",
+                      background: "none", border: "1px solid var(--vedika-line)", cursor: "pointer", font: "inherit",
+                      borderRadius: 6,
+                    }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 16, height: 16 }}>
+                      <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+                    </svg>
+                    Search Products
+                  </button>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -671,7 +668,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
             <DialogTitle>Search Products</DialogTitle>
           </DialogHeader>
           <div className="flex items-center border-b px-4">
-            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <SearchIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
             <input
               ref={inputRef}
               type="text"
@@ -714,7 +711,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
               </div>
             ) : searchQuery && searchResults.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
-                <Search className="h-8 w-8 text-muted-foreground/50" />
+                <SearchIcon className="h-8 w-8 text-muted-foreground/50" />
                 <p className="mt-2 text-sm text-muted-foreground">
                   No results found
                 </p>
@@ -806,7 +803,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <Search className="h-8 w-8 text-muted-foreground/50" />
+                    <SearchIcon className="h-8 w-8 text-muted-foreground/50" />
                     <p className="mt-2 text-sm text-muted-foreground">
                       Start typing to search products
                     </p>

@@ -123,11 +123,11 @@ export function StoreLayout({
   }, [settings?.chat_widget_id]);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="vedika-theme vedika-grain flex min-h-screen flex-col">
       {/* Announcement Bar */}
       {settings?.announcement_text ? (
         <div className="bg-primary text-center text-xs py-2 px-4">
-          <p className="text-white">{settings.announcement_text}</p>
+          <p className="text-primary-foreground">{settings.announcement_text}</p>
         </div>
       ) : null}
       <StoreHeader onNavigate={onNavigate} />

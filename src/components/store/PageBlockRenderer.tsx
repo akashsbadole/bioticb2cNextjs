@@ -504,7 +504,7 @@ function ProductsBlock({
     const fetchProducts = async () => {
       try {
         const res = await fetch(
-          `/api/products?featured=true&limit=${maxProducts}`,
+          `/api/products?featured=true&inStock=true&limit=${maxProducts}`,
         );
         if (res.ok) {
           const data = await res.json();
