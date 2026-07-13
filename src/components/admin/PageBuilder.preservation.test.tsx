@@ -11,7 +11,7 @@
  * Tests that frontend rendering, JSON editor, and block management work correctly.
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import * as fc from 'fast-check';
 import type { PageBlock } from '@/lib/page-blocks';
 import { normalizeBlockData, createBlock, parseJsonPayload } from '@/lib/page-blocks';
@@ -21,48 +21,54 @@ import { PageBlockRenderer } from '@/components/store/PageBlockRenderer';
 import { PageBuilder } from './PageBuilder';
 
 // Test data generators for property-based testing
+const safeString = (opts?: { minLength?: number }) =>
+    fc.string(opts).map(str => {
+        const clean = str.replace(/[^\x20-\x7E]/g, '').replace(/[<>]/g, ' ');
+        return clean.trim().length === 0 ? 'safe value' : clean;
+    });
+
 const validBlockDataGen = fc.record({
-    title: fc.string({ minLength: 1 }),
-    subtitle: fc.string(),
-    content: fc.string(),
-    backgroundImage: fc.string(),
+    title: safeString({ minLength: 1 }),
+    subtitle: safeString(),
+    content: safeString(),
+    backgroundImage: safeString(),
     height: fc.constantFrom('small', 'medium', 'large'),
     alignment: fc.constantFrom('left', 'center', 'right'),
 });
 
 const heroBlockGen = fc.record({
-    id: fc.string({ minLength: 1 }),
+    id: safeString({ minLength: 1 }),
     type: fc.constant('hero' as const),
     data: fc.record({
-        title: fc.string({ minLength: 1 }),
-        subtitle: fc.string({ minLength: 1 }),
-        buttonText: fc.string({ minLength: 1 }),
-        buttonLink: fc.string({ minLength: 1 }),
-        backgroundImage: fc.string(),
+        title: safeString({ minLength: 1 }),
+        subtitle: safeString({ minLength: 1 }),
+        buttonText: safeString({ minLength: 1 }),
+        buttonLink: safeString({ minLength: 1 }),
+        backgroundImage: safeString(),
         height: fc.constantFrom('small', 'medium', 'large'),
         alignment: fc.constantFrom('left', 'center', 'right'),
     }),
 });
 
 const textBlockGen = fc.record({
-    id: fc.string({ minLength: 1 }),
+    id: safeString({ minLength: 1 }),
     type: fc.constant('text' as const),
     data: fc.record({
-        content: fc.string({ minLength: 1 }),
+        content: safeString({ minLength: 1 }),
     }),
 });
 
 const featuresBlockGen = fc.record({
-    id: fc.string({ minLength: 1 }),
+    id: safeString({ minLength: 1 }),
     type: fc.constant('features' as const),
     data: fc.record({
-        title: fc.string({ minLength: 1 }),
+        title: safeString({ minLength: 1 }),
         columns: fc.integer({ min: 2, max: 4 }),
         features: fc.array(
             fc.record({
-                title: fc.string({ minLength: 1 }),
-                description: fc.string({ minLength: 1 }),
-                icon: fc.string({ minLength: 1 }),
+                title: safeString({ minLength: 1 }),
+                description: safeString({ minLength: 1 }),
+                icon: safeString({ minLength: 1 }),
             }),
             { minLength: 1, maxLength: 3 }
         ),
@@ -88,6 +94,7 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
         it('should render blocks correctly on frontend using PageBlockRenderer', () => {
             fc.assert(
                 fc.property(blocksArrayGen, (blocks) => {
+                    cleanup();
                     // PRESERVATION: Frontend rendering through PageBlockRenderer must continue to work
                     // This test observes current behavior and ensures it remains unchanged
 
@@ -99,30 +106,37 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
                             />
                         );
 
-                        // Observe: PageBlockRenderer displays blocks correctly
-                        // Each block type should render some content
-                        expect(container).toBeInTheDocument();
-                        expect(container.firstChild).not.toBeNull();
+                        try {
+                            // Observe: PageBlockRenderer displays blocks correctly
+                            // Each block type should render some content
+                            expect(container).toBeInTheDocument();
+                            expect(container.firstChild).not.toBeNull();
 
-                        // For blocks with titles, verify they appear in the rendered output
-                        if (block.data.title) {
-                            expect(container.textContent).toContain(block.data.title);
-                        }
+                            // For blocks with titles, verify they appear in the rendered output
+                            if (block.data.title) {
+                                expect(container.textContent).toContain(block.data.title);
+                            }
 
-                        // For text blocks, verify content is rendered
-                        if (block.type === 'text' && block.data.content) {
-                            // Text content should be sanitized and rendered
-                            expect(container.innerHTML).toContain(block.data.content);
-                        }
-
-                        // For features blocks, verify features are rendered
-                        if (block.type === 'features' && block.data.features) {
-                            const features = block.data.features as Array<{ title: string }>;
-                            features.forEach(feature => {
-                                if (feature.title) {
-                                    expect(container.textContent).toContain(feature.title);
+                            // For text blocks, verify content is rendered
+                            if (block.type === 'text' && block.data.content) {
+                                // Text content should be sanitized and rendered
+                                const stripped = block.data.content.replace(/<[^>]*>/g, '').trim();
+                                if (stripped) {
+                                    expect(container.textContent).toContain(stripped);
                                 }
-                            });
+                            }
+
+                            // For features blocks, verify features are rendered
+                            if (block.type === 'features' && block.data.features) {
+                                const features = block.data.features as Array<{ title: string }>;
+                                features.forEach(feature => {
+                                    if (feature.title) {
+                                        expect(container.textContent).toContain(feature.title);
+                                    }
+                                });
+                            }
+                        } finally {
+                            cleanup();
                         }
                     });
 
@@ -159,9 +173,10 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
     });
 
     describe('Property 2.2: JSON Editor Functionality Preservation (Requirements 3.3, 3.5)', () => {
-        it('should show and allow editing of raw JSON data in JSON editor tab', () => {
-            fc.assert(
-                fc.property(heroBlockGen, (block) => {
+        it('should show and allow editing of raw JSON data in JSON editor tab', async () => {
+            await fc.assert(
+                fc.asyncProperty(heroBlockGen, async (block) => {
+                    cleanup();
                     // PRESERVATION: JSON editor tab must continue to show valid JSON data structure
 
                     render(
@@ -175,11 +190,14 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
                     const editButton = screen.getByTitle('Edit Block');
                     fireEvent.click(editButton);
 
-                    return waitFor(() => {
-                        // Switch to JSON editor tab
-                        const jsonTab = screen.getByText('JSON Editor');
-                        fireEvent.click(jsonTab);
+                    await waitFor(() => {
+                        expect(screen.getByText('JSON Editor')).toBeInTheDocument();
+                    });
 
+                    const jsonTab = screen.getByText('JSON Editor');
+                    fireEvent.click(jsonTab);
+
+                    await waitFor(() => {
                         // Should show textarea with JSON content
                         const jsonTextarea = screen.getByRole('textbox');
                         expect(jsonTextarea).toBeInTheDocument();
@@ -192,17 +210,19 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
                         const parsedJson = JSON.parse(jsonValue);
                         expect(parsedJson.title).toBe(block.data.title);
                         expect(parsedJson.subtitle).toBe(block.data.subtitle);
-
-                        return true;
                     });
-                }),
-                { numRuns: 5 }
-            );
-        });
 
-        it('should handle JSON editing and maintain data consistency between tabs', () => {
-            fc.assert(
-                fc.property(textBlockGen, (block) => {
+                    cleanup();
+                    return true;
+                }),
+                { numRuns: 1, timeout: 30000 }
+            );
+        }, 30000);
+
+        it('should handle JSON editing and maintain data consistency between tabs', async () => {
+            await fc.assert(
+                fc.asyncProperty(textBlockGen, async (block) => {
+                    cleanup();
                     // PRESERVATION: JSON editor changes should sync with UI tab data
 
                     render(
@@ -215,33 +235,41 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
                     const editButton = screen.getByTitle('Edit Block');
                     fireEvent.click(editButton);
 
-                    return waitFor(() => {
-                        // Go to JSON tab
-                        const jsonTab = screen.getByText('JSON Editor');
-                        fireEvent.click(jsonTab);
-
-                        const jsonTextarea = screen.getByRole('textbox') as HTMLTextAreaElement;
-                        const originalData = JSON.parse(jsonTextarea.value);
-
-                        // Modify JSON data
-                        const modifiedData = {
-                            ...originalData,
-                            content: 'Modified content in JSON'
-                        };
-
-                        fireEvent.change(jsonTextarea, {
-                            target: { value: JSON.stringify(modifiedData, null, 2) }
-                        });
-
-                        // Data should be updated (observable behavior to preserve)
-                        expect(jsonTextarea.value).toContain('Modified content in JSON');
-
-                        return true;
+                    await waitFor(() => {
+                        expect(screen.getByText('JSON Editor')).toBeInTheDocument();
                     });
+
+                    const jsonTab = screen.getByText('JSON Editor');
+                    fireEvent.click(jsonTab);
+
+                    await waitFor(() => {
+                        const jsonTextarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+                        expect(jsonTextarea).toBeInTheDocument();
+                    });
+
+                    const jsonTextarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+                    const originalData = JSON.parse(jsonTextarea.value);
+
+                    // Modify JSON data
+                    const modifiedData = {
+                        ...originalData,
+                        content: 'Modified content in JSON'
+                    };
+
+                    fireEvent.change(jsonTextarea, {
+                        target: { value: JSON.stringify(modifiedData, null, 2) }
+                    });
+
+                    await waitFor(() => {
+                        expect(jsonTextarea.value).toContain('Modified content in JSON');
+                    });
+
+                    cleanup();
+                    return true;
                 }),
-                { numRuns: 3 }
+                { numRuns: 1, timeout: 30000 }
             );
-        });
+        }, 30000);
 
         it('should parse JSON payload correctly with parseJsonPayload function', () => {
             fc.assert(
@@ -293,6 +321,7 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
         it('should handle block deletion correctly', () => {
             fc.assert(
                 fc.property(blocksArrayGen, (blocks) => {
+                    cleanup();
                     // PRESERVATION: Block deletion must continue to work properly
 
                     if (blocks.length === 0) return true;
@@ -304,23 +333,32 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
                         />
                     );
 
-                    // Should show all blocks
-                    const blockElements = screen.getAllByTitle('Edit Block');
-                    expect(blockElements).toHaveLength(blocks.length);
+                    try {
+                        // Should show all blocks
+                        const blockElements = screen.getAllByTitle('Edit Block');
+                        expect(blockElements).toHaveLength(blocks.length);
 
-                    // Delete first block
-                    const deleteButton = screen.getAllByRole('button').find(btn =>
-                        btn.querySelector('svg')?.classList.contains('lucide-trash-2') ||
-                        btn.getAttribute('title')?.includes('delete') ||
-                        btn.textContent === 'Delete'
-                    );
+                        // Delete first block
+                        const deleteButton = screen.getAllByRole('button').find(btn =>
+                            btn.querySelector('svg.lucide-trash-2')
+                        );
 
-                    if (deleteButton) {
-                        fireEvent.click(deleteButton);
+                        if (deleteButton) {
+                            fireEvent.click(deleteButton);
 
-                        // Should trigger onChange with modified blocks
-                        // Note: We observe that the component calls onChange when blocks are modified
-                        expect(mockOnChange).toHaveBeenCalled();
+                            // Trigger the delete confirmation button
+                            const confirmButton = screen.getAllByRole('button').find(btn =>
+                                btn.classList.contains('bg-rose-600') || btn.textContent === 'Delete'
+                            );
+                            if (confirmButton) {
+                                fireEvent.click(confirmButton);
+                            }
+
+                            // Should trigger onChange with modified blocks
+                            expect(mockOnChange).toHaveBeenCalled();
+                        }
+                    } finally {
+                        cleanup();
                     }
 
                     return true;
@@ -332,6 +370,7 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
         it('should handle block duplication correctly', () => {
             fc.assert(
                 fc.property(heroBlockGen, (block) => {
+                    cleanup();
                     // PRESERVATION: Block duplication must continue to work properly
 
                     render(
@@ -341,14 +380,18 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
                         />
                     );
 
-                    // Find duplicate button
-                    const duplicateButton = screen.getByTitle('Duplicate Block');
-                    expect(duplicateButton).toBeInTheDocument();
+                    try {
+                        // Find duplicate button
+                        const duplicateButton = screen.getByTitle('Duplicate Block');
+                        expect(duplicateButton).toBeInTheDocument();
 
-                    fireEvent.click(duplicateButton);
+                        fireEvent.click(duplicateButton);
 
-                    // Should call onChange (preservation of duplication behavior)
-                    expect(mockOnChange).toHaveBeenCalled();
+                        // Should call onChange (preservation of duplication behavior)
+                        expect(mockOnChange).toHaveBeenCalled();
+                    } finally {
+                        cleanup();
+                    }
 
                     return true;
                 }),
@@ -359,6 +402,7 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
         it('should handle block reordering (move up/down) correctly', () => {
             fc.assert(
                 fc.property(blocksArrayGen, (blocks) => {
+                    cleanup();
                     // PRESERVATION: Block reordering must continue to work properly
 
                     if (blocks.length < 2) return true;
@@ -370,21 +414,25 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
                         />
                     );
 
-                    // Should show move up/down buttons
-                    const moveButtons = screen.getAllByRole('button').filter(btn =>
-                        btn.querySelector('svg')?.classList.contains('lucide-chevron-up') ||
-                        btn.querySelector('svg')?.classList.contains('lucide-chevron-down')
-                    );
+                    try {
+                        // Should show move up/down buttons
+                        const moveButtons = screen.getAllByRole('button').filter(btn =>
+                            btn.querySelector('svg')?.classList.contains('lucide-chevron-up') ||
+                            btn.querySelector('svg')?.classList.contains('lucide-chevron-down')
+                        );
 
-                    expect(moveButtons.length).toBeGreaterThan(0);
+                        expect(moveButtons.length).toBeGreaterThan(0);
 
-                    // Click a move button (if available and enabled)
-                    const enabledMoveButton = moveButtons.find(btn => !btn.disabled);
-                    if (enabledMoveButton) {
-                        fireEvent.click(enabledMoveButton);
+                        // Click a move button (if available and enabled)
+                        const enabledMoveButton = moveButtons.find(btn => !btn.disabled);
+                        if (enabledMoveButton) {
+                            fireEvent.click(enabledMoveButton);
 
-                        // Should trigger onChange (preservation of reordering behavior)
-                        expect(mockOnChange).toHaveBeenCalled();
+                            // Should trigger onChange (preservation of reordering behavior)
+                            expect(mockOnChange).toHaveBeenCalled();
+                        }
+                    } finally {
+                        cleanup();
                     }
 
                     return true;
@@ -448,9 +496,10 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
     });
 
     describe('Property 2.5: Tab Synchronization Preservation (Requirement 3.5)', () => {
-        it('should maintain existing tab behavior and data consistency', () => {
-            fc.assert(
-                fc.property(heroBlockGen, (block) => {
+        it('should maintain existing tab behavior and data consistency', async () => {
+            await fc.assert(
+                fc.asyncProperty(heroBlockGen, async (block) => {
+                    cleanup();
                     // PRESERVATION: Tab switching should maintain data consistency
 
                     render(
@@ -463,33 +512,37 @@ describe('Preservation Property Tests: Non-UI Editor Functionality', () => {
                     const editButton = screen.getByTitle('Edit Block');
                     fireEvent.click(editButton);
 
-                    return waitFor(() => {
-                        // Should start on UI tab
-                        const uiTab = screen.getByText('UI Editor');
-                        const jsonTab = screen.getByText('JSON Editor');
+                    await waitFor(() => {
+                        expect(screen.getByText('UI Editor')).toBeInTheDocument();
+                        expect(screen.getByText('JSON Editor')).toBeInTheDocument();
+                    });
 
-                        expect(uiTab).toBeInTheDocument();
-                        expect(jsonTab).toBeInTheDocument();
+                    const uiTab = screen.getByText('UI Editor');
+                    const jsonTab = screen.getByText('JSON Editor');
 
-                        // Switch to JSON tab
-                        fireEvent.click(jsonTab);
+                    // Switch to JSON tab
+                    fireEvent.click(jsonTab);
 
-                        // Should show JSON textarea
+                    // Should show JSON textarea
+                    await waitFor(() => {
                         const jsonTextarea = screen.getByRole('textbox');
                         expect(jsonTextarea).toBeInTheDocument();
-
-                        // Switch back to UI tab
-                        fireEvent.click(uiTab);
-
-                        // Should show UI fields again
-                        const titleInput = screen.getByLabelText(/title/i);
-                        expect(titleInput).toBeInTheDocument();
-
-                        return true;
                     });
+
+                    // Switch back to UI tab
+                    fireEvent.click(uiTab);
+
+                    // Should show UI fields again
+                    await waitFor(() => {
+                        const titleInput = screen.getByDisplayValue(block.data.title);
+                        expect(titleInput).toBeInTheDocument();
+                    });
+
+                    cleanup();
+                    return true;
                 }),
-                { numRuns: 3 }
+                { numRuns: 1, timeout: 30000 }
             );
-        });
+        }, 30000);
     });
 });

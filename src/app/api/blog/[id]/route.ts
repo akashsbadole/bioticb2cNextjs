@@ -4,6 +4,7 @@ import { normalizeBlocksForStorage } from '@/lib/page-blocks';
 import { getStoreId } from '@/lib/store-db';
 import { normalizeImageUrl } from '@/lib/utils';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { sanitizeHtml, sanitizeBlocks } from '@/lib/sanitize';
 
 async function resolveBlogPost(idOrSlug: string, storeId: string | null) {
   return db.blogPost.findFirst({
@@ -101,7 +102,7 @@ export async function PUT(
         ...(body.excerpt !== undefined && {
           excerpt: body.excerpt || null,
         }),
-        ...(body.content !== undefined && { content: body.content }),
+        ...(body.content !== undefined && { content: sanitizeHtml(body.content) }),
         ...(body.coverImage !== undefined && {
           coverImage: normalizeImageUrl(body.coverImage),
         }),
@@ -127,7 +128,7 @@ export async function PUT(
         }),
         ...(body.isPublished !== undefined && { isPublished: body.isPublished }),
         ...(publishedAt !== undefined && { publishedAt }),
-        ...(blocks !== undefined && { blocks }),
+        ...(blocks !== undefined && { blocks: sanitizeBlocks(blocks) }),
       },
     });
 

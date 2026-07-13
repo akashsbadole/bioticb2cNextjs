@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { requireAuth } from '@/lib/admin-auth';
 
 export async function PUT(request: NextRequest) {
   try {
-    const userId = request.headers.get('x-user-id');
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID required' },
-        { status: 400 }
-      );
-    }
+    const auth = await requireAuth(request);
+    if (!auth.success) return auth.response;
+    const userId = auth.payload.userId;
 
     const result = await db.notification.updateMany({
       where: {

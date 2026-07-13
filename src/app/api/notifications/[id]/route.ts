@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { requireAuth, requireAdminAuth } from '@/lib/admin-auth';
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAuth(request);
+    if (!auth.success) return auth.response;
+    const userId = auth.payload.userId;
+
     const { id } = await params;
-    const userId = request.headers.get('x-user-id');
     const body = await request.json();
     const { isRead } = body;
 
@@ -19,10 +23,10 @@ export async function PUT(
     }
 
     // Verify the notification belongs to the current user or is a broadcast
-    const where: Record<string, unknown> = { id };
-    if (userId) {
-      where.OR = [{ userId }, { userId: null }];
-    }
+    const where: Record<string, unknown> = {
+      id,
+      OR: [{ userId }, { userId: null }]
+    };
 
     const notification = await db.notification.findFirst({ where });
     if (!notification) {
@@ -52,13 +56,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userRole = request.headers.get('x-user-role');
-    if (userRole !== 'admin') {
-      return NextResponse.json(
-        { error: 'Admin access required' },
-        { status: 403 }
-      );
-    }
+    const auth = await requireAdminAuth(request);
+    if (!auth.success) return auth.response;
 
     const { id } = await params;
 

@@ -23,11 +23,16 @@ export async function GET(
   }
 }
 
+import { requireAdminAuth } from '@/lib/admin-auth';
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdminAuth(request);
+    if (!auth.success) return auth.response;
+
     const { id } = await params;
     const body = await request.json();
     const { name, sku, price, comparePrice, stock, images, sortOrder, isActive } = body;

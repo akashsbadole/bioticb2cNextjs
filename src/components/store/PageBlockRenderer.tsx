@@ -170,10 +170,13 @@ const SANITIZE_OPTIONS = {
   ],
 };
 
-// Dynamic icon resolver
+// Dynamic icon resolver with security hardening against prototype access
 function LucideIcon({ name, className }: { name: string; className?: string }) {
+  if (!name || name === '__proto__' || name === 'constructor' || name === 'prototype') {
+    return <Star className={className} />;
+  }
   const IconComponent = iconMap[name];
-  if (IconComponent) {
+  if (IconComponent && (typeof IconComponent === 'function' || typeof IconComponent === 'object')) {
     return <IconComponent className={className} />;
   }
   return <Star className={className} />;

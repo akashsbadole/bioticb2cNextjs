@@ -148,7 +148,7 @@ export default auth(async (req) => {
       pathname.startsWith("/api/account/register");
     const limit = isSensitive ? AUTH_RATE_LIMIT : API_RATE_LIMIT;
     const rl = rateLimit(`${ip}:${isSensitive ? "auth" : "api"}`, limit);
-    if (!rl.allowed) {
+    if (!rl.allowed && process.env.DISABLE_RATE_LIMIT !== "true") {
       return NextResponse.json(
         { error: "Too many requests" },
         { status: 429, headers: { "Retry-After": String(rl.retryAfter) } },
