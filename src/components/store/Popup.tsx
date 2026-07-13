@@ -65,6 +65,10 @@ export function Popup() {
   const [popups, setPopups] = useState<PopupData[]>([]);
   const [index, setIndex] = useState(-1);
 
+  if (process.env.NEXT_PUBLIC_DISABLE_POPUPS === "true" || process.env.NODE_ENV === "test") {
+    return null;
+  }
+
   useEffect(() => {
     let cancelled = false;
     fetch("/api/popups")

@@ -9,7 +9,7 @@ const OTP_RATE_LIMIT = { maxRequests: 5, windowMs: 15 * 60 * 1000, prefix: "otp-
 const schema = z.object({
   email: z.string().email(),
   channel: z.enum(["email", "sms"]).default("email"),
-  recaptchaToken: z.string().optional(),
+  recaptchaToken: z.string().nullable().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
+      console.error("[OTP-ROUTE-ERROR]", parsed.error);
       return NextResponse.json({ error: "Invalid email" }, { status: 400 });
     }
 
@@ -36,7 +37,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      ...(process.env.NODE_ENV !== "production" ? { devCode: result.code } : {}),
+    });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

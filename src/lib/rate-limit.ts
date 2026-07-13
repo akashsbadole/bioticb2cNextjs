@@ -27,6 +27,9 @@ export async function rateLimit(
     prefix: string;
   }
 ): Promise<RateLimitResult> {
+  if (process.env.DISABLE_RATE_LIMIT === "true" || process.env.NODE_ENV === "test") {
+    return { success: true };
+  }
   const identifier = getClientIp(request);
   const endpoint = options.prefix;
   const now = new Date();

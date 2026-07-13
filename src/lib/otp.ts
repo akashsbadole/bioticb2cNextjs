@@ -25,7 +25,7 @@ function generateCode(): string {
 export async function requestOtp(
   email: string,
   channel: "email" | "sms" = "email",
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; code?: string; error?: string }> {
   const normalized = email.trim().toLowerCase();
   const user = await db.user.findUnique({ where: { email: normalized } });
 
@@ -56,8 +56,11 @@ export async function requestOtp(
     );
     if (!result.success) {
       console.log(`[OTP DEV] Code ${code} would have been sent via SMS to ${user.phone}`);
+      if (process.env.NODE_ENV !== "production") {
+        return { success: true, code };
+      }
     }
-    return { success: result.success, error: result.error };
+    return { success: result.success, code, error: result.error };
   }
 
   const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Store";
@@ -75,7 +78,7 @@ export async function requestOtp(
     console.log(`[OTP DEV] Code ${code} would have been sent via email to ${normalized}`);
   }
 
-  return { success: true };
+  return { success: true, code };
 }
 
 /**
