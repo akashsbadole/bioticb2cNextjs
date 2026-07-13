@@ -63,7 +63,7 @@ const mainNavLinks: NavItem[] = [
 ];
 
 export function StoreHeader({ onNavigate }: StoreHeaderProps) {
-  const { currentPage, settings, cart, wishlistIds } = useAppStore();
+  const { currentPage, settings, cart, wishlistIds, auth } = useAppStore();
   const cartItemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -475,7 +475,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
             </button>
 
             {/* Account Button */}
-            <button onClick={() => onNavigate("account")} className="icon-btn" aria-label="Account"
+            <button onClick={() => onNavigate(auth?.user ? "account" : "login")} className="icon-btn" aria-label="Account"
               style={{ width: 38, height: 38, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--vedika-green-dark)", position: "relative", background: "none", border: "none", cursor: "pointer", transition: "background .2s ease" }}
               onMouseEnter={(e) => e.currentTarget.style.background = "var(--vedika-sand)"}
               onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
@@ -624,7 +624,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
                   </button>
 
                   <button
-                    onClick={() => { onNavigate("account"); setMobileOpen(false); }}
+                    onClick={() => { onNavigate(auth?.user ? "account" : "login"); setMobileOpen(false); }}
                     style={{
                       display: "flex", alignItems: "center", gap: 10,
                       width: "100%", textAlign: "left",

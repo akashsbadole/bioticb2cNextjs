@@ -15,8 +15,8 @@ const config: NextAuthConfig = {
         recaptchaToken: { label: "reCAPTCHA", type: "text" },
       },
       async authorize(credentials) {
-        const recaptchaToken = String(credentials?.recaptchaToken ?? "");
-        if (recaptchaToken) {
+        const recaptchaToken = credentials?.recaptchaToken ? String(credentials.recaptchaToken) : "";
+        if (recaptchaToken && recaptchaToken !== "null" && recaptchaToken !== "undefined") {
           const { verifyRecaptcha } = await import("@/lib/recaptcha");
           const valid = await verifyRecaptcha(recaptchaToken);
           if (!valid.success) return null;
@@ -61,10 +61,12 @@ const config: NextAuthConfig = {
   callbacks: {
     ...authConfig.callbacks,
     async jwt({ token, user }) {
-      const u = user as { id?: string; role?: string } | undefined;
+      const u = user as { id?: string; role?: string; name?: string; email?: string } | undefined;
       if (u?.id) {
         token.id = u.id;
         token.role = u.role ?? "customer";
+        token.name = u.name ?? "";
+        token.email = u.email ?? "";
       }
       // Keep role fresh from the database (Node runtime only).
       if (token.id) {
@@ -74,6 +76,8 @@ const config: NextAuthConfig = {
           if (dbUser) {
             token.id = dbUser.id;
             token.role = (dbUser as { role?: string }).role ?? "customer";
+            token.name = dbUser.name ?? "";
+            token.email = dbUser.email ?? "";
           }
         } catch {
           /* ignore */
