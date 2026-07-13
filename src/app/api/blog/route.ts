@@ -6,6 +6,7 @@ import { getStoreId } from '@/lib/store-db';
 import { normalizeBlocksForStorage } from '@/lib/page-blocks';
 import { normalizeImageUrl } from '@/lib/utils';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { sanitizeHtml, sanitizeBlocks } from '@/lib/sanitize';
 
 export async function GET(request: NextRequest) {
   try {
@@ -142,13 +143,13 @@ export async function POST(request: NextRequest) {
         title: validatedData.title,
         slug: validatedData.slug,
         excerpt: validatedData.excerpt || null,
-        content: validatedData.content || '',
+        content: sanitizeHtml(validatedData.content || ''),
         coverImage: normalizeImageUrl(validatedData.coverImage),
         authorId: validatedData.authorId || null,
         metaTitle: validatedData.metaTitle || null,
         metaDescription: validatedData.metaDescription || null,
         ogImage: normalizeImageUrl(validatedData.ogImage),
-        blocks,
+        blocks: sanitizeBlocks(blocks),
         tags: validatedData.tags
           ? JSON.stringify(validatedData.tags.split(',').map((t: string) => t.trim()).filter(Boolean))
           : null,

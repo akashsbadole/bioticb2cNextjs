@@ -59,6 +59,8 @@ export async function resetPassword(apiBase: string, token: string, password: st
   return { status: res.status, body: await res.json() };
 }
 
+export { expect } from '@playwright/test';
+
 export const test = base.extend<TestFixtures>({
   apiBase: 'http://localhost:3000',
 

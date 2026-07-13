@@ -8,6 +8,7 @@ import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { normalizeBlocksForStorage } from '@/lib/page-blocks';
 import { PLATFORM_PAGE_SLUGS } from '@/lib/platform-pages';
+import { sanitizeHtml, sanitizeBlocks } from '@/lib/sanitize';
 
 export async function GET(request: NextRequest) {
   try {
@@ -89,8 +90,8 @@ export async function POST(request: NextRequest) {
       data: {
         title: validatedData.title,
         slug: validatedData.slug,
-        content: validatedData.content || '',
-        blocks,
+        content: sanitizeHtml(validatedData.content || ''),
+        blocks: sanitizeBlocks(blocks),
         heroImage: normalizeImageUrl(validatedData.heroImage),
         metaTitle: validatedData.metaTitle || null,
         metaDescription: validatedData.metaDescription || null,

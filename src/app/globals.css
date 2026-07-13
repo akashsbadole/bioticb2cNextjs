@@ -487,6 +487,11 @@
 .nav-links { display: flex; }
 .menu-toggle { display: none; }
 
+@media (max-width: 1024px) {
+  .nav-links { display: none !important; }
+  .menu-toggle { display: block !important; }
+}
+
 /* Responsive */
 @media (max-width: 1080px) {
   .vedika-grid-4 { grid-template-columns: repeat(2, 1fr); }

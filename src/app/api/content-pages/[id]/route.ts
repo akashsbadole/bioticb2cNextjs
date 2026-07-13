@@ -6,6 +6,7 @@ import { requireAdminAuth } from '@/lib/admin-auth';
 import { normalizeImageUrl } from '@/lib/utils';
 import { getStoreId } from '@/lib/store-db';
 import { normalizeBlocksForStorage } from '@/lib/page-blocks';
+import { sanitizeHtml, sanitizeBlocks } from '@/lib/sanitize';
 
 export async function GET(
   _request: NextRequest,
@@ -82,7 +83,7 @@ export async function PUT(
       data: {
         ...(body.title !== undefined && { title: body.title }),
         ...(body.slug !== undefined && { slug: body.slug }),
-        ...(body.content !== undefined && { content: body.content }),
+        ...(body.content !== undefined && { content: sanitizeHtml(body.content) }),
         ...(body.heroImage !== undefined && {
           heroImage: normalizeImageUrl(body.heroImage),
         }),
@@ -100,7 +101,7 @@ export async function PUT(
         }),
         ...(body.isActive !== undefined && { isActive: body.isActive }),
         ...(body.sortOrder !== undefined && { sortOrder: body.sortOrder }),
-        ...(blocks !== undefined && { blocks }),
+        ...(blocks !== undefined && { blocks: sanitizeBlocks(blocks) }),
         ...(storeId ? { storeId } : { storeId: null }),
       },
     });

@@ -376,7 +376,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
           </Link>
 
           {/* Desktop Navigation - Center */}
-          <ul className="nav-links" style={{ display: "flex", alignItems: "center", gap: 36, fontSize: ".92rem", fontWeight: 500, listStyle: "none", margin: 0, padding: 0 }}>
+          <ul className="nav-links" style={{ alignItems: "center", gap: 36, fontSize: ".92rem", fontWeight: 500, listStyle: "none", margin: 0, padding: 0 }}>
             {menuLoading
               ? Array.from({ length: 5 }).map((_, i) => (
                   <li key={i}><div style={{ width: 60, height: 16, background: "var(--vedika-sand)", borderRadius: 4, opacity: 0.3 }} /></li>
