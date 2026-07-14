@@ -173,11 +173,8 @@ export function HomePage({
     <div className="flex flex-col">
       {/* ─── HERO ─── */}
       <section
-        className="hero"
+        className="hero grid grid-cols-1 lg:grid-cols-[1.05fr_.95fr] px-4 py-10 sm:px-10 sm:py-14"
         style={{
-          padding: "56px 40px",
-          display: "grid",
-          gridTemplateColumns: "1.05fr .95fr",
           gap: 40,
           alignItems: "center",
         }}
@@ -501,10 +498,8 @@ export function HomePage({
             description="A minimal routine drawn from the Ashtanga Hridayam — order matters here, so we keep it exactly this simple."
           />
           <div
-            className="ritual"
+            className="ritual grid grid-cols-1 md:grid-cols-3"
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
               gap: 32,
             }}
           >
@@ -523,10 +518,8 @@ export function HomePage({
       {/* ─── INGREDIENT SPOTLIGHT ─── */}
       <section className="vedika-container">
         <div
-          className="spotlight"
+          className="spotlight grid grid-cols-1 lg:grid-cols-[.85fr_1.15fr]"
           style={{
-            display: "grid",
-            gridTemplateColumns: ".85fr 1.15fr",
             gap: 56,
             alignItems: "center",
             background: "var(--vedika-green-dark)",

@@ -62,7 +62,7 @@ export function ContactPage({ onNavigate, data: _data }: ContactPageProps) {
       </div>
 
       <section className="vedika-container vedika-section-tight">
-        <div className="contact-layout" style={{ display: "grid", gridTemplateColumns: ".9fr 1.1fr", gap: 56 }}>
+        <div className="contact-layout grid grid-cols-1 lg:grid-cols-[.9fr_1.1fr]" style={{ gap: 56 }}>
           {/* LEFT: Contact Info */}
           <div>
             <VedikaContactCard icon={<MailIcon className="w-5 h-5" />} label="Email" value="hello@vedikaayurveda.com" href="mailto:hello@vedikaayurveda.com" />
@@ -84,7 +84,7 @@ export function ContactPage({ onNavigate, data: _data }: ContactPageProps) {
             <div style={{ background: "var(--vedika-paper)", border: "1px solid var(--vedika-line)", borderRadius: "14px", padding: "36px" }}>
               <VedikaSectionTitle eyebrow="Send a Message" title="Write to us" align="left" />
               <form onSubmit={handleSubmit}>
-                <div className="form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+                <div className="form-grid grid grid-cols-1 md:grid-cols-2" style={{ gap: 20 }}>
                   <div className="form-field">
                     <label style={{ display: "block", fontSize: ".84rem", fontWeight: 600, color: "var(--vedika-green-dark)", marginBottom: 8 }}>Full Name *</label>
                     <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}

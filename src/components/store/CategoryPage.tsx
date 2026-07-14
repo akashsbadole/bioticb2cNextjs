@@ -105,7 +105,7 @@ export function CategoryPage({ slug, onNavigate }: CategoryPageProps) {
       </div>
 
       <div className="vedika-container" style={{ paddingBottom: 96 }}>
-        <div className="shop-layout" style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 44, alignItems: "start" }}>
+        <div className="shop-layout grid grid-cols-1 lg:grid-cols-[260px_1fr]" style={{ gap: 44, alignItems: "start" }}>
           <aside className="hidden lg:block">
             <div style={{ position: "sticky", top: 120 }}>
               <VedikaFilterSidebar>

@@ -238,18 +238,19 @@ export function VedikaNewsletter() {
   const [email, setEmail] = useState("");
   return (
     <div className="vedika-container vedika-section">
-      <div className="newsletter" style={{ background: "var(--vedika-sand)", borderRadius: "28px", padding: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "40px", flexWrap: "wrap" }}>
-        <div>
+      <div className="newsletter flex flex-col md:flex-row items-center justify-between gap-10 px-6 py-10 sm:p-14" style={{ background: "var(--vedika-sand)", borderRadius: "28px" }}>
+        <div className="text-center md:text-left">
           <h2 style={{ fontSize: "clamp(1.8rem,3vw,2.6rem)", marginBottom: 8 }}>Stay in the know</h2>
           <p style={{ color: "var(--vedika-ink-soft)" }}>Seasonal formulations, ritual tips, and subscriber-only offers.</p>
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); setEmail(""); }} style={{ display: "flex", gap: "10px", flexShrink: 0 }}>
+        <form onSubmit={(e) => { e.preventDefault(); setEmail(""); }} className="flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto shrink-0">
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            style={{ border: "1px solid var(--vedika-green-dark)", borderRadius: "100px", padding: "14px 20px", width: "280px", background: "var(--vedika-paper)", fontFamily: "inherit", fontSize: "1rem", outline: "none" }}
+            style={{ border: "1px solid var(--vedika-green-dark)", borderRadius: "100px", padding: "14px 20px", background: "var(--vedika-paper)", fontFamily: "inherit", fontSize: "1rem", outline: "none" }}
+            className="w-full sm:w-[280px]"
             onFocus={(e) => e.target.style.outline = "2px solid var(--vedika-green)"}
             onBlur={(e) => e.target.style.outline = "none"}
           />

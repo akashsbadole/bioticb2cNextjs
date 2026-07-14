@@ -362,11 +362,11 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
 
       {/* === MAIN NAVIGATION BAR === */}
       <header className="site-header" style={{ position: "sticky", top: 0, zIndex: 500, background: "rgba(247,241,222,.92)", backdropFilter: "blur(10px)", borderBottom: "1px solid var(--vedika-line)" }}>
-        <div className="nav" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 32px", maxWidth: "1240px", margin: "0 auto", gap: "24px" }}>
+        <div className="nav flex items-center justify-between px-3 py-3 md:px-8 md:py-[18px] max-w-[1240px] mx-auto gap-3 md:gap-6">
           {/* Logo */}
-          <Link href={"/"} className="logo" style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "1.5rem", fontWeight: 600, color: "var(--vedika-green-dark)", flexShrink: 0 }}>
-            <button onClick={() => onNavigate("home")} style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer", font: "inherit", color: "inherit" }}>
-              <svg viewBox="0 0 32 32" fill="none" style={{ width: 30, height: 30 }}>
+          <Link href={"/"} className="logo flex items-center gap-1.5 md:gap-2.5 shrink-0" style={{ fontFamily: "var(--font-fraunces), Georgia, serif", color: "var(--vedika-green-dark)" }}>
+            <button onClick={() => onNavigate("home")} className="flex items-center gap-1.5 md:gap-2.5 bg-none border-none cursor-pointer font-inherit color-inherit text-[1.1rem] sm:text-[1.25rem] md:text-[1.5rem] font-semibold">
+              <svg viewBox="0 0 32 32" fill="none" className="w-6 h-6 sm:w-7 sm:h-7 md:w-[30px] md:h-[30px]">
                 <circle cx="16" cy="16" r="15" stroke="#2F4A3C" strokeWidth="1.4"/>
                 <path d="M16 24C16 24 9 20.5 9 13.5C9 9.5 12 7 16 7C20 7 23 9.5 23 13.5C23 20.5 16 24 16 24Z" stroke="#2F4A3C" strokeWidth="1.3" strokeLinejoin="round"/>
                 <path d="M16 24V10" stroke="#2F4A3C" strokeWidth="1.3"/>
@@ -462,36 +462,39 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
           </ul>
 
           {/* Right: Icon Actions */}
-          <div className="nav-actions" style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          <div className="nav-actions flex items-center gap-1.5 sm:gap-2.5 md:gap-4.5">
             {/* Search Button */}
-            <button onClick={() => setSearchOpen(true)} className="icon-btn" aria-label="Search"
-              style={{ width: 38, height: 38, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--vedika-green-dark)", position: "relative", background: "none", border: "none", cursor: "pointer", transition: "background .2s ease" }}
+            <button onClick={() => setSearchOpen(true)} className="icon-btn flex items-center justify-center text-[var(--vedika-green-dark)] relative bg-none border-none cursor-pointer transition-[background] duration-200"
+              style={{ width: 38, height: 38, borderRadius: "50%" }}
+              aria-label="Search"
               onMouseEnter={(e) => e.currentTarget.style.background = "var(--vedika-sand)"}
               onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 19, height: 19 }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-[18px] h-[18px] sm:w-[19px] sm:h-[19px]">
                 <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
               </svg>
             </button>
 
             {/* Account Button */}
-            <button onClick={() => onNavigate(auth?.user ? "account" : "login")} className="icon-btn" aria-label="Account"
-              style={{ width: 38, height: 38, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--vedika-green-dark)", position: "relative", background: "none", border: "none", cursor: "pointer", transition: "background .2s ease" }}
+            <button onClick={() => onNavigate(auth?.user ? "account" : "login")} className="icon-btn hidden sm:flex items-center justify-center text-[var(--vedika-green-dark)] relative bg-none border-none cursor-pointer transition-[background] duration-200"
+              style={{ width: 38, height: 38, borderRadius: "50%" }}
+              aria-label="Account"
               onMouseEnter={(e) => e.currentTarget.style.background = "var(--vedika-sand)"}
               onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 19, height: 19 }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-[18px] h-[18px] sm:w-[19px] sm:h-[19px]">
                 <circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
               </svg>
             </button>
 
             {/* Cart Button */}
-            <button onClick={() => onNavigate("cart")} className="icon-btn" aria-label="Cart"
-              style={{ width: 38, height: 38, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--vedika-green-dark)", position: "relative", background: "none", border: "none", cursor: "pointer", transition: "background .2s ease" }}
+            <button onClick={() => onNavigate("cart")} className="icon-btn flex items-center justify-center text-[var(--vedika-green-dark)] relative bg-none border-none cursor-pointer transition-[background] duration-200"
+              style={{ width: 38, height: 38, borderRadius: "50%" }}
+              aria-label="Cart"
               onMouseEnter={(e) => e.currentTarget.style.background = "var(--vedika-sand)"}
               onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 19, height: 19 }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-[18px] h-[18px] sm:w-[19px] sm:h-[19px]">
                 <path d="M4 6h2l1.6 10.2A2 2 0 0 0 9.6 18h7.8a2 2 0 0 0 2-1.7L21 8H7"/><circle cx="10" cy="21" r="1"/><circle cx="18" cy="21" r="1"/>
               </svg>
               {cartItemCount > 0 && (

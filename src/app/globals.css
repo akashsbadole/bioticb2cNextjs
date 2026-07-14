@@ -441,7 +441,13 @@
 .vedika-container {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 16px;
+}
+
+@media (min-width: 640px) {
+  .vedika-container {
+    padding: 0 32px;
+  }
 }
 
 /* Vedika section */
@@ -500,10 +506,13 @@
   .contact-layout { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
+@media (max-width: 640px) {
+  .footer-grid { grid-template-columns: 1fr !important; }
+}
 @media (max-width: 860px) {
   .hero { grid-template-columns: 1fr !important; }
   .hero .hero-art { order: -1; max-width: 340px; margin: 0 auto; }
-  .spotlight { grid-template-columns: 1fr !important; padding: 40px !important; }
+  .spotlight { grid-template-columns: 1fr !important; padding: 24px 16px !important; }
   .vedika-grid-3 { grid-template-columns: 1fr; }
   .vedika-grid-2 { grid-template-columns: 1fr; }
   .ritual { grid-template-columns: 1fr !important; }
