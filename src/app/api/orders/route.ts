@@ -230,17 +230,22 @@ export async function POST(request: NextRequest) {
 
     // Handle Payment Integration (PayU)
     if (paymentMethod === 'payu') {
-       const payuKey = process.env.PAYU_MERCHANT_KEY;
-       const payuSalt = process.env.PAYU_MERCHANT_SALT;
+       const payuSettings = await db.siteSetting.findMany({
+         where: { key: { in: ['payu_merchant_key', 'payu_merchant_salt', 'payu_test_mode'] } }
+       });
+       const payuMap = new Map(payuSettings.map((s) => [s.key, s.value]));
+
+       const payuKey = payuMap.get('payu_merchant_key') || process.env.PAYU_MERCHANT_KEY;
+       const payuSalt = payuMap.get('payu_merchant_salt') || process.env.PAYU_MERCHANT_SALT;
+
        if (!payuKey || !payuSalt) {
          return NextResponse.json(
            { error: 'Payment gateway not configured (PAYU_MERCHANT_KEY / PAYU_MERCHANT_SALT missing)' },
            { status: 500 },
          );
        }
-        const isProd =
-          process.env.PAYU_TEST_MODE === 'false' ||
-          process.env.NODE_ENV === 'production';
+       const dbTestMode = payuMap.get('payu_test_mode');
+       const isProd = dbTestMode !== undefined ? dbTestMode === 'false' : (process.env.PAYU_TEST_MODE === 'false' || process.env.NODE_ENV === 'production');
        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
        const paymentData = {

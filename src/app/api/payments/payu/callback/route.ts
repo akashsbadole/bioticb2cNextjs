@@ -13,7 +13,10 @@ export async function POST(request: NextRequest) {
       data[key] = value.toString();
     });
 
-    const payuSalt = process.env.PAYU_MERCHANT_SALT || 'test_salt';
+    const saltSetting = await db.siteSetting.findFirst({
+      where: { key: 'payu_merchant_salt' }
+    });
+    const payuSalt = (saltSetting && saltSetting.value) || process.env.PAYU_MERCHANT_SALT || 'test_salt';
     const isValid = verifyPayUHash(data, payuSalt);
 
     if (!isValid) {

@@ -87,17 +87,45 @@ const defaultSettings: Settings = {
   tax_rate_gst: "18",
   shipping_fixed_cost: "50",
   shipping_free_threshold: "500",
+  shipping_weight_rates: "[]",
   cod_enabled: "false",
   cod_fee: "0",
   chat_widget_id: "",
   recaptcha_site_key: "",
   recaptcha_secret_key: "",
+  payu_merchant_key: "",
+  payu_merchant_salt: "",
+  payu_test_mode: "true",
 };
 
 export function AdminSettings() {
   const queryClient = useQueryClient();
   const fetchGlobalSettings = useAppStore((s) => s.fetchSettings);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
+
+  const weightRates = (() => {
+    try {
+      return JSON.parse(settings.shipping_weight_rates || "[]");
+    } catch {
+      return [];
+    }
+  })();
+
+  const handleAddWeightRate = () => {
+    const newRates = [...weightRates, { maxWeight: 1, rate: 50 }];
+    handleSettingChange("shipping_weight_rates", JSON.stringify(newRates));
+  };
+
+  const handleUpdateWeightRate = (index: number, key: "maxWeight" | "rate", value: number) => {
+    const newRates = [...weightRates];
+    newRates[index] = { ...newRates[index], [key]: value };
+    handleSettingChange("shipping_weight_rates", JSON.stringify(newRates));
+  };
+
+  const handleRemoveWeightRate = (index: number) => {
+    const newRates = weightRates.filter((_: any, i: number) => i !== index);
+    handleSettingChange("shipping_weight_rates", JSON.stringify(newRates));
+  };
 
   const { isLoading: loading } = useQuery({
     queryKey: ["admin-store-settings"],
@@ -513,6 +541,61 @@ export function AdminSettings() {
               Additional fee charged on COD orders
             </p>
           </div>
+          <div className="space-y-4 sm:col-span-3 border p-4 rounded-lg bg-muted/20">
+            <div>
+              <Label className="text-base font-semibold">Weight Based Shipping Rates</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Define shipping charges based on total product weight in kilograms (kg). The matching tier with the smallest max weight greater than or equal to the total cart weight is used.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              {weightRates.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">No weight based rates defined yet. Flat shipping cost will be used as fallback.</p>
+              ) : (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-3 gap-4 text-xs font-semibold text-muted-foreground px-2">
+                    <span>Max Weight (kg)</span>
+                    <span>Shipping Rate (₹)</span>
+                    <span>Action</span>
+                  </div>
+                  {weightRates.map((rate: any, idx: number) => (
+                    <div key={idx} className="grid grid-cols-3 gap-4 items-center">
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        value={rate.maxWeight}
+                        onChange={(e) => handleUpdateWeightRate(idx, "maxWeight", parseFloat(e.target.value) || 0)}
+                        placeholder="Max weight (e.g. 1)"
+                      />
+                      <Input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={rate.rate}
+                        onChange={(e) => handleUpdateWeightRate(idx, "rate", parseFloat(e.target.value) || 0)}
+                        placeholder="Rate (e.g. 50)"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive w-fit"
+                        onClick={() => handleRemoveWeightRate(idx)}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <Button type="button" variant="outline" size="sm" onClick={handleAddWeightRate}>
+                Add Weight Rate Tier
+              </Button>
+            </div>
+          </div>
+
           <div className="space-y-2 sm:col-span-3">
             <Label htmlFor="chat">Tawk.to Chat Widget ID</Label>
             <Input
@@ -567,6 +650,61 @@ export function AdminSettings() {
             <p className="text-xs text-muted-foreground">
               Private key — never exposed to the frontend.
             </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* PayU Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <ShieldCheck className="h-4 w-4" />
+            PayU Gateway Settings
+          </CardTitle>
+          <CardDescription>
+            Configure your PayU dynamic payment gateway keys.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="payu_merchant_key">Merchant Key</Label>
+            <Input
+              id="payu_merchant_key"
+              value={settings.payu_merchant_key}
+              onChange={(e) => handleSettingChange("payu_merchant_key", e.target.value)}
+              placeholder="Merchant Key"
+            />
+            <p className="text-xs text-muted-foreground">
+              Your PayU merchant identifier.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="payu_merchant_salt">Merchant Salt</Label>
+            <Input
+              id="payu_merchant_salt"
+              type="password"
+              value={settings.payu_merchant_salt}
+              onChange={(e) => handleSettingChange("payu_merchant_salt", e.target.value)}
+              placeholder="Merchant Salt"
+            />
+            <p className="text-xs text-muted-foreground">
+              Keep this salt confidential.
+            </p>
+          </div>
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="payu_test_mode">Test Mode</Label>
+            <div className="flex items-center gap-2 h-10">
+              <Switch
+                id="payu_test_mode"
+                checked={settings.payu_test_mode === "true"}
+                onCheckedChange={(checked) =>
+                  handleSettingChange("payu_test_mode", checked ? "true" : "false")
+                }
+              />
+              <span className="text-sm text-muted-foreground">
+                {settings.payu_test_mode === "true" ? "Test Mode (Sandbox)" : "Production Mode"}
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>

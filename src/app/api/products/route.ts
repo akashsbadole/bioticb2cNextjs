@@ -235,6 +235,7 @@ export async function POST(request: NextRequest) {
         isDigital: body.isDigital === true,
         downloadUrl: body.downloadUrl || null,
         videoUrl: body.videoUrl || null,
+        weight: typeof body.weight === 'number' ? body.weight : (parseFloat(body.weight) || 0),
         blocks: typeof body.blocks === 'string' ? body.blocks : JSON.stringify(body.blocks || []),
 
         ...(storeId ? { storeId } : {}),

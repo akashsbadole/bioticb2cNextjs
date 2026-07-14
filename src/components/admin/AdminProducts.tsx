@@ -126,6 +126,7 @@ interface Product {
   isDigital: boolean;
   downloadUrl: string;
   videoUrl: string;
+  weight: number | null;
   sortOrder: number;
   specifications: string | null;
   metaTitle: string | null;
@@ -162,6 +163,7 @@ interface ProductFormData {
   isDigital: boolean;
   downloadUrl: string;
   videoUrl: string;
+  weight: string;
   sortOrder: string;
   specifications: string;
   metaTitle: string;
@@ -194,6 +196,7 @@ const emptyForm: ProductFormData = {
   isDigital: false,
   downloadUrl: "",
   videoUrl: "",
+  weight: "0",
   sortOrder: "0",
   specifications: "",
   metaTitle: "",
@@ -473,6 +476,7 @@ export function AdminProducts() {
       isDigital: product.isDigital || false,
       downloadUrl: product.downloadUrl || "",
       videoUrl: product.videoUrl || "",
+      weight: product.weight ? String(product.weight) : "0",
       sortOrder: String(product.sortOrder),
       specifications: product.specifications || "",
       metaTitle: product.metaTitle || "",
@@ -534,6 +538,7 @@ export function AdminProducts() {
       isDigital: form.isDigital,
       downloadUrl: form.downloadUrl.trim() || null,
       videoUrl: form.videoUrl.trim() || null,
+      weight: form.weight ? Number(form.weight) : 0,
       sortOrder: parseInt(form.sortOrder) || 0,
       specifications: form.specifications.trim() || null,
       metaTitle: form.metaTitle.trim() || null,
@@ -1486,6 +1491,25 @@ export function AdminProducts() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="prod-weight">Weight (kg)</Label>
+                    <Input
+                      id="prod-weight"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.5"
+                      value={form.weight}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          weight: e.target.value,
+                        }))
+                      }
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Used for weight-based shipping calculation
+                    </p>
                   </div>
                 </div>
 
