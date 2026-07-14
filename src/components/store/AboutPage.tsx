@@ -69,7 +69,7 @@ export function AboutPage({ onNavigate, data: _data }: AboutPageProps) {
       {/* STORY SPOTLIGHT */}
       <section className="vedika-section" style={{ paddingTop: 0 }}>
         <div className="vedika-container">
-          <div className="spotlight" style={{ display: "grid", gridTemplateColumns: ".85fr 1.15fr", gap: 56, alignItems: "center", background: "var(--vedika-green-dark)", borderRadius: "28px", padding: "64px", color: "var(--vedika-bg)", overflow: "hidden" }}>
+          <div className="spotlight grid grid-cols-1 lg:grid-cols-[.85fr_1.15fr]" style={{ gap: 56, alignItems: "center", background: "var(--vedika-green-dark)", borderRadius: "28px", padding: "64px", color: "var(--vedika-bg)", overflow: "hidden" }}>
             <div className="spotlight-art" style={{ aspectRatio: "1", borderRadius: "50%", background: "radial-gradient(circle at 35% 30%, #3C5A49, var(--vedika-green-dark) 75%)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,255,255,.08)" }}>
               <svg viewBox="0 0 200 200" fill="none" style={{ width: "60%", height: "60%" }}>
                 <path d="M100 170c0-50 20-70 20-100 0-16-9-28-20-32-11 4-20 16-20 32 0 30 20 50 20 100z" fill="#3C5A49" stroke="#C68A2E" strokeWidth="1.5"/>

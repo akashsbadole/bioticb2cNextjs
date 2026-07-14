@@ -75,7 +75,7 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
   return (
     <footer className="site-footer" style={{ background: "var(--vedika-green-dark)", color: "#CBD3C9", padding: "80px 0 0" }}>
       <div className="vedika-container">
-        <div className="footer-grid" style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr 1fr 1.2fr", gap: 32, paddingBottom: 56, borderBottom: "1px solid rgba(255,255,255,.1)" }}>
+        <div className="footer-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1.2fr]" style={{ gap: 32, paddingBottom: 56, borderBottom: "1px solid rgba(255,255,255,.1)" }}>
           {/* Brand Column */}
           <div className="footer-col">
             <div className="footer-logo" style={{ fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "1.5rem", color: "#fff", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>

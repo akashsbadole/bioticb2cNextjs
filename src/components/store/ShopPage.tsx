@@ -234,7 +234,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
       </div>
 
       <div className="vedika-container" style={{ paddingBottom: 96 }}>
-        <div className="shop-layout" style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 44, alignItems: "start" }}>
+        <div className="shop-layout grid grid-cols-1 lg:grid-cols-[260px_1fr]" style={{ gap: 44, alignItems: "start" }}>
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block">
             <div style={{ position: "sticky", top: 120 }}>
@@ -255,7 +255,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <Sheet>
                   <SheetTrigger asChild>
-                    <button className="vedika-btn vedika-btn-outline vedika-btn-sm lg-hidden" style={{ display: "none", fontSize: ".82rem" }}
+                    <button className="vedika-btn vedika-btn-outline vedika-btn-sm lg:hidden flex" style={{ fontSize: ".82rem" }}
                       onClick={() => {}}>
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 14, height: 14, marginRight: 6 }}><path d="M4 6h16M8 12h8M11 18h2"/></svg>
                       Filters
