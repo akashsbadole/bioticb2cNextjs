@@ -126,6 +126,7 @@ export async function PUT(
         ...(body.isDigital !== undefined && { isDigital: body.isDigital }),
         ...(body.downloadUrl !== undefined && { downloadUrl: body.downloadUrl }),
         ...(body.videoUrl !== undefined && { videoUrl: body.videoUrl }),
+        ...(body.weight !== undefined && { weight: typeof body.weight === 'number' ? body.weight : (parseFloat(body.weight) || 0) }),
         ...(body.sortOrder !== undefined && { sortOrder: body.sortOrder }),
         ...(body.specifications !== undefined && {
           specifications: body.specifications

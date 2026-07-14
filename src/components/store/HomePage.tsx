@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAppStore } from "@/lib/store";
 import { useSeo } from "@/lib/use-seo";
@@ -143,7 +144,7 @@ export function HomePage({
     queryKey: ["categories"],
     queryFn: async () => {
       const res = await fetch("/api/categories");
-      return res.ok ? (await res.json()).slice(0, 8) : [];
+      return res.ok ? (await res.json()) : [];
     },
   });
 
@@ -157,7 +158,26 @@ export function HomePage({
     },
   });
 
-  if (catLoading || prodLoading) return <StoreLoading />;
+  const { data: allProducts = [], isLoading: allProdLoading } = useQuery({
+    queryKey: ["all-storefront-products"],
+    queryFn: async () => {
+      const res = await fetch("/api/products?limit=100&inStock=true");
+      return res.ok ? (await res.json()).products || [] : [];
+    },
+  });
+
+  const categoryWithProducts = useMemo(() => {
+    return categories
+      .map((cat: any) => {
+        const catProducts = allProducts.filter(
+          (p: any) => p.categoryId === cat.id
+        );
+        return { ...cat, products: catProducts };
+      })
+      .filter((cat: any) => cat.products.length > 0);
+  }, [categories, allProducts]);
+
+  if (catLoading || prodLoading || allProdLoading) return <StoreLoading />;
 
   const handleAddToCart = (product: any) => {
     addToCart({
@@ -488,6 +508,40 @@ export function HomePage({
           </div>
         </div>
       </section>
+
+      {/* ─── DYNAMIC CATEGORY PRODUCTS ─── */}
+      {categoryWithProducts.length > 0 && (
+        <section className="vedika-section bg-paper border-y" style={{ borderTop: "1px solid var(--vedika-line)", borderBottom: "1px solid var(--vedika-line)", padding: "88px 0" }}>
+          <div className="vedika-container space-y-16">
+            {categoryWithProducts.slice(0, 4).map((cat: any) => (
+              <div key={cat.id} className="space-y-6">
+                <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: "var(--vedika-line)" }}>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-[var(--vedika-green-dark)]" style={{ fontFamily: "var(--font-fraunces), Georgia, serif" }}>{cat.name}</h3>
+                    {cat.description && <p className="text-xs text-muted-foreground mt-0.5">{cat.description}</p>}
+                  </div>
+                  <button onClick={() => onNavigate("category", cat.slug)} className="text-sm font-semibold text-[var(--vedika-red)] hover:underline">
+                    View All {cat.name} →
+                  </button>
+                </div>
+                <div className="vedika-product-grid">
+                  {cat.products.slice(0, 4).map((product: any) => (
+                    <VedikaProductCard
+                      key={product.id}
+                      product={product}
+                      onNavigate={onNavigate}
+                      formatPrice={(p) => formatPrice(p, currency)}
+                      onAddToCart={handleAddToCart}
+                      onToggleWishlist={toggleWishlistId}
+                      inWishlist={wishlistIds.includes(product.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ─── RITUAL STEPS ─── */}
       <section className="vedika-section">

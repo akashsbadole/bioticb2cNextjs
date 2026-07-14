@@ -349,7 +349,7 @@ export function AdminUsers() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Users</h2>
-          <p className="text-muted-foreground mt-1">Manage admin and clerk accounts</p>
+          <p className="text-muted-foreground mt-1">Manage admin and editor accounts</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <label className="cursor-pointer">

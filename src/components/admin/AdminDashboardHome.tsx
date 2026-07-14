@@ -27,6 +27,16 @@ import { adminFetch } from '@/lib/admin-fetch';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatPrice } from '@/lib/pricing';
+import { format } from 'date-fns';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 interface DashboardStats {
   productStats: {
@@ -68,6 +78,10 @@ export function AdminDashboardHome({ onNavigate }: { onNavigate?: (tab: string) 
   const smtpConfigured = useMemo(() => {
     const s = settingsData?.settings;
     return !!(s?.smtp_host && s?.smtp_user);
+  }, [settingsData]);
+
+  const currency = useMemo(() => {
+    return settingsData?.settings?.currency || "INR";
   }, [settingsData]);
 
   const loading = statsLoading;
@@ -205,7 +219,155 @@ export function AdminDashboardHome({ onNavigate }: { onNavigate?: (tab: string) 
           </Card>
         )}
       </div>
+
+      {/* Recent Orders Section */}
+      <RecentOrdersSection onNavigate={onNavigate} currency={currency} />
     </div>
+  );
+}
+
+function RecentOrdersSection({ onNavigate, currency }: { onNavigate?: (tab: string) => void; currency: string }) {
+  const [filter, setFilter] = useState<'all' | 'open' | 'completed' | 'cancelled'>('all');
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-orders'],
+    queryFn: async () => {
+      const res = await adminFetch('/api/admin/orders');
+      if (!res.ok) throw new Error('Failed');
+      return res.json();
+    },
+  });
+
+  const orders = data?.orders || [];
+
+  const filteredOrders = useMemo(() => {
+    return orders.filter((order: any) => {
+      if (filter === 'all') return true;
+      if (filter === 'open') {
+        return ['pending', 'processing', 'shipped'].includes(order.status);
+      }
+      if (filter === 'completed') {
+        return order.status === 'delivered';
+      }
+      if (filter === 'cancelled') {
+        return order.status === 'cancelled';
+      }
+      return true;
+    });
+  }, [orders, filter]);
+
+  // Take top 5 orders
+  const recentOrders = filteredOrders.slice(0, 5);
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <Badge variant="secondary">Pending</Badge>;
+      case 'processing':
+        return <Badge variant="default" className="bg-blue-500">Processing</Badge>;
+      case 'shipped':
+        return <Badge variant="default" className="bg-purple-500">Shipped</Badge>;
+      case 'delivered':
+        return <Badge variant="default" className="bg-emerald-500">Delivered</Badge>;
+      case 'cancelled':
+        return <Badge variant="destructive">Cancelled</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  return (
+    <Card className="w-full">
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <CardTitle className="text-lg font-bold">Recent Orders</CardTitle>
+          <p className="text-xs text-muted-foreground mt-0.5">Filter and manage your most recent customer orders</p>
+        </div>
+        <div className="flex flex-wrap gap-1.5 bg-muted p-1 rounded-lg">
+          {(['all', 'open', 'completed', 'cancelled'] as const).map((f) => (
+            <Button
+              key={f}
+              variant={filter === f ? 'secondary' : 'ghost'}
+              size="sm"
+              className="text-xs capitalize h-7 px-3"
+              onClick={() => setFilter(f)}
+            >
+              {f}
+            </Button>
+          ))}
+        </div>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="space-y-2 py-4">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-10 w-full" />
+            ))}
+          </div>
+        ) : recentOrders.length === 0 ? (
+          <div className="text-center py-8 text-sm text-muted-foreground">
+            No recent orders found matching this filter.
+          </div>
+        ) : (
+          <div className="border rounded-lg overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[120px]">Order ID</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {recentOrders.map((order: any) => (
+                  <TableRow key={order.id}>
+                    <TableCell className="font-mono text-xs font-medium">
+                      #{order.id.slice(0, 8)}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm">{order.customerName || 'Guest'}</span>
+                        <span className="text-xs text-muted-foreground">{order.customerEmail || 'N/A'}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-xs">
+                      {order.createdAt ? format(new Date(order.createdAt), 'MMM d, yyyy') : 'N/A'}
+                    </TableCell>
+                    <TableCell className="font-semibold text-sm">
+                      {formatPrice(order.totalAmount, currency)}
+                    </TableCell>
+                    <TableCell>{getStatusBadge(order.status)}</TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => onNavigate?.('orders')}
+                      >
+                        Manage
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+        <div className="flex justify-end mt-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs gap-1"
+            onClick={() => onNavigate?.('orders')}
+          >
+            View All Orders <ChevronRight className="h-3 w-3" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
