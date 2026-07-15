@@ -116,14 +116,8 @@ export function StoreShell({ initialPage, children }: StoreShellProps) {
 
   useEffect(() => {
     if (initialPageObj) {
-      const state = useAppStore.getState();
-      const current = state.currentPage;
-      const needsNav = initialPageObj.slug
-        ? current.type !== initialPageObj.type || (current as ShellPage).slug !== initialPageObj.slug
-        : current.type !== initialPageObj.type;
-      if (needsNav) {
-        state.navigate(initialPageObj.type, initialPageObj.slug);
-      }
+      useAppStore.setState({ currentPage: initialPageObj });
+      setPage(initialPageObj);
     } else {
       const path = window.location.pathname;
       if (path !== "/" && !path.startsWith("/admin")) {

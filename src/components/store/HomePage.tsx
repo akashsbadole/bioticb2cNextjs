@@ -144,7 +144,11 @@ export function HomePage({
     queryKey: ["categories"],
     queryFn: async () => {
       const res = await fetch("/api/categories");
-      return res.ok ? (await res.json()) : [];
+      if (res.ok) {
+        const json = await res.json();
+        return json.categories || json.data || json || [];
+      }
+      return [];
     },
   });
 
