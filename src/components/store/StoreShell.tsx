@@ -1,34 +1,12 @@
 "use client";
 
-import { useEffect, useCallback, useState, ReactNode } from "react";
+import { useEffect, useCallback, useState, ReactNode, Suspense } from "react";
 import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
 import { useAppStore } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { StoreLayout } from "./StoreLayout";
-import { HomePage } from "./HomePage";
-import { ShopPage } from "./ShopPage";
-import { CategoryPage } from "./CategoryPage";
-import { ProductPage } from "./ProductPage";
-import { ProductsOverviewPage } from "./ProductsOverviewPage";
-import { BlogPage } from "./BlogPage";
-import { BlogPostView } from "./BlogPostView";
-import { CmsPage } from "./CmsPage";
-import { AboutPage } from "./AboutPage";
-import { ManufacturingPage } from "./ManufacturingPage";
-import { ContactPage } from "./ContactPage";
-import { CartPage } from "./CartPage";
-import { CheckoutPage } from "./CheckoutPage";
-import { OrderSuccessPage } from "./OrderSuccessPage";
-import { OrdersPage } from "./OrdersPage";
-import { AccountPage } from "./AccountPage";
-import { LoginPage } from "./LoginPage";
-import { RegisterPage } from "./RegisterPage";
-import { WishlistPage } from "./WishlistPage";
-import { FaqPage } from "./FaqPage";
-import { ComparisonPage } from "./ComparisonPage";
-import { SupportPage } from "./SupportPage";
-import { TrackingPage } from "./TrackingPage";
-import { BundlesPage } from "./BundlesPage";
+import { PageSkeleton } from "./PageSkeleton";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 interface StoreShellProps {
@@ -36,7 +14,10 @@ interface StoreShellProps {
   children?: ReactNode;
 }
 
-const routeFromPath = (path: string, navigate: (page: string, data?: unknown) => void) => {
+const routeFromPath = (
+  path: string,
+  navigate: (page: string, data?: unknown) => void,
+) => {
   if (path === "/" || path === "") return;
   const segments = path.split("/").filter(Boolean);
   if (segments[0] === "products" && segments[1]) {
@@ -87,11 +68,108 @@ interface ShellPage {
   slug?: string;
 }
 
-function toPage(initialPage: string | { type: string; slug?: string } | undefined): ShellPage | null {
+function toPage(
+  initialPage: string | { type: string; slug?: string } | undefined,
+): ShellPage | null {
   if (!initialPage) return null;
   if (typeof initialPage === "string") return { type: initialPage };
   return initialPage;
 }
+
+const HomePage = dynamic(() => import("./HomePage").then((m) => m.HomePage), {
+  ssr: false,
+  loading: () => <PageSkeleton />,
+});
+const ShopPage = dynamic(() => import("./ShopPage").then((m) => m.ShopPage), {
+  ssr: false,
+  loading: () => <PageSkeleton />,
+});
+const CategoryPage = dynamic(
+  () => import("./CategoryPage").then((m) => m.CategoryPage),
+  { ssr: false, loading: () => <PageSkeleton /> },
+);
+const ProductPage = dynamic(
+  () => import("./ProductPage").then((m) => m.ProductPage),
+  { ssr: false, loading: () => <PageSkeleton /> },
+);
+const ProductsOverviewPage = dynamic(
+  () => import("./ProductsOverviewPage").then((m) => m.ProductsOverviewPage),
+  { ssr: false, loading: () => <PageSkeleton /> },
+);
+const CartPage = dynamic(() => import("./CartPage").then((m) => m.CartPage), {
+  ssr: false,
+  loading: () => <PageSkeleton />,
+});
+const CheckoutPage = dynamic(
+  () => import("./CheckoutPage").then((m) => m.CheckoutPage),
+  { ssr: false, loading: () => <PageSkeleton /> },
+);
+const OrderSuccessPage = dynamic(
+  () => import("./OrderSuccessPage").then((m) => m.OrderSuccessPage),
+  { ssr: false, loading: () => <PageSkeleton /> },
+);
+const OrdersPage = dynamic(
+  () => import("./OrdersPage").then((m) => m.OrdersPage),
+  { ssr: false, loading: () => <PageSkeleton /> },
+);
+const AccountPage = dynamic(
+  () => import("./AccountPage").then((m) => m.AccountPage),
+  { ssr: false, loading: () => <PageSkeleton /> },
+);
+const LoginPage = dynamic(
+  () => import("./LoginPage").then((m) => m.LoginPage),
+  { ssr: false, loading: () => <PageSkeleton /> },
+);
+const RegisterPage = dynamic(
+  () => import("./RegisterPage").then((m) => m.RegisterPage),
+  { ssr: false, loading: () => <PageSkeleton /> },
+);
+const WishlistPage = dynamic(
+  () => import("./WishlistPage").then((m) => m.WishlistPage),
+  { ssr: false, loading: () => <PageSkeleton /> },
+);
+const ComparisonPage = dynamic(
+  () => import("./ComparisonPage").then((m) => m.ComparisonPage),
+  { ssr: false, loading: () => <PageSkeleton /> },
+);
+const BundlesPage = dynamic(
+  () => import("./BundlesPage").then((m) => m.BundlesPage),
+  { ssr: false, loading: () => <PageSkeleton /> },
+);
+
+const BlogPage = dynamic(() => import("./BlogPage").then((m) => m.BlogPage), {
+  loading: () => <PageSkeleton />,
+});
+const BlogPostView = dynamic(
+  () => import("./BlogPostView").then((m) => m.BlogPostView),
+  { loading: () => <PageSkeleton /> },
+);
+const CmsPage = dynamic(() => import("./CmsPage").then((m) => m.CmsPage), {
+  loading: () => <PageSkeleton />,
+});
+const AboutPage = dynamic(
+  () => import("./AboutPage").then((m) => m.AboutPage),
+  { loading: () => <PageSkeleton /> },
+);
+const ManufacturingPage = dynamic(
+  () => import("./ManufacturingPage").then((m) => m.ManufacturingPage),
+  { loading: () => <PageSkeleton /> },
+);
+const ContactPage = dynamic(
+  () => import("./ContactPage").then((m) => m.ContactPage),
+  { loading: () => <PageSkeleton /> },
+);
+const FaqPage = dynamic(() => import("./FaqPage").then((m) => m.FaqPage), {
+  loading: () => <PageSkeleton />,
+});
+const SupportPage = dynamic(
+  () => import("./SupportPage").then((m) => m.SupportPage),
+  { loading: () => <PageSkeleton /> },
+);
+const TrackingPage = dynamic(
+  () => import("./TrackingPage").then((m) => m.TrackingPage),
+  { loading: () => <PageSkeleton /> },
+);
 
 export function StoreShell({ initialPage, children }: StoreShellProps) {
   const storePage = useAppStore((s) => s.currentPage);
@@ -112,12 +190,21 @@ export function StoreShell({ initialPage, children }: StoreShellProps) {
 
   const initialPageObj = toPage(initialPage);
 
-  const [page, setPage] = useState<ShellPage>(() => initialPageObj ?? storePage);
+  const [page, setPage] = useState<ShellPage>(
+    () => initialPageObj ?? storePage,
+  );
 
   useEffect(() => {
     if (initialPageObj) {
-      useAppStore.setState({ currentPage: initialPageObj });
-      setPage(initialPageObj);
+      const state = useAppStore.getState();
+      const current = state.currentPage;
+      const needsNav = initialPageObj.slug
+        ? current.type !== initialPageObj.type ||
+          (current as ShellPage).slug !== initialPageObj.slug
+        : current.type !== initialPageObj.type;
+      if (needsNav) {
+        state.navigate(initialPageObj.type, initialPageObj.slug);
+      }
     } else {
       const path = window.location.pathname;
       if (path !== "/" && !path.startsWith("/admin")) {
@@ -207,7 +294,8 @@ export function StoreShell({ initialPage, children }: StoreShellProps) {
               Page not found
             </h1>
             <p className="mt-2 text-muted-foreground max-w-md">
-              The page you&apos;re looking for doesn&apos;t exist or has been moved.
+              The page you&apos;re looking for doesn&apos;t exist or has been
+              moved.
             </p>
             <div className="mt-6 flex gap-3">
               <button
@@ -234,13 +322,15 @@ export function StoreShell({ initialPage, children }: StoreShellProps) {
     <StoreLayout currentPage={page.type} onNavigate={navigate}>
       <AnimatePresence mode="wait">
         <motion.div
-            key={page.type + (page.slug || "")}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
+          key={page.type + (page.slug || "")}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
         >
+          <Suspense fallback={<PageSkeleton />}>
             <ErrorBoundary>{renderPage()}</ErrorBoundary>
+          </Suspense>
         </motion.div>
       </AnimatePresence>
     </StoreLayout>
