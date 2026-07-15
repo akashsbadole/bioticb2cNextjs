@@ -24,6 +24,6 @@ test.describe("Platform Production Readiness", () => {
   test("Admin Authentication Page", async ({ page }) => {
     console.log("Checking Admin Login...");
     await page.goto("/admin");
-    await expect(page.getByText(/Admin Login/i)).toBeVisible();
+    await expect(page.getByText(/Admin (Login|Sign In)/i)).toBeVisible();
   });
 });

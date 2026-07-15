@@ -88,6 +88,8 @@ import {
   parseJsonPayload,
 } from "@/lib/page-blocks";
 
+import WysiwygEditor from "@/components/admin/WysiwygEditor";
+
 const PreviewRenderer = dynamic(
   () =>
     import("@/components/store/PageBlockRenderer").then((m) => ({
@@ -131,6 +133,8 @@ const PAGE_CONTENT_BLOCK_TYPES = new Set<BlockType>([
   "manufacturing-content",
   "contact-page-content",
   "products-page-content",
+  "mfg-page-content",
+  "catalogue-page-content",
 ]);
 
 function getTopLevelKeys(data: Record<string, unknown>): string[] {
@@ -852,10 +856,9 @@ function BlockEditDialog({
                 {block.type === "text" && (
                   <div className="space-y-2">
                     <Label>HTML Content</Label>
-                    <Textarea
-                      rows={12}
+                    <WysiwygEditor
                       value={(localData.content as string) || ""}
-                      onChange={(e) => updateField("content", e.target.value)}
+                      onChange={(v) => updateField("content", v)}
                       placeholder="Enter HTML content..."
                     />
                     <p className="text-xs text-muted-foreground">

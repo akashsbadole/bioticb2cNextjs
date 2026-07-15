@@ -6,6 +6,7 @@ export default defineConfig({
         environment: 'jsdom',
         setupFiles: ['./src/test-setup.ts'],
         globals: true,
+        exclude: ['**/node_modules/**', '**/dist/**', '**/.{idea,git,cache,output,temp}/**', 'tests/**/*.spec.ts'],
     },
     resolve: {
         alias: {

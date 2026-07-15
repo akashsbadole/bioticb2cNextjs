@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 import { NextRequest, NextResponse } from "next/server";
+import { verifyToken } from "@/lib/jwt-helper";
 
 const { auth } = NextAuth(authConfig);
 
@@ -219,7 +220,16 @@ export default auth(async (req) => {
     requestHeaders.set("x-store-id", storeId);
   }
 
-  if (session?.user) {
+  const authHeader = req.headers.get("authorization");
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.substring(7);
+    const decoded = await verifyToken(token);
+    if (decoded) {
+      requestHeaders.set("x-user-id", decoded.userId);
+      requestHeaders.set("x-user-role", decoded.role || "customer");
+      requestHeaders.set("x-user-email", decoded.email || "");
+    }
+  } else if (session?.user) {
     requestHeaders.set("x-user-id", session.user.id);
     requestHeaders.set("x-user-role", (session.user as { role?: string }).role || "customer");
     requestHeaders.set("x-user-email", session.user.email || "");
