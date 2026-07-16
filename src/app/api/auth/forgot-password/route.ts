@@ -3,9 +3,15 @@ import crypto from 'crypto';
 import { db } from '@/lib/db';
 import { sendEmail } from '@/lib/email';
 import { getGlobalSetting } from '@/lib/settings';
+import { checkRateLimit } from '@/lib/rate-limit';
+
+const RESET_RATE_LIMIT = { maxRequests: 5, windowMs: 15 * 60 * 1000, prefix: 'forgot-password-post' };
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimitResponse = await checkRateLimit(request, RESET_RATE_LIMIT);
+    if (rateLimitResponse) return rateLimitResponse;
+
     const body = await request.json();
     const { email } = body;
 

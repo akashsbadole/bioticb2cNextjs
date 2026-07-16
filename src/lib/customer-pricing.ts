@@ -19,9 +19,11 @@ export function useCustomerPrices(): {
   const [prices, setPrices] = useState<CustomerPriceMap>({});
   const [loading, setLoading] = useState(false);
   const { auth } = useAppStore();
+  const userId = auth?.user?.id;
+  const userRole = auth?.user?.role;
 
   const fetchPrices = useCallback(async () => {
-    if (!auth?.user?.id || auth.user.role === "admin") {
+    if (!userId || userRole === "admin") {
       setPrices({});
       return;
     }
@@ -45,7 +47,7 @@ export function useCustomerPrices(): {
     } finally {
       setLoading(false);
     }
-  }, [auth?.user?.id, auth?.user?.role]);
+  }, [userId, userRole]);
 
   useEffect(() => {
     fetchPrices();

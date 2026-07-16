@@ -40,6 +40,37 @@ export async function POST(request: NextRequest) {
         quantity: Math.min(Math.max(Math.floor(i.quantity), 1), 999),
       }));
 
+    const validatedItems: typeof sanitizedItems = [];
+    for (const item of sanitizedItems) {
+      const product = await db.product.findUnique({
+        where: { id: item.productId },
+        select: { stock: true },
+      });
+      if (!product) continue;
+
+      let availableStock = product.stock;
+
+      if (item.variantId) {
+        const variant = await db.productVariant.findUnique({
+          where: { id: item.variantId },
+          select: { stock: true },
+        });
+        if (variant) {
+          availableStock = variant.stock;
+        }
+      }
+
+      if (availableStock <= 0) {
+        continue;
+      }
+
+      const validatedQty = Math.min(item.quantity, availableStock);
+      validatedItems.push({
+        ...item,
+        quantity: validatedQty,
+      });
+    }
+
     const cart = await db.cart.upsert({
       where,
       create: {
@@ -49,7 +80,7 @@ export async function POST(request: NextRequest) {
         email: email || null,
         phone: phone || null,
         items: {
-          create: sanitizedItems.map((i) => ({
+          create: validatedItems.map((i) => ({
             productId: i.productId,
             variantId: i.variantId,
             quantity: i.quantity,
@@ -61,7 +92,7 @@ export async function POST(request: NextRequest) {
         phone: phone || null,
         items: {
           deleteMany: {},
-          create: sanitizedItems.map((i) => ({
+          create: validatedItems.map((i) => ({
             productId: i.productId,
             variantId: i.variantId,
             quantity: i.quantity,

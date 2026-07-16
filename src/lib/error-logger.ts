@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 /**
  * Consistent error logging utility.
  * Replaces silent catch blocks with categorized, traceable logging.
@@ -14,16 +16,17 @@ interface LogErrorOptions {
 
 /**
  * Log an error with category and context.
- * In production, this could be extended to send to an error tracking service.
+ * In production, this can be extended to send to external error tracking services.
  */
 export function logError(error: unknown, options: LogErrorOptions): void {
-  const { category, context, silent = true } = options;
+  const { category, context, userId, silent = true } = options;
   const timestamp = new Date().toISOString();
   const message = error instanceof Error ? error.message : String(error);
   const stack = error instanceof Error ? error.stack : undefined;
 
   const logEntry = `[${timestamp}] [${category.toUpperCase()}] ${context ? `${context}: ` : ''}${message}`;
   
+  // Make sure we explicitly call console.error so standard log monitoring catches it
   if (category === 'email') {
     console.warn(logEntry);
   } else {
@@ -34,10 +37,24 @@ export function logError(error: unknown, options: LogErrorOptions): void {
     console.error(stack);
   }
 
-  // In production, send to error tracking service:
-  // if (process.env.NODE_ENV === 'production') {
-  //   sendToErrorTracker({ category, context, message, stack, timestamp });
-  // }
+  // Persist error logs in the database for centralized viewing in admin activity logs
+  db.activityLog.create({
+    data: {
+      action: `error.${category}`,
+      entity: 'system',
+      entityId: context || null,
+      details: JSON.stringify({
+        message,
+        stack,
+        userId,
+        timestamp,
+      }),
+      userId: userId || null,
+    }
+  }).catch((dbErr) => {
+    // Prevent DB log failures from breaking the app
+    console.error('Failed to save error log to database:', dbErr);
+  });
 }
 
 /**
