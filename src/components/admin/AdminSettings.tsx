@@ -838,7 +838,7 @@ export function AdminSettings() {
               id="seo_ga_id"
               value={settings.seo_ga_id}
               onChange={(e) => handleSettingChange("seo_ga_id", e.target.value)}
-              placeholder="G-XXXXXXXXXX"
+              placeholder="G-1234567890"
             />
             <p className="text-xs text-muted-foreground">
               Your Google Analytics 4 measurement ID.
@@ -852,7 +852,7 @@ export function AdminSettings() {
               onChange={(e) =>
                 handleSettingChange("seo_fb_pixel", e.target.value)
               }
-              placeholder="XXXXXXXXXXXXXXX"
+              placeholder="123456789012345"
             />
             <p className="text-xs text-muted-foreground">
               Your Meta (Facebook) Pixel ID for tracking conversions.

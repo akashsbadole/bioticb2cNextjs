@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { logError } from '@/lib/error-logger';
 
 async function resolveProduct(idOrSlug: string, includeDeleted = false) {
   const where = {
@@ -43,7 +44,7 @@ export async function PATCH(
 
     return NextResponse.json({ error: 'No valid action specified' }, { status: 400 });
   } catch (error) {
-    console.error('Patch product error:', error);
+    logError(error, { category: 'api', context: 'PATCH /api/products/[id]' });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -65,7 +66,7 @@ export async function GET(
 
     return NextResponse.json({ product });
   } catch (error) {
-    console.error('Get product error:', error);
+    logError(error, { category: 'api', context: 'GET /api/products/[id]' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -151,7 +152,7 @@ export async function PUT(
 
     return NextResponse.json({ product });
   } catch (error) {
-    console.error('Update product error:', error);
+    logError(error, { category: 'api', context: 'PUT /api/products/[id]' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -195,7 +196,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Product moved to trash' });
   } catch (error) {
-    console.error('Delete product error:', error);
+    logError(error, { category: 'api', context: 'DELETE /api/products/[id]' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

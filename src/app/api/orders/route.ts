@@ -177,8 +177,22 @@ export async function POST(request: NextRequest) {
 
     // Create order in transaction
     const order = await db.$transaction(async (tx) => {
-      // 1. Create the order
-      const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+      // 1. Create the order with retry collision handling
+      let orderNumber = "";
+      let isUnique = false;
+      let attempts = 0;
+
+      while (!isUnique && attempts < 5) {
+        attempts++;
+        orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+        const existing = await tx.order.findUnique({
+          where: { orderNumber },
+        });
+        if (!existing) {
+          isUnique = true;
+        }
+      }
+
       const newOrder = await tx.order.create({
         data: {
           storeId,

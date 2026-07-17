@@ -74,6 +74,16 @@ export function AdminThemeCustomizer() {
   const [editConfig, setEditConfig] = useState<ThemeConfig | null>(null);
   const [previewTheme, setPreviewTheme] = useState<string | null>(null);
 
+  const applyTheme = useCallback((config: ThemeConfig) => {
+    const root = document.documentElement;
+    for (const [key, value] of Object.entries(config.colors)) {
+      root.style.setProperty(key, value);
+    }
+    for (const [key, value] of Object.entries(config.radii)) {
+      root.style.setProperty(key, value);
+    }
+  }, []);
+
   const fetchThemes = useCallback(async () => {
     setLoading(true);
     try {
@@ -90,21 +100,11 @@ export function AdminThemeCustomizer() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [previewTheme, applyTheme]);
 
   useEffect(() => {
     fetchThemes();
   }, [fetchThemes]);
-
-  const applyTheme = (config: ThemeConfig) => {
-    const root = document.documentElement;
-    for (const [key, value] of Object.entries(config.colors)) {
-      root.style.setProperty(key, value);
-    }
-    for (const [key, value] of Object.entries(config.radii)) {
-      root.style.setProperty(key, value);
-    }
-  };
 
   const activateTheme = async (theme: ThemeItem) => {
     if (!theme.id) {

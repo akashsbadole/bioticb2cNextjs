@@ -9,7 +9,7 @@ import {
   Grid3X3,
   MousePointerClick,
   GitMerge,
-  Image,
+  Image as ImageIcon,
   Images,
   Save,
   HelpCircle,
@@ -76,7 +76,7 @@ const sectionIcons: Record<string, React.ReactNode> = {
   cards: <Grid3X3 className="h-4 w-4" />,
   cta: <MousePointerClick className="h-4 w-4" />,
   process: <GitMerge className="h-4 w-4" />,
-  infographic: <Image className="h-4 w-4" />,
+  infographic: <ImageIcon className="h-4 w-4" />,
   gallery: <Images className="h-4 w-4" />,
   faq: <HelpCircle className="h-4 w-4" />,
 };

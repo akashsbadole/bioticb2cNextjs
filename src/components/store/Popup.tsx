@@ -65,11 +65,11 @@ export function Popup() {
   const [popups, setPopups] = useState<PopupData[]>([]);
   const [index, setIndex] = useState(-1);
 
-  if (process.env.NEXT_PUBLIC_DISABLE_POPUPS === "true" || process.env.NODE_ENV === "test") {
-    return null;
-  }
+  const isDisabled = process.env.NEXT_PUBLIC_DISABLE_POPUPS === "true" || process.env.NODE_ENV === "test";
 
   useEffect(() => {
+    if (isDisabled) return;
+
     let cancelled = false;
     fetch("/api/popups")
       .then((res) => res.json())
@@ -113,7 +113,11 @@ export function Popup() {
       cancelled = true;
       cleanup?.();
     };
-  }, []);
+  }, [isDisabled]);
+
+  if (isDisabled) {
+    return null;
+  }
 
   const active = index >= 0 && index < popups.length ? popups[index] : null;
 

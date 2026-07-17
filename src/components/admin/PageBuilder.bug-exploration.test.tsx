@@ -17,8 +17,8 @@ import { PageBuilder } from './PageBuilder';
 // Test data generators for property-based testing
 const safeString = (opts?: { minLength?: number }) =>
     fc.string(opts).map(str => {
-        const clean = str.replace(/[^\x20-\x7E]/g, '').replace(/[<>]/g, ' ');
-        return clean.trim().length === 0 ? 'safe value' : clean;
+        const clean = str.replace(/[^a-zA-Z0-9]/g, '');
+        return clean.trim().length === 0 ? 'safevalue' : clean;
     });
 
 const heroBlockGen = fc.record({

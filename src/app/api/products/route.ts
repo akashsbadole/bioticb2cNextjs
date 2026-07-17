@@ -4,9 +4,15 @@ import { logActivity } from '@/lib/activity-log';
 import { productSchema } from '@/lib/validations';
 import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { logError } from '@/lib/error-logger';
+
+const PRODUCTS_RATE_LIMIT = { maxRequests: 120, windowMs: 60 * 1000, prefix: 'products-search' };
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimitResponse = await checkRateLimit(request, PRODUCTS_RATE_LIMIT);
+    if (rateLimitResponse) return rateLimitResponse;
+
     const storeId = getStoreId(request);
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
@@ -164,7 +170,7 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Get products error:', error);
+    logError(error, { category: 'api', context: 'GET /api/products' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -259,7 +265,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (error) {
-    console.error('Create product error:', error);
+    logError(error, { category: 'api', context: 'POST /api/products' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
