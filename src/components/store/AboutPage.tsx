@@ -47,42 +47,42 @@ export function AboutPage({ onNavigate, data: _data }: AboutPageProps) {
   return (
     <div>
       {/* HERO */}
-      <section className="page-hero" style={{ background: "var(--vedika-green-dark)", color: "var(--vedika-bg)", padding: "70px 0 60px", position: "relative", overflow: "hidden" }}>
-        <div className="vedika-container" style={{ position: "relative", zIndex: 1 }}>
-          <div className="vedika-eyebrow" style={{ color: "var(--vedika-gold)" }}>Our Story</div>
-          <h1 style={{ color: "#fff", fontSize: "clamp(2.4rem,4.5vw,3.8rem)", lineHeight: 1.05, maxWidth: 640 }}>Rooted in the Vedas, refined for today.</h1>
-          <p style={{ color: "#B7C0B4", maxWidth: 560, marginTop: 12 }}>We believe Ayurveda doesn&apos;t need reinvention — it needs integrity. Every formula we make starts with a classical text and ends with a lab report.</p>
+      <section className="page-hero bg-vedika-green-dark text-vedika-bg py-[70px] pb-[60px] relative overflow-hidden">
+          <div className="vedika-container relative z-[1]">
+          <div className="vedika-eyebrow text-vedika-gold">Our Story</div>
+          <h1 className="text-white max-w-[640px]" style={{ fontSize: "clamp(2.4rem,4.5vw,3.8rem)", lineHeight: 1.05 }}>Rooted in the Vedas, refined for today.</h1>
+          <p className="text-[#B7C0B4] max-w-[560px] mt-3">We believe Ayurveda doesn&apos;t need reinvention — it needs integrity. Every formula we make starts with a classical text and ends with a lab report.</p>
         </div>
-        <svg viewBox="0 0 200 200" fill="none" style={{ position: "absolute", right: -60, top: -60, width: 320, height: 320, opacity: 0.12 }}>
+        <svg viewBox="0 0 200 200" fill="none" className="absolute -right-[60px] -top-[60px] w-[320px] h-[320px] opacity-[0.12]">
           <path d="M100 20c-20 40-50 50-50 90s30 60 50 70c20-10 50-30 50-70s-30-50-50-90z" stroke="currentColor" strokeWidth=".6"/>
         </svg>
       </section>
 
       <div className="vedika-container">
-        <div className="breadcrumb" style={{ padding: "20px 0", fontSize: ".82rem", color: "var(--vedika-ink-soft)", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-          <button onClick={() => onNavigate("home")} style={{ background: "none", border: "none", cursor: "pointer", font: "inherit", color: "inherit" }}>Home</button>
-          <span style={{ color: "var(--vedika-sand)" }}>/</span>
-          <span style={{ color: "var(--vedika-red)" }}>About Us</span>
+        <div className="breadcrumb py-5 text-xs text-vedika-ink-soft flex gap-2 items-center flex-wrap">
+          <button onClick={() => onNavigate("home")} className="bg-transparent border-none cursor-pointer font-[inherit] text-inherit">Home</button>
+          <span className="text-vedika-sand">/</span>
+          <span className="text-vedika-red">About Us</span>
         </div>
       </div>
 
       {/* STORY SPOTLIGHT */}
-      <section className="vedika-section" style={{ paddingTop: 0 }}>
+      <section className="vedika-section pt-0">
         <div className="vedika-container">
-          <div className="spotlight grid grid-cols-1 lg:grid-cols-[.85fr_1.15fr]" style={{ gap: 56, alignItems: "center", background: "var(--vedika-green-dark)", borderRadius: "28px", padding: "64px", color: "var(--vedika-bg)", overflow: "hidden" }}>
-            <div className="spotlight-art" style={{ aspectRatio: "1", borderRadius: "50%", background: "radial-gradient(circle at 35% 30%, #3C5A49, var(--vedika-green-dark) 75%)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,255,255,.08)" }}>
-              <svg viewBox="0 0 200 200" fill="none" style={{ width: "60%", height: "60%" }}>
+          <div className="spotlight grid grid-cols-1 lg:grid-cols-[.85fr_1.15fr] gap-14 items-center bg-vedika-green-dark rounded-[28px] p-16 text-vedika-bg overflow-hidden">
+            <div className="spotlight-art aspect-square rounded-full flex items-center justify-center border border-white/10" style={{ background: "radial-gradient(circle at 35% 30%, #3C5A49, var(--vedika-green-dark) 75%)" }}>
+              <svg viewBox="0 0 200 200" fill="none" className="w-3/5 h-3/5">
                 <path d="M100 170c0-50 20-70 20-100 0-16-9-28-20-32-11 4-20 16-20 32 0 30 20 50 20 100z" fill="#3C5A49" stroke="#C68A2E" strokeWidth="1.5"/>
                 <path d="M100 130c-18-4-30-18-30-18M100 110c18-4 28-16 28-16M100 90c-14-3-22-13-22-13" stroke="#C68A2E" strokeWidth="1.3"/>
               </svg>
             </div>
             <div>
-              <div className="vedika-eyebrow" style={{ color: "var(--vedika-gold)" }}>The Vedika Difference</div>
-              <h2 style={{ color: "var(--vedika-gold-tint)" }}>Ayurveda that honours both the past and the proof.</h2>
-              <p style={{ color: "#CBD3C9" }}>Every formulation we make begins with a classical Ayurvedic text — the Charaka Samhita, the Sushruta Samhita, or the Ashtanga Hridayam. From there, we work with vaidyas who have spent decades studying these texts, not interpreting them through a modern lens. Once a formula is finalised, it goes through third-party lab testing for potency, heavy metals, and microbial safety. Tradition and science don&apos;t have to be at odds — they&apos;re both part of the same standard.</p>
-              <div className="spot-stats" style={{ display: "flex", gap: 32, marginTop: 28 }}>
-                <div><strong style={{ fontFamily: "var(--font-fraunces), Georgia, serif", color: "var(--vedika-gold-tint)", fontSize: "1.4rem", display: "block" }}>3</strong><span style={{ fontSize: ".76rem", color: "#A9B3A5" }}>Classical texts referenced</span></div>
-                <div><strong style={{ fontFamily: "var(--font-fraunces), Georgia, serif", color: "var(--vedika-gold-tint)", fontSize: "1.4rem", display: "block" }}>100%</strong><span style={{ fontSize: ".76rem", color: "#A9B3A5" }}>Lab-tested batches</span></div>
+              <div className="vedika-eyebrow text-vedika-gold">The Vedika Difference</div>
+              <h2 className="text-vedika-gold-tint">Ayurveda that honours both the past and the proof.</h2>
+              <p className="text-[#CBD3C9]">Every formulation we make begins with a classical Ayurvedic text — the Charaka Samhita, the Sushruta Samhita, or the Ashtanga Hridayam. From there, we work with vaidyas who have spent decades studying these texts, not interpreting them through a modern lens. Once a formula is finalised, it goes through third-party lab testing for potency, heavy metals, and microbial safety. Tradition and science don&apos;t have to be at odds — they&apos;re both part of the same standard.</p>
+              <div className="spot-stats flex gap-8 mt-7">
+                <div><strong className="font-fraunces text-vedika-gold-tint text-[1.4rem] block">3</strong><span className="text-[.76rem] text-[#A9B3A5]">Classical texts referenced</span></div>
+                <div><strong className="font-fraunces text-vedika-gold-tint text-[1.4rem] block">100%</strong><span className="text-[.76rem] text-[#A9B3A5]">Lab-tested batches</span></div>
               </div>
             </div>
           </div>
@@ -90,7 +90,7 @@ export function AboutPage({ onNavigate, data: _data }: AboutPageProps) {
       </section>
 
       {/* VALUES */}
-      <section className="vedika-section" style={{ background: "var(--vedika-bg-alt)" }}>
+      <section className="vedika-section bg-vedika-bg-alt">
         <div className="vedika-container">
           <VedikaSectionTitle eyebrow="Our Principles" title="How we formulate" description="Three things we don&apos;t compromise on — no matter how fast we grow." />
           <div className="vedika-grid-3">
@@ -105,11 +105,11 @@ export function AboutPage({ onNavigate, data: _data }: AboutPageProps) {
       <section className="vedika-section">
         <div className="vedika-container">
           <VedikaSectionTitle eyebrow="Our Journey" title="The story so far" description="From a small workshop in Jaipur to a community of thousands." align="left" />
-          <div className="timeline" style={{ position: "relative", paddingLeft: 40, maxWidth: 640 }}>
-            <div style={{ position: "absolute", left: 9, top: 8, bottom: 8, width: 2, background: "var(--vedika-line)" }} />
+          <div className="timeline relative pl-10 max-w-[640px]">
+            <div className="absolute left-[9px] top-2 bottom-2 w-0.5 bg-vedika-line" />
             {timeline.map((t, i) => (
-              <div key={i} style={{ position: "relative", paddingBottom: 44 }}>
-                <div style={{ position: "absolute", left: -40, top: 4, width: 20, height: 20, borderRadius: "50%", background: "var(--vedika-paper)", border: "3px solid var(--vedika-red)" }} />
+              <div key={i} className="relative pb-11">
+                <div className="absolute -left-10 top-1 w-5 h-5 rounded-full bg-vedika-paper border-[3px] border-vedika-red" />
                 <VedikaTimelineItem year={t.year} title={t.title} description={t.description} />
               </div>
             ))}
@@ -118,7 +118,7 @@ export function AboutPage({ onNavigate, data: _data }: AboutPageProps) {
       </section>
 
       {/* TEAM */}
-      <section className="vedika-section" style={{ background: "var(--vedika-bg-alt)" }}>
+      <section className="vedika-section bg-vedika-bg-alt">
         <div className="vedika-container">
           <VedikaSectionTitle eyebrow="The People" title="The team behind your rituals" description="Formulators, sourcers, and quality experts who treat every batch like it&apos;s for their own family." />
           <div className="vedika-grid-4">

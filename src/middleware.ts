@@ -70,11 +70,20 @@ async function resolveDefaultStoreId(): Promise<string | null> {
   if (defaultStoreId && defaultStoreCacheExpiry > now) {
     return defaultStoreId;
   }
+
+  // Fast path: use env var if configured, avoids self-referential fetch
+  if (process.env.DEFAULT_STORE_ID) {
+    defaultStoreId = process.env.DEFAULT_STORE_ID;
+    defaultStoreCacheExpiry = now + DEFAULT_STORE_TTL;
+    return defaultStoreId;
+  }
+
+  // Fallback: fetch from internal API (works without env config)
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `http://localhost:3000`;
     const res = await fetch(`${baseUrl}/api/store/default`, {
       headers: { "x-internal-request": "true" },
-      signal: AbortSignal.timeout(2000),
+      signal: AbortSignal.timeout(5000),
     });
     if (res.ok) {
       const data = await res.json();

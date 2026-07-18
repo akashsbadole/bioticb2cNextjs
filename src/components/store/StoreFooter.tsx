@@ -73,33 +73,27 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
   };
 
   return (
-    <footer className="site-footer" style={{ background: "var(--vedika-green-dark)", color: "#CBD3C9", padding: "80px 0 0" }}>
+    <footer className="bg-vedika-green-dark text-[#CBD3C9] pt-20">
       <div className="vedika-container">
-        <div className="footer-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1.2fr]" style={{ gap: 32, paddingBottom: 56, borderBottom: "1px solid rgba(255,255,255,.1)" }}>
+        <div className="footer-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1.2fr] gap-8 pb-14 border-b border-white/10">
           {/* Brand Column */}
           <div className="footer-col">
-            <div className="footer-logo" style={{ fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "1.5rem", color: "#fff", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
-              <LeafIcon className="w-[26px] h-[26px]" style={{ color: "var(--vedika-gold)" }} />
+            <div className="font-fraunces text-2xl text-white mb-3.5 flex items-center gap-2">
+              <LeafIcon className="w-[26px] h-[26px] text-vedika-gold" />
               {siteName}
             </div>
-            <p style={{ color: "#98A398", fontSize: ".88rem", lineHeight: 1.7 }}>
+            <p className="text-[#98A398] text-sm leading-[1.7]">
               {settings?.site_description || "Rooted in wellness. Small-batch, classical Ayurvedic formulations made with integrity and intention."}
             </p>
-            <div className="social-row" style={{ display: "flex", gap: 10, marginTop: 18 }}>
+            <div className="flex gap-2.5 mt-[18px]">
               {facebookUrl !== "#" && (
-                <a href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook" style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,.08)", display: "flex", alignItems: "center", justifyContent: "center", color: "#B7C0B4", transition: "background .2s ease" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--vedika-gold)"; e.currentTarget.style.color = "var(--vedika-green-dark)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,.08)"; e.currentTarget.style.color = "#B7C0B4"; }}
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 15, height: 15 }}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2z"/></svg>
+                <a href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-[#B7C0B4] transition-all duration-200 hover:bg-vedika-gold hover:text-vedika-green-dark">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-[15px] h-[15px]"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2z"/></svg>
                 </a>
               )}
               {instagramUrl !== "#" && (
-                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,.08)", display: "flex", alignItems: "center", justifyContent: "center", color: "#B7C0B4", transition: "background .2s ease" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--vedika-gold)"; e.currentTarget.style.color = "var(--vedika-green-dark)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,.08)"; e.currentTarget.style.color = "#B7C0B4"; }}
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 15, height: 15 }}><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
+                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-[#B7C0B4] transition-all duration-200 hover:bg-vedika-gold hover:text-vedika-green-dark">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-[15px] h-[15px]"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
                 </a>
               )}
             </div>
@@ -109,35 +103,31 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
           {loading ? (
             Array.from({ length: 2 }).map((_, i) => (
               <div key={i} className="footer-col">
-                <div style={{ height: 14, width: 80, background: "rgba(255,255,255,.1)", borderRadius: 4, marginBottom: 18 }} />
-                <div style={{ height: 10, width: 120, background: "rgba(255,255,255,.08)", borderRadius: 4, marginBottom: 11 }} />
-                <div style={{ height: 10, width: 100, background: "rgba(255,255,255,.08)", borderRadius: 4, marginBottom: 11 }} />
+                <div className="h-3.5 w-20 bg-white/10 rounded mb-[18px]" />
+                <div className="h-2.5 w-30 bg-white/8 rounded mb-[11px]" />
+                <div className="h-2.5 w-25 bg-white/8 rounded mb-[11px]" />
               </div>
             ))
           ) : footerMenus.length > 0 ? (
             footerMenus.map((menuData, idx) => (
               <div key={idx} className="footer-col">
-                <h4 style={{ color: "#fff", fontSize: ".86rem", letterSpacing: ".05em", textTransform: "uppercase", marginBottom: 18 }}>
+                <h4 className="text-white text-sm tracking-wide uppercase mb-[18px]">
                   {menuData.menu?.name || "Links"}
                 </h4>
-                <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+                <ul className="list-none m-0 p-0">
                   {menuData.items.map((item) => (
-                    <li key={item.id} style={{ marginBottom: 11 }}>
+                    <li key={item.id} className="mb-[11px]">
                       <button onClick={() => navigateItem(item)}
-                        style={{ fontSize: ".88rem", color: "#B7C0B4", transition: "color .2s ease", background: "none", border: "none", cursor: "pointer", font: "inherit", textAlign: "left" }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = "var(--vedika-gold)"}
-                        onMouseLeave={(e) => e.currentTarget.style.color = "#B7C0B4"}
+                        className="text-sm text-[#B7C0B4] transition-colors duration-200 bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold"
                       >
                         {item.label}
                       </button>
                       {item.children && item.children.length > 0 && (
-                        <ul style={{ listStyle: "none", margin: "8px 0 0", paddingLeft: 12 }}>
+                        <ul className="list-none m-2 mt-0 pl-3">
                           {item.children.map((child) => (
-                            <li key={child.id} style={{ marginBottom: 8 }}>
+                            <li key={child.id} className="mb-2">
                               <button onClick={() => navigateItem(child)}
-                                style={{ fontSize: ".82rem", color: "#98A398", transition: "color .2s ease", background: "none", border: "none", cursor: "pointer", font: "inherit", textAlign: "left" }}
-                                onMouseEnter={(e) => e.currentTarget.style.color = "var(--vedika-gold)"}
-                                onMouseLeave={(e) => e.currentTarget.style.color = "#98A398"}
+                                className="text-xs text-[#98A398] transition-colors duration-200 bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold"
                               >
                                 {child.label}
                               </button>
@@ -152,72 +142,51 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
             ))
           ) : (
             <div className="footer-col">
-              <h4 style={{ color: "#fff", fontSize: ".86rem", letterSpacing: ".05em", textTransform: "uppercase", marginBottom: 18 }}>Quick Links</h4>
-              <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-                <li style={{ marginBottom: 11 }}><button onClick={() => onNavigate("home")} style={{ fontSize: ".88rem", color: "#B7C0B4", background: "none", border: "none", cursor: "pointer", font: "inherit", textAlign: "left" }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = "var(--vedika-gold)"}
-                  onMouseLeave={(e) => e.currentTarget.style.color = "#B7C0B4"}
-                >Home</button></li>
-                <li style={{ marginBottom: 11 }}><button onClick={() => onNavigate("shop")} style={{ fontSize: ".88rem", color: "#B7C0B4", background: "none", border: "none", cursor: "pointer", font: "inherit", textAlign: "left" }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = "var(--vedika-gold)"}
-                  onMouseLeave={(e) => e.currentTarget.style.color = "#B7C0B4"}
-                >Shop</button></li>
+              <h4 className="text-white text-sm tracking-wide uppercase mb-[18px]">Quick Links</h4>
+              <ul className="list-none m-0 p-0">
+                <li className="mb-[11px]"><button onClick={() => onNavigate("home")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold">Home</button></li>
+                <li className="mb-[11px]"><button onClick={() => onNavigate("shop")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold">Shop</button></li>
               </ul>
             </div>
           )}
 
           {/* Support Column */}
           <div className="footer-col">
-            <h4 style={{ color: "#fff", fontSize: ".86rem", letterSpacing: ".05em", textTransform: "uppercase", marginBottom: 18 }}>Support</h4>
-            <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-              <li style={{ marginBottom: 11 }}><button onClick={() => onNavigate("contact")} style={{ fontSize: ".88rem", color: "#B7C0B4", background: "none", border: "none", cursor: "pointer", font: "inherit", textAlign: "left" }}
-                onMouseEnter={(e) => e.currentTarget.style.color = "var(--vedika-gold)"}
-                onMouseLeave={(e) => e.currentTarget.style.color = "#B7C0B4"}
-              >Contact Us</button></li>
-              <li style={{ marginBottom: 11 }}><button onClick={() => onNavigate("faq")} style={{ fontSize: ".88rem", color: "#B7C0B4", background: "none", border: "none", cursor: "pointer", font: "inherit", textAlign: "left" }}
-                onMouseEnter={(e) => e.currentTarget.style.color = "var(--vedika-gold)"}
-                onMouseLeave={(e) => e.currentTarget.style.color = "#B7C0B4"}
-              >FAQ</button></li>
-              <li style={{ marginBottom: 11 }}><button onClick={() => onNavigate("tracking")} style={{ fontSize: ".88rem", color: "#B7C0B4", background: "none", border: "none", cursor: "pointer", font: "inherit", textAlign: "left" }}
-                onMouseEnter={(e) => e.currentTarget.style.color = "var(--vedika-gold)"}
-                onMouseLeave={(e) => e.currentTarget.style.color = "#B7C0B4"}
-              >Track Order</button></li>
+            <h4 className="text-white text-sm tracking-wide uppercase mb-[18px]">Support</h4>
+            <ul className="list-none m-0 p-0">
+              <li className="mb-[11px]"><button onClick={() => onNavigate("contact")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold">Contact Us</button></li>
+              <li className="mb-[11px]"><button onClick={() => onNavigate("faq")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold">FAQ</button></li>
+              <li className="mb-[11px]"><button onClick={() => onNavigate("tracking")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold">Track Order</button></li>
             </ul>
           </div>
 
           {/* Contact Column */}
           <div className="footer-col">
-            <h4 style={{ color: "#fff", fontSize: ".86rem", letterSpacing: ".05em", textTransform: "uppercase", marginBottom: 18 }}>Get in Touch</h4>
-            <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+            <h4 className="text-white text-sm tracking-wide uppercase mb-[18px]">Get in Touch</h4>
+            <ul className="list-none m-0 p-0">
               {companyEmail && (
-                <li style={{ marginBottom: 11, display: "flex", alignItems: "center", gap: 8 }}>
-                  <MailIcon className="w-[14px] h-[14px]" style={{ color: "var(--vedika-gold)", flexShrink: 0 }} />
-                  <a href={`mailto:${companyEmail}`} style={{ fontSize: ".86rem", color: "#B7C0B4", transition: "color .2s ease", textDecoration: "none" }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = "var(--vedika-gold)"}
-                    onMouseLeave={(e) => e.currentTarget.style.color = "#B7C0B4"}
-                  >{companyEmail}</a>
+                <li className="mb-[11px] flex items-center gap-2">
+                  <MailIcon className="w-[14px] h-[14px] text-vedika-gold shrink-0" />
+                  <a href={`mailto:${companyEmail}`} className="text-sm text-[#B7C0B4] transition-colors duration-200 no-underline hover:text-vedika-gold">{companyEmail}</a>
                 </li>
               )}
               {companyPhone && (
-                <li style={{ marginBottom: 11, display: "flex", alignItems: "center", gap: 8 }}>
-                  <PhoneIcon className="w-[14px] h-[14px]" style={{ color: "var(--vedika-gold)", flexShrink: 0 }} />
-                  <a href={`tel:${companyPhone}`} style={{ fontSize: ".86rem", color: "#B7C0B4", transition: "color .2s ease", textDecoration: "none" }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = "var(--vedika-gold)"}
-                    onMouseLeave={(e) => e.currentTarget.style.color = "#B7C0B4"}
-                  >{companyPhone}</a>
+                <li className="mb-[11px] flex items-center gap-2">
+                  <PhoneIcon className="w-[14px] h-[14px] text-vedika-gold shrink-0" />
+                  <a href={`tel:${companyPhone}`} className="text-sm text-[#B7C0B4] transition-colors duration-200 no-underline hover:text-vedika-gold">{companyPhone}</a>
                 </li>
               )}
               {companyAddress && (
-                <li style={{ marginBottom: 11, display: "flex", alignItems: "flex-start", gap: 8 }}>
-                  <PinIcon className="w-[14px] h-[14px]" style={{ color: "var(--vedika-gold)", flexShrink: 0, marginTop: 2 }} />
-                  <span style={{ fontSize: ".86rem", color: "#98A398" }}>{companyAddress}</span>
+                <li className="mb-[11px] flex items-start gap-2">
+                  <PinIcon className="w-[14px] h-[14px] text-vedika-gold shrink-0 mt-0.5" />
+                  <span className="text-sm text-[#98A398]">{companyAddress}</span>
                 </li>
               )}
             </ul>
           </div>
         </div>
 
-        <div className="footer-bottom" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 0", fontSize: ".78rem", color: "#8A9587", flexWrap: "wrap", gap: 12 }}>
+        <div className="flex justify-between items-center py-6 text-xs text-[#8A9587] flex-wrap gap-3">
           <span>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</span>
           <span>Crafted with care for quality Ayurveda.</span>
         </div>

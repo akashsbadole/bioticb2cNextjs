@@ -197,48 +197,24 @@ export function HomePage({
     <div className="flex flex-col">
       {/* ─── HERO ─── */}
       <section
-        className="hero grid grid-cols-1 lg:grid-cols-[1.05fr_.95fr] px-4 py-10 sm:px-10 sm:py-14"
-        style={{
-          gap: 40,
-          alignItems: "center",
-        }}
+        className="hero grid grid-cols-1 lg:grid-cols-[1.05fr_.95fr] px-4 py-10 sm:px-10 sm:py-14 gap-10 items-center"
       >
-        <div className="vedika-container" style={{ display: "contents" }}>
+        <div className="vedika-container contents">
           <div className="hero-copy">
-            <div
-              className="vedika-eyebrow"
-              style={{ justifyContent: "flex-start" }}
-            >
+            <div className="vedika-eyebrow justify-start">
               Rooted in the Vedas, Made for Today
             </div>
-            <h1
-              style={{
-                fontSize: "clamp(2.4rem,4.5vw,3.8rem)",
-                lineHeight: 1.05,
-                margin: "0 0 .2em",
-              }}
-            >
+            <h1 className="text-[clamp(2.4rem,4.5vw,3.8rem)] leading-[1.05] m-0 mb-[.2em]">
               Ayurveda,
               <br />
               measured &amp; modern.
             </h1>
-            <p
-              className="lead"
-              style={{
-                fontSize: "1.1rem",
-                maxWidth: 460,
-                color: "var(--vedika-ink-soft)",
-                marginBottom: 28,
-              }}
-            >
+            <p className="lead text-lg max-w-[460px] text-vedika-ink-soft mb-7">
               Small-batch herbal formulations for skin, hair and wellness — made
               from single-origin botanicals, balanced to your dosha, and
               lab-tested for what actually matters.
             </p>
-            <div
-              className="hero-actions"
-              style={{ display: "flex", gap: 14, flexWrap: "wrap" }}
-            >
+            <div className="flex gap-3.5 flex-wrap">
               <button
                 onClick={() => onNavigate("shop")}
                 className="vedika-btn vedika-btn-primary"
@@ -252,93 +228,45 @@ export function HomePage({
                 Our Sourcing Story
               </button>
             </div>
-            <div
-              className="hero-stats"
-              style={{ display: "flex", gap: 36, marginTop: 44 }}
-            >
+            <div className="flex gap-9 mt-11">
               <div>
-                <strong
-                  style={{
-                    fontFamily: "var(--font-fraunces), Georgia, serif",
-                    fontSize: "1.6rem",
-                    color: "var(--vedika-green-dark)",
-                    display: "block",
-                  }}
-                >
+                <strong className="font-fraunces text-[1.6rem] text-vedika-green-dark block">
                   120+
                 </strong>
-                <span
-                  style={{
-                    fontSize: ".78rem",
-                    color: "var(--vedika-ink-soft)",
-                    letterSpacing: ".03em",
-                  }}
-                >
+                <span className="text-xs text-vedika-ink-soft tracking-wide">
                   Formulations
                 </span>
               </div>
               <div>
-                <strong
-                  style={{
-                    fontFamily: "var(--font-fraunces), Georgia, serif",
-                    fontSize: "1.6rem",
-                    color: "var(--vedika-green-dark)",
-                    display: "block",
-                  }}
-                >
+                <strong className="font-fraunces text-[1.6rem] text-vedika-green-dark block">
                   40k+
                 </strong>
-                <span
-                  style={{
-                    fontSize: ".78rem",
-                    color: "var(--vedika-ink-soft)",
-                    letterSpacing: ".03em",
-                  }}
-                >
+                <span className="text-xs text-vedika-ink-soft tracking-wide">
                   Rituals shipped
                 </span>
               </div>
               <div>
-                <strong
-                  style={{
-                    fontFamily: "var(--font-fraunces), Georgia, serif",
-                    fontSize: "1.6rem",
-                    color: "var(--vedika-green-dark)",
-                    display: "block",
-                  }}
-                >
+                <strong className="font-fraunces text-[1.6rem] text-vedika-green-dark block">
                   4.8/5
                 </strong>
-                <span
-                  style={{
-                    fontSize: ".78rem",
-                    color: "var(--vedika-ink-soft)",
-                    letterSpacing: ".03em",
-                  }}
-                >
+                <span className="text-xs text-vedika-ink-soft tracking-wide">
                   Average rating
                 </span>
               </div>
             </div>
           </div>
           <div
-            className="hero-art"
+            className="hero-art relative aspect-1 rounded-full flex items-center justify-center"
             style={{
-              position: "relative",
-              aspectRatio: "1/1",
-              borderRadius: "50%",
               background:
                 "radial-gradient(circle at 32% 28%, var(--vedika-sand) 0%, var(--vedika-gold-tint) 45%, var(--vedika-bg-alt) 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
               boxShadow: "0 12px 30px -14px rgba(28,44,35,.28)",
             }}
           >
             <svg
               viewBox="0 0 300 300"
               fill="none"
-              style={{ width: "78%", height: "78%" }}
+              className="w-[78%] h-[78%]"
             >
               <ellipse
                 cx="150"
@@ -389,60 +317,14 @@ export function HomePage({
               <circle cx="95" cy="250" r="14" fill="#A6402F" opacity=".85" />
               <circle cx="205" cy="255" r="10" fill="#C68A2E" opacity=".85" />
             </svg>
-            <div
-              className="badge-float b1"
-              style={{
-                position: "absolute",
-                top: "8%",
-                right: "2%",
-                background: "var(--vedika-paper)",
-                borderRadius: 100,
-                padding: "10px 18px",
-                fontSize: ".76rem",
-                fontWeight: 600,
-                color: "var(--vedika-green-dark)",
-                boxShadow: "0 12px 30px -14px rgba(28,44,35,.28)",
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                style={{ width: 16, height: 16, color: "var(--vedika-red)" }}
-              >
+            <div className="badge-float b1 absolute top-[8%] right-[2%] bg-vedika-paper rounded-full px-[18px] py-2.5 text-xs font-semibold text-vedika-green-dark shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)] flex items-center gap-2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-vedika-red">
                 <path d="M20 6L9 17l-5-5" />
               </svg>
               100% Natural
             </div>
-            <div
-              className="badge-float b2"
-              style={{
-                position: "absolute",
-                bottom: "12%",
-                left: "-2%",
-                background: "var(--vedika-paper)",
-                borderRadius: 100,
-                padding: "10px 18px",
-                fontSize: ".76rem",
-                fontWeight: 600,
-                color: "var(--vedika-green-dark)",
-                boxShadow: "0 12px 30px -14px rgba(28,44,35,.28)",
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                style={{ width: 16, height: 16, color: "var(--vedika-red)" }}
-              >
+            <div className="badge-float b2 absolute bottom-[12%] -left-[2%] bg-vedika-paper rounded-full px-[18px] py-2.5 text-xs font-semibold text-vedika-green-dark shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)] flex items-center gap-2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-vedika-red">
                 <circle cx="12" cy="12" r="9" />
                 <path d="M12 7v5l3 3" />
               </svg>
@@ -481,9 +363,7 @@ export function HomePage({
       </section>
 
       {/* ─── BESTSELLERS ─── */}
-      <section
-        style={{ background: "var(--vedika-bg-alt)", padding: "88px 0 96px" }}
-      >
+      <section className="bg-vedika-bg-alt py-[88px] pb-24">
         <div className="vedika-container">
           <VedikaSectionTitle
             eyebrow="Community Favourites"
@@ -502,7 +382,7 @@ export function HomePage({
               />
             ))}
           </div>
-          <div style={{ textAlign: "center", marginTop: 48 }}>
+          <div className="text-center mt-12">
             <button
               onClick={() => onNavigate("shop")}
               className="vedika-btn vedika-btn-outline"
@@ -515,16 +395,16 @@ export function HomePage({
 
       {/* ─── DYNAMIC CATEGORY PRODUCTS ─── */}
       {categoryWithProducts.length > 0 && (
-        <section className="vedika-section bg-paper border-y" style={{ borderTop: "1px solid var(--vedika-line)", borderBottom: "1px solid var(--vedika-line)", padding: "88px 0" }}>
+        <section className="vedika-section bg-paper border-y border-vedika-line py-[88px]">
           <div className="vedika-container space-y-16">
             {categoryWithProducts.slice(0, 4).map((cat: any) => (
               <div key={cat.id} className="space-y-6">
-                <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: "var(--vedika-line)" }}>
+                <div className="flex items-center justify-between border-b border-vedika-line pb-3">
                   <div>
-                    <h3 className="text-2xl font-semibold text-[var(--vedika-green-dark)]" style={{ fontFamily: "var(--font-fraunces), Georgia, serif" }}>{cat.name}</h3>
+                    <h3 className="text-2xl font-semibold text-vedika-green-dark font-fraunces">{cat.name}</h3>
                     {cat.description && <p className="text-xs text-muted-foreground mt-0.5">{cat.description}</p>}
                   </div>
-                  <button onClick={() => onNavigate("category", cat.slug)} className="text-sm font-semibold text-[var(--vedika-red)] hover:underline">
+                  <button onClick={() => onNavigate("category", cat.slug)} className="text-sm font-semibold text-vedika-red hover:underline">
                     View All {cat.name} →
                   </button>
                 </div>
@@ -555,12 +435,7 @@ export function HomePage({
             title="Three steps, every sunrise"
             description="A minimal routine drawn from the Ashtanga Hridayam — order matters here, so we keep it exactly this simple."
           />
-          <div
-            className="ritual grid grid-cols-1 md:grid-cols-3"
-            style={{
-              gap: 32,
-            }}
-          >
+          <div className="ritual grid grid-cols-1 md:grid-cols-3 gap-8">
             {ritualSteps.map((step) => (
               <VedikaRitualStep
                 key={step.number}
@@ -575,125 +450,35 @@ export function HomePage({
 
       {/* ─── INGREDIENT SPOTLIGHT ─── */}
       <section className="vedika-container">
-        <div
-          className="spotlight grid grid-cols-1 lg:grid-cols-[.85fr_1.15fr]"
-          style={{
-            gap: 56,
-            alignItems: "center",
-            background: "var(--vedika-green-dark)",
-            borderRadius: "28px",
-            padding: "64px",
-            color: "var(--vedika-bg)",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            className="spotlight-art"
+        <div className="spotlight grid grid-cols-1 lg:grid-cols-[.85fr_1.15fr] gap-14 items-center bg-vedika-green-dark rounded-[28px] p-16 text-vedika-bg overflow-hidden">
+          <div className="spotlight-art aspect-1 rounded-full flex items-center justify-center border border-white/10"
             style={{
-              aspectRatio: "1",
-              borderRadius: "50%",
               background:
                 "radial-gradient(circle at 35% 30%, #3C5A49, var(--vedika-green-dark) 75%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "1px solid rgba(255,255,255,.08)",
             }}
           >
-            <svg
-              viewBox="0 0 200 200"
-              fill="none"
-              style={{ width: "60%", height: "60%" }}
-            >
-              <path
-                d="M100 170c0-50 20-70 20-100 0-16-9-28-20-32-11 4-20 16-20 32 0 30 20 50 20 100z"
-                fill="#3C5A49"
-                stroke="#C68A2E"
-                strokeWidth="1.5"
-              />
-              <path
-                d="M100 130c-18-4-30-18-30-18M100 110c18-4 28-16 28-16M100 90c-14-3-22-13-22-13"
-                stroke="#C68A2E"
-                strokeWidth="1.3"
-              />
+            <svg viewBox="0 0 200 200" fill="none" className="w-[60%] h-[60%]">
+              <path d="M100 170c0-50 20-70 20-100 0-16-9-28-20-32-11 4-20 16-20 32 0 30 20 50 20 100z" fill="#3C5A49" stroke="#C68A2E" strokeWidth="1.5"/>
+              <path d="M100 130c-18-4-30-18-30-18M100 110c18-4 28-16 28-16M100 90c-14-3-22-13-22-13" stroke="#C68A2E" strokeWidth="1.3"/>
             </svg>
           </div>
           <div>
-            <div
-              className="vedika-eyebrow"
-              style={{ color: "var(--vedika-gold)" }}
-            >
-              Ingredient Spotlight
-            </div>
-            <h2
-              style={{
-                color: "var(--vedika-gold-tint)",
-                fontSize: "clamp(1.8rem,3vw,2.6rem)",
-              }}
-            >
-              Ashwagandha, the vitality root
-            </h2>
-            <p style={{ color: "#CBD3C9" }}>
-              Withania somnifera has anchored Ayurvedic wellness formulas for
-              over three thousand years, prized for helping the body adapt to
-              daily stress. We source ours from a single cooperative of farmers
-              in Nagpur who&apos;ve grown it for three generations.
-            </p>
-            <button
-              onClick={() => onNavigate("shop")}
-              className="vedika-btn vedika-btn-gold"
-              style={{ marginTop: 8 }}
-            >
-              Shop Ashwagandha Range
-            </button>
-            <div
-              className="spot-stats"
-              style={{ display: "flex", gap: 32, marginTop: 28 }}
-            >
+            <div className="vedika-eyebrow text-vedika-gold">Ingredient Spotlight</div>
+            <h2 className="text-vedika-gold-tint text-[clamp(1.8rem,3vw,2.6rem)]">Ashwagandha, the vitality root</h2>
+            <p className="text-[#CBD3C9]">Withania somnifera has anchored Ayurvedic wellness formulas for over three thousand years, prized for helping the body adapt to daily stress. We source ours from a single cooperative of farmers in Nagpur who&apos;ve grown it for three generations.</p>
+            <button onClick={() => onNavigate("shop")} className="vedika-btn vedika-btn-gold mt-2">Shop Ashwagandha Range</button>
+            <div className="flex gap-8 mt-7">
               <div>
-                <strong
-                  style={{
-                    fontFamily: "var(--font-fraunces), Georgia, serif",
-                    color: "var(--vedika-gold-tint)",
-                    fontSize: "1.4rem",
-                    display: "block",
-                  }}
-                >
-                  3,000+
-                </strong>
-                <span style={{ fontSize: ".76rem", color: "#A9B3A5" }}>
-                  Years in use
-                </span>
+                <strong className="font-fraunces text-vedika-gold-tint text-[1.4rem] block">3,000+</strong>
+                <span className="text-xs text-[#A9B3A5]">Years in use</span>
               </div>
               <div>
-                <strong
-                  style={{
-                    fontFamily: "var(--font-fraunces), Georgia, serif",
-                    color: "var(--vedika-gold-tint)",
-                    fontSize: "1.4rem",
-                    display: "block",
-                  }}
-                >
-                  1
-                </strong>
-                <span style={{ fontSize: ".76rem", color: "#A9B3A5" }}>
-                  Farming cooperative
-                </span>
+                <strong className="font-fraunces text-vedika-gold-tint text-[1.4rem] block">1</strong>
+                <span className="text-xs text-[#A9B3A5]">Farming cooperative</span>
               </div>
               <div>
-                <strong
-                  style={{
-                    fontFamily: "var(--font-fraunces), Georgia, serif",
-                    color: "var(--vedika-gold-tint)",
-                    fontSize: "1.4rem",
-                    display: "block",
-                  }}
-                >
-                  0
-                </strong>
-                <span style={{ fontSize: ".76rem", color: "#A9B3A5" }}>
-                  Fillers added
-                </span>
+                <strong className="font-fraunces text-vedika-gold-tint text-[1.4rem] block">0</strong>
+                <span className="text-xs text-[#A9B3A5]">Fillers added</span>
               </div>
             </div>
           </div>
@@ -721,9 +506,7 @@ export function HomePage({
       </section>
 
       {/* ─── BLOG PREVIEW ─── */}
-      <section
-        style={{ background: "var(--vedika-bg-alt)", padding: "96px 0" }}
-      >
+      <section className="bg-vedika-bg-alt py-24">
         <div className="vedika-container">
           <VedikaSectionTitle eyebrow="The Journal" title="Notes on Ayurveda" />
           <div className="vedika-grid-3">
@@ -737,7 +520,7 @@ export function HomePage({
               />
             ))}
           </div>
-          <div style={{ textAlign: "center", marginTop: 48 }}>
+          <div className="text-center mt-12">
             <button
               onClick={() => onNavigate("blog")}
               className="vedika-btn vedika-btn-outline"
@@ -752,7 +535,7 @@ export function HomePage({
       <VedikaNewsletter />
 
       {/* ─── RECENTLY VIEWED ─── */}
-      <section className="vedika-section" style={{ paddingTop: 0 }}>
+      <section className="vedika-section pt-0">
         <div className="vedika-container">
           <RecentlyViewed />
         </div>

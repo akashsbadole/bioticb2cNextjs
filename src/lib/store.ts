@@ -68,6 +68,7 @@ export type Page =
   | { type: "compare" }
   | { type: "support" }
   | { type: "tracking" }
+  | { type: "account" }
   | { type: "bundles" };
 
 interface AdminUser {
@@ -272,6 +273,11 @@ export const useAppStore = create<AppState>()(
             set({ currentPage: { type: "bundles" } });
             if (typeof window !== "undefined")
               window.history.pushState({}, "", "/bundles");
+            break;
+          case "account":
+            set({ currentPage: { type: "account" } });
+            if (typeof window !== "undefined")
+              window.history.pushState({}, "", "/account");
             break;
           case "wishlist":
             set({ currentPage: { type: "wishlist" } });

@@ -175,14 +175,14 @@ export function HerbDeco({ className, style }: VedikaIconProps) {
 
 export function VedikaBreadcrumb({ items }: { items: { label: string; href?: string }[] }) {
   return (
-    <div className="vedika-container" style={{ padding: "20px 32px", fontSize: ".82rem", color: "var(--vedika-ink-soft)", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+    <div className="vedika-container py-5 px-8 text-xs text-vedika-ink-soft flex items-center gap-2 flex-wrap">
       {items.map((item, i) => (
-        <span key={i} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          {i > 0 && <span style={{ color: "var(--vedika-sand)" }}>/</span>}
+        <span key={i} className="flex items-center gap-2">
+          {i > 0 && <span className="text-vedika-sand">/</span>}
           {item.href ? (
-            <span onClick={() => {}} style={{ cursor: "pointer" }}>{item.label}</span>
+            <span className="cursor-pointer">{item.label}</span>
           ) : (
-            <span style={{ color: "var(--vedika-red)" }}>{item.label}</span>
+            <span className="text-vedika-red">{item.label}</span>
           )}
         </span>
       ))}
@@ -194,8 +194,8 @@ export function VedikaSectionTitle({ eyebrow, title, description, align = "cente
   return (
     <div className={`vedika-section-head ${align === "left" ? "left" : ""}`}>
       {eyebrow && <div className="vedika-eyebrow">{eyebrow}</div>}
-      <h2 style={{ fontSize: "clamp(1.8rem,3vw,2.6rem)", lineHeight: 1.12, margin: "0 0 .5em" }}>{title}</h2>
-      {description && <p style={{ color: "var(--vedika-ink-soft)", maxWidth: align === "left" ? undefined : "560px", margin: align === "left" ? "0" : "0 auto" }}>{description}</p>}
+      <h2 className="text-[clamp(1.8rem,3vw,2.6rem)] leading-[1.12] m-0 mb-[.5em]">{title}</h2>
+      {description && <p className={`text-vedika-ink-soft ${align === "left" ? "" : "mx-auto"} max-w-[560px]`} style={{ margin: align === "left" ? "0" : undefined }}>{description}</p>}
     </div>
   );
 }
@@ -208,12 +208,12 @@ export function VedikaTrustStrip() {
     { icon: <ShieldIcon className="w-[22px] h-[22px]" />, label: "30-day satisfaction guarantee" },
   ];
   return (
-    <div className="vedika-section-tight" style={{ borderTop: "1px solid var(--vedika-line)", borderBottom: "1px solid var(--vedika-line)" }}>
+    <div className="vedika-section-tight border-t border-b border-vedika-line">
       <div className="vedika-container">
-        <div className="trust-row" style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "20px" }}>
+        <div className="trust-row flex justify-between flex-wrap gap-5">
           {items.map((item, i) => (
-            <div key={i} className="trust-item" style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: ".82rem", fontWeight: 600, color: "var(--vedika-green-dark)", letterSpacing: ".02em" }}>
-              <span style={{ color: "var(--vedika-red)", flexShrink: 0 }}>{item.icon}</span>
+            <div key={i} className="trust-item flex items-center gap-2.5 text-xs font-semibold text-vedika-green-dark tracking-wide">
+              <span className="text-vedika-red shrink-0">{item.icon}</span>
               {item.label}
             </div>
           ))}
@@ -225,11 +225,11 @@ export function VedikaTrustStrip() {
 
 export function VedikaStarRating({ rating, size = 13 }: { rating: number; size?: number }) {
   return (
-    <div className="stars" style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: ".76rem", color: "var(--vedika-ink-soft)", marginBottom: "10px" }}>
+    <div className="flex items-center gap-1 text-xs text-vedika-ink-soft mb-2.5">
       {Array.from({ length: 5 }).map((_, i) => (
-        <StarIcon key={i} className={`w-[${size}px] h-[${size}px]`} style={{ color: i < rating ? "var(--vedika-gold)" : "var(--vedika-sand)", width: size, height: size }} />
+        <StarIcon key={i} className={`${i < rating ? "text-vedika-gold" : "text-vedika-sand"}`} style={{ width: size, height: size }} />
       ))}
-      <span style={{ marginLeft: 4 }}>({rating})</span>
+      <span className="ml-1">({rating})</span>
     </div>
   );
 }
@@ -238,10 +238,10 @@ export function VedikaNewsletter() {
   const [email, setEmail] = useState("");
   return (
     <div className="vedika-container vedika-section">
-      <div className="newsletter flex flex-col md:flex-row items-center justify-between gap-10 px-6 py-10 sm:p-14" style={{ background: "var(--vedika-sand)", borderRadius: "28px" }}>
+      <div className="newsletter flex flex-col md:flex-row items-center justify-between gap-10 px-6 py-10 sm:p-14 bg-vedika-sand rounded-[28px]">
         <div className="text-center md:text-left">
-          <h2 style={{ fontSize: "clamp(1.8rem,3vw,2.6rem)", marginBottom: 8 }}>Stay in the know</h2>
-          <p style={{ color: "var(--vedika-ink-soft)" }}>Seasonal formulations, ritual tips, and subscriber-only offers.</p>
+          <h2 className="text-[clamp(1.8rem,3vw,2.6rem)] mb-2">Stay in the know</h2>
+          <p className="text-vedika-ink-soft">Seasonal formulations, ritual tips, and subscriber-only offers.</p>
         </div>
         <form onSubmit={(e) => { e.preventDefault(); setEmail(""); }} className="flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto shrink-0">
           <input
@@ -249,10 +249,7 @@ export function VedikaNewsletter() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            style={{ border: "1px solid var(--vedika-green-dark)", borderRadius: "100px", padding: "14px 20px", background: "var(--vedika-paper)", fontFamily: "inherit", fontSize: "1rem", outline: "none" }}
-            className="w-full sm:w-[280px]"
-            onFocus={(e) => e.target.style.outline = "2px solid var(--vedika-green)"}
-            onBlur={(e) => e.target.style.outline = "none"}
+            className="w-full sm:w-[280px] border border-vedika-green-dark rounded-full px-5 py-3.5 bg-vedika-paper font-inherit text-base outline-none focus:outline-2 focus:outline-vedika-green"
           />
           <button type="submit" className="vedika-btn vedika-btn-primary">Subscribe</button>
         </form>
@@ -264,15 +261,15 @@ export function VedikaNewsletter() {
 export function VedikaFAQItem({ question, answer, open: defaultOpen = false }: { question: string; answer: string; open?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`faq-item ${open ? "open" : ""}`} style={{ borderBottom: "1px solid var(--vedika-line)" }}>
-      <button onClick={() => setOpen(!open)} className="faq-q" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "22px 0", fontFamily: "var(--serif)", fontSize: "1.05rem", color: "var(--vedika-green-dark)", cursor: "pointer", background: "none", border: "none", width: "100%", textAlign: "left" }}>
+    <div className={`faq-item ${open ? "open" : ""} border-b border-vedika-line`}>
+      <button onClick={() => setOpen(!open)} className="faq-q flex justify-between items-center py-5.5 w-full text-left bg-transparent border-none cursor-pointer font-[var(--serif)] text-lg text-vedika-green-dark">
         {question}
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 18, height: 18, flexShrink: 0, transition: "transform .25s ease", transform: open ? "rotate(45deg)" : "rotate(0)" }}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-[18px] h-[18px] shrink-0 transition-transform duration-300" style={{ transform: open ? "rotate(45deg)" : "rotate(0)" }}>
           <path d="M12 5v14M5 12h14"/>
         </svg>
       </button>
-      <div className="faq-a" style={{ maxHeight: open ? "200px" : "0", overflow: "hidden", transition: "max-height .3s ease", paddingBottom: open ? "22px" : "0" }}>
-        <p style={{ color: "var(--vedika-ink-soft)", margin: 0 }}>{answer}</p>
+      <div className="overflow-hidden transition-all duration-300" style={{ maxHeight: open ? "200px" : "0", paddingBottom: open ? "22px" : "0" }}>
+        <p className="text-vedika-ink-soft m-0">{answer}</p>
       </div>
     </div>
   );
@@ -280,38 +277,38 @@ export function VedikaFAQItem({ question, answer, open: defaultOpen = false }: {
 
 export function VedikaContactCard({ icon, label, value, href }: { icon: React.ReactNode; label: string; value: string; href?: string }) {
   const content = (
-    <div className="contact-card" style={{ background: "var(--vedika-paper)", border: "1px solid var(--vedika-line)", borderRadius: "14px", padding: "24px", display: "flex", gap: "16px", alignItems: "flex-start", marginBottom: "16px" }}>
-      <div className="ic" style={{ width: 46, height: 46, borderRadius: "50%", background: "var(--vedika-green-tint)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--vedika-green)" }}>
+    <div className="contact-card bg-vedika-paper border border-vedika-line rounded-xl p-6 flex gap-4 items-start mb-4">
+      <div className="w-[46px] h-[46px] rounded-full bg-vedika-green-tint shrink-0 flex items-center justify-center text-vedika-green">
         {icon}
       </div>
       <div>
-        <div style={{ fontSize: ".84rem", fontWeight: 600, color: "var(--vedika-green-dark)", marginBottom: 4 }}>{label}</div>
-        <div style={{ fontSize: ".88rem", color: "var(--vedika-ink-soft)" }}>{value}</div>
+        <div className="text-sm font-semibold text-vedika-green-dark mb-1">{label}</div>
+        <div className="text-sm text-vedika-ink-soft">{value}</div>
       </div>
     </div>
   );
-  if (href) return <a href={href} style={{ textDecoration: "none", color: "inherit", display: "block" }}>{content}</a>;
+  if (href) return <a href={href} className="no-underline text-inherit block">{content}</a>;
   return content;
 }
 
 export function VedikaTimelineItem({ year, title, description }: { year: string; title: string; description: string }) {
   return (
-    <div className="timeline-item" style={{ position: "relative", paddingBottom: 44 }}>
-      <div className="yr" style={{ fontFamily: "var(--font-fraunces), Georgia, serif", color: "var(--vedika-red)", fontWeight: 600, fontSize: "1.1rem" }}>{year}</div>
-      <h4 style={{ margin: "4px 0 8px" }}>{title}</h4>
-      <p style={{ color: "var(--vedika-ink-soft)", margin: 0 }}>{description}</p>
+    <div className="relative pb-11">
+      <div className="font-fraunces text-vedika-red font-semibold text-lg">{year}</div>
+      <h4 className="my-1 mb-2">{title}</h4>
+      <p className="text-vedika-ink-soft m-0">{description}</p>
     </div>
   );
 }
 
 export function VedikaValueCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="value-card vedika-card" style={{ padding: "36px 28px", textAlign: "left" }}>
-      <div style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--vedika-green-tint)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--vedika-green)", marginBottom: 16 }}>
+    <div className="value-card vedika-card p-9 text-left">
+      <div className="w-12 h-12 rounded-full bg-vedika-green-tint flex items-center justify-center text-vedika-green mb-4">
         {icon}
       </div>
-      <h3 style={{ marginBottom: 8 }}>{title}</h3>
-      <p style={{ color: "var(--vedika-ink-soft)", fontSize: ".88rem", margin: 0 }}>{description}</p>
+      <h3 className="mb-2">{title}</h3>
+      <p className="text-vedika-ink-soft text-sm m-0">{description}</p>
     </div>
   );
 }
@@ -319,38 +316,38 @@ export function VedikaValueCard({ icon, title, description }: { icon: React.Reac
 export function VedikaTeamCard({ name, role }: { name: string; role: string }) {
   const initials = name.split(" ").map(n => n[0]).join("");
   return (
-    <div className="team-card" style={{ textAlign: "center" }}>
-      <div className="team-photo" style={{ aspectRatio: "1", borderRadius: "50%", margin: "0 auto 18px", width: "70%", background: "linear-gradient(160deg, var(--vedika-sand), var(--vedika-gold-tint))", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "1.5rem", fontWeight: 600, color: "var(--vedika-green-dark)" }}>{initials}</span>
+    <div className="text-center">
+      <div className="aspect-1 rounded-full mx-auto mb-[18px] w-[70%] bg-gradient-to-br from-vedika-sand to-vedika-gold-tint flex items-center justify-center">
+        <span className="font-fraunces text-2xl font-semibold text-vedika-green-dark">{initials}</span>
       </div>
-      <h4 style={{ marginBottom: 4 }}>{name}</h4>
-      <p style={{ fontSize: ".84rem", color: "var(--vedika-ink-soft)", margin: 0 }}>{role}</p>
+      <h4 className="mb-1">{name}</h4>
+      <p className="text-sm text-vedika-ink-soft m-0">{role}</p>
     </div>
   );
 }
 
 export function VedikaRitualStep({ number, title, description }: { number: number; title: string; description: string }) {
   return (
-    <div className="ritual-step" style={{ position: "relative", paddingTop: 12 }}>
-      <div className="ritual-num" style={{ fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "3.2rem", color: "var(--vedika-sand)", lineHeight: 1, marginBottom: 8, fontWeight: 600 }}>
+    <div className="relative pt-3">
+      <div className="font-fraunces text-[3.2rem] text-vedika-sand leading-none mb-2 font-semibold">
         {String(number).padStart(2, "0")}
       </div>
-      <h3 style={{ marginBottom: 8 }}>{title}</h3>
-      <p style={{ color: "var(--vedika-ink-soft)", margin: 0 }}>{description}</p>
+      <h3 className="mb-2">{title}</h3>
+      <p className="text-vedika-ink-soft m-0">{description}</p>
     </div>
   );
 }
 
 export function VedikaHeroSection({ eyebrow, title, description, children }: { eyebrow?: string; title: string; description?: string; children?: React.ReactNode }) {
   return (
-    <section className="page-hero" style={{ background: "var(--vedika-green-dark)", color: "var(--vedika-bg)", padding: "70px 0 60px", position: "relative", overflow: "hidden" }}>
-      <div className="vedika-container" style={{ position: "relative", zIndex: 1 }}>
-        {eyebrow && <div className="vedika-eyebrow" style={{ color: "var(--vedika-gold)" }}>{eyebrow}</div>}
-        <h1 style={{ color: "#fff", fontSize: "clamp(2.4rem,4.5vw,3.8rem)", lineHeight: 1.05, maxWidth: 640 }}>{title}</h1>
-        {description && <p style={{ color: "#B7C0B4", maxWidth: 560, marginTop: 12 }}>{description}</p>}
+    <section className="bg-vedika-green-dark text-vedika-bg py-[70px] pb-[60px] relative overflow-hidden">
+      <div className="vedika-container relative z-1">
+        {eyebrow && <div className="text-vedika-gold vedika-eyebrow">{eyebrow}</div>}
+        <h1 className="text-white text-[clamp(2.4rem,4.5vw,3.8rem)] leading-[1.05] max-w-[640px]">{title}</h1>
+        {description && <p className="text-[#B7C0B4] max-w-[560px] mt-3">{description}</p>}
         {children}
       </div>
-      <HerbDeco className="w-[320px] h-[320px]" style={{ position: "absolute", right: -60, top: -60, opacity: 0.12 }} />
+      <HerbDeco className="w-[320px] h-[320px] absolute -right-15 -top-15 opacity-12" />
     </section>
   );
 }
@@ -358,21 +355,17 @@ export function VedikaHeroSection({ eyebrow, title, description, children }: { e
 export function VedikaPagination({ current, total, onChange }: { current: number; total: number; onChange: (page: number) => void }) {
   if (total <= 1) return null;
   return (
-    <div className="pagination" style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "56px" }}>
+    <div className="flex justify-center gap-2 mt-14">
       {Array.from({ length: total }).map((_, i) => (
         <button
           key={i}
           onClick={() => onChange(i + 1)}
-          className={i + 1 === current ? "active" : ""}
-          style={{
-            width: 40, height: 40, borderRadius: "50%", border: "1px solid var(--vedika-line)",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: ".86rem", fontWeight: 600,
-            cursor: "pointer", fontFamily: "inherit",
-            background: i + 1 === current ? "var(--vedika-green)" : "transparent",
-            color: i + 1 === current ? "#fff" : "var(--vedika-ink-soft)",
-            borderColor: i + 1 === current ? "var(--vedika-green)" : "var(--vedika-line)",
-            transition: "all .2s ease",
-          }}
+          className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer font-inherit transition-all duration-200 ${
+            i + 1 === current
+              ? "bg-vedika-green text-white border-vedika-green"
+              : "bg-transparent text-vedika-ink-soft border-vedika-line"
+          }`}
+          style={{ border: "1px solid" }}
         >
           {i + 1}
         </button>
@@ -383,7 +376,7 @@ export function VedikaPagination({ current, total, onChange }: { current: number
 
 export function VedikaFilterSidebar({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ background: "var(--vedika-paper)", border: "1px solid var(--vedika-line)", borderRadius: "14px", padding: "26px", marginBottom: "20px" }}>
+    <div className="bg-vedika-paper border border-vedika-line rounded-xl p-[26px] mb-5">
       {children}
     </div>
   );
@@ -391,8 +384,8 @@ export function VedikaFilterSidebar({ children }: { children: React.ReactNode })
 
 export function VedikaFilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 20 }}>
-      <h4 style={{ fontSize: ".86rem", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 16, color: "var(--vedika-green-dark)" }}>{title}</h4>
+    <div className="mb-5">
+      <h4 className="text-sm uppercase tracking-wide mb-4 text-vedika-green-dark">{title}</h4>
       <div className="filter-list">{children}</div>
     </div>
   );
@@ -400,8 +393,8 @@ export function VedikaFilterGroup({ title, children }: { title: string; children
 
 export function VedikaCheckbox({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
   return (
-    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: ".88rem", color: "var(--vedika-ink-soft)", marginBottom: 12, cursor: "pointer" }}>
-      <input type="checkbox" checked={checked} onChange={onChange} style={{ accentColor: "var(--vedika-green)", width: 15, height: 15 }} />
+    <label className="flex items-center gap-2.5 text-sm text-vedika-ink-soft mb-3 cursor-pointer">
+      <input type="checkbox" checked={checked} onChange={onChange} className="accent-vedika-green w-[15px] h-[15px]" />
       {label}
     </label>
   );
@@ -409,27 +402,25 @@ export function VedikaCheckbox({ label, checked, onChange }: { label: string; ch
 
 export function VedikaBlogCard({ title, category, date, readTime, onClick }: { title: string; category?: string; date?: string; readTime?: string; onClick?: () => void }) {
   return (
-    <div className="blog-card" style={{ background: "var(--vedika-paper)", border: "1px solid var(--vedika-line)", borderRadius: "14px", overflow: "hidden", transition: "transform .3s ease, box-shadow .3s ease", cursor: "pointer" }}
+    <div className="bg-vedika-paper border border-vedika-line rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:-translate-y-1.5 hover:shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)]"
       onClick={onClick}
-      onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 12px 30px -14px rgba(28,44,35,.28)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
     >
-      <div className="blog-media" style={{ aspectRatio: "16/10", background: "linear-gradient(150deg, var(--vedika-gold-tint), var(--vedika-bg-alt))", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <LeafSimple className="w-[40%] h-[40%]" style={{ color: "var(--vedika-green)", opacity: 0.3 }} />
+      <div className="aspect-[16/10] bg-gradient-to-br from-vedika-gold-tint to-vedika-bg-alt flex items-center justify-center">
+        <LeafSimple className="w-[40%] h-[40%] text-vedika-green opacity-30" />
       </div>
-      <div className="blog-body" style={{ padding: 24 }}>
-        {category && <span className="blog-cat" style={{ fontSize: ".7rem", letterSpacing: ".06em", textTransform: "uppercase", color: "var(--vedika-red)", fontWeight: 700, marginBottom: 10, display: "block" }}>{category}</span>}
-        <h3 style={{ marginBottom: 10, lineHeight: 1.3, fontSize: "1.15rem" }}>{title}</h3>
-        <div className="blog-meta" style={{ display: "flex", gap: 14, fontSize: ".78rem", color: "var(--vedika-ink-soft)", marginTop: 16, alignItems: "center" }}>
+      <div className="p-6">
+        {category && <span className="text-[.7rem] tracking-wide uppercase text-vedika-red font-bold mb-2.5 block">{category}</span>}
+        <h3 className="mb-2.5 leading-[1.3] text-lg">{title}</h3>
+        <div className="flex gap-3.5 text-xs text-vedika-ink-soft mt-4 items-center">
           {date && (
-            <span className="m-item" style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <ClockIcon className="w-[13px] h-[13px]" style={{ color: "var(--vedika-sand)" }} />
+            <span className="flex items-center gap-1">
+              <ClockIcon className="w-[13px] h-[13px] text-vedika-sand" />
               {date}
             </span>
           )}
           {readTime && (
-            <span className="m-item" style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <ClockIcon className="w-[13px] h-[13px]" style={{ color: "var(--vedika-sand)" }} />
+            <span className="flex items-center gap-1">
+              <ClockIcon className="w-[13px] h-[13px] text-vedika-sand" />
               {readTime}
             </span>
           )}
@@ -442,16 +433,16 @@ export function VedikaBlogCard({ title, category, date, readTime, onClick }: { t
 export function VedikaTestimonialCard({ quote, name, title: role, initials }: { quote: string; name: string; title?: string; initials?: string }) {
   const abbr = initials || name.split(" ").map(n => n[0]).join("");
   return (
-    <div className="testi-card vedika-card" style={{ padding: "32px" }}>
-      <QuoteIcon className="w-6 h-6" style={{ color: "var(--vedika-sand)", marginBottom: 12, opacity: 0.5 }} />
-      <div className="testi-quote" style={{ fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "1.05rem", color: "var(--vedika-green-dark)", marginBottom: 20 }}>{quote}</div>
-      <div className="testi-person" style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div className="avatar" style={{ width: 42, height: 42, borderRadius: "50%", background: "var(--vedika-sand)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 600, color: "var(--vedika-green-dark)", flexShrink: 0 }}>
+    <div className="testi-card vedika-card p-8">
+      <QuoteIcon className="w-6 h-6 text-vedika-sand mb-3 opacity-50" />
+      <div className="font-fraunces text-lg text-vedika-green-dark mb-5">{quote}</div>
+      <div className="flex items-center gap-3">
+        <div className="w-[42px] h-[42px] rounded-full bg-vedika-sand flex items-center justify-center font-fraunces font-semibold text-vedika-green-dark shrink-0">
           {abbr}
         </div>
         <div>
-          <strong style={{ fontSize: ".92rem", display: "block" }}>{name}</strong>
-          {role && <span style={{ fontSize: ".8rem", color: "var(--vedika-ink-soft)", display: "block" }}>{role}</span>}
+          <strong className="text-sm block">{name}</strong>
+          {role && <span className="text-xs text-vedika-ink-soft block">{role}</span>}
         </div>
       </div>
     </div>
@@ -460,17 +451,16 @@ export function VedikaTestimonialCard({ quote, name, title: role, initials }: { 
 
 export function VedikaCategoryCard({ name, count, icon, onClick }: { name: string; count?: number; icon?: React.ReactNode; onClick?: () => void }) {
   return (
-    <div className="cat-card" style={{ background: "var(--vedika-paper)", borderRadius: "28px", padding: "36px 28px", textAlign: "center", border: "1px solid var(--vedika-line)", cursor: onClick ? "pointer" : "default", transition: "transform .3s ease, box-shadow .3s ease" }}
+    <div className="bg-vedika-paper rounded-[28px] p-9 text-center border border-vedika-line transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)]"
       onClick={onClick}
-      onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 30px -14px rgba(28,44,35,.28)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+      style={{ cursor: onClick ? "pointer" : "default" }}
     >
-      <div className="cat-icon" style={{ width: 64, height: 64, margin: "0 auto 20px", background: "var(--vedika-green-tint)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        {icon || <LeafSimple className="w-[30px] h-[30px]" style={{ color: "var(--vedika-green)" }} />}
+      <div className="w-16 h-16 mx-auto mb-5 bg-vedika-green-tint rounded-full flex items-center justify-center">
+        {icon || <LeafSimple className="w-[30px] h-[30px] text-vedika-green" />}
       </div>
-      <h3 style={{ marginBottom: 6 }}>{name}</h3>
-      <p style={{ color: "var(--vedika-ink-soft)", fontSize: ".86rem", marginBottom: 14 }}>Handpicked formulations</p>
-      {count !== undefined && <span className="count" style={{ fontSize: ".76rem", color: "var(--vedika-red)", fontWeight: 600, letterSpacing: ".03em" }}>{count} products</span>}
+      <h3 className="mb-1.5">{name}</h3>
+      <p className="text-vedika-ink-soft text-sm mb-3.5">Handpicked formulations</p>
+      {count !== undefined && <span className="text-xs text-vedika-red font-semibold tracking-wide">{count} products</span>}
     </div>
   );
 }
@@ -491,40 +481,34 @@ export function VedikaProductCard({ product, onNavigate, formatPrice, onAddToCar
   })() : null;
 
   return (
-    <div className="product-card" style={{ background: "var(--vedika-paper)", borderRadius: "14px", border: "1px solid var(--vedika-line)", overflow: "hidden", transition: "transform .3s ease, box-shadow .3s ease", position: "relative" }}
-      onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 12px 30px -14px rgba(28,44,35,.28)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-    >
-      <div className="product-media" style={{ aspectRatio: "1/1.05", background: image ? "var(--vedika-bg-alt)" : "linear-gradient(160deg, var(--vedika-bg-alt), var(--vedika-green-tint))", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+    <div className="bg-vedika-paper rounded-xl border border-vedika-line overflow-hidden relative transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)]">
+      <div className={`aspect-[1/1.05] flex items-center justify-center relative overflow-hidden ${image ? "bg-vedika-bg-alt" : "bg-gradient-to-br from-vedika-bg-alt to-vedika-green-tint"}`}>
         {image ? (
           <Image src={image} alt={product.name} fill className="object-cover" sizes="(max-width: 680px) 100vw, 25vw" />
         ) : (
-          <LeafSimple className="w-[56%] h-[56%]" style={{ color: "var(--vedika-green)", opacity: 0.3 }} />
+          <LeafSimple className="w-[56%] h-[56%] text-vedika-green opacity-30" />
         )}
         {onToggleWishlist && (
-          <button onClick={() => onToggleWishlist(product.id)} className="product-wish" style={{ position: "absolute", top: 12, right: 12, width: 34, height: 34, borderRadius: "50%", background: "rgba(255,253,246,.9)", display: "flex", alignItems: "center", justifyContent: "center", color: inWishlist ? "var(--vedika-red)" : "var(--vedika-green-dark)", border: "none", cursor: "pointer" }}>
-            <HeartIcon className="w-[16px] h-[16px]" />
+          <button onClick={() => onToggleWishlist(product.id)} className={`icon-circle-sm absolute top-3 right-3 ${inWishlist ? "text-vedika-red" : "text-vedika-green-dark"}`} style={{ color: inWishlist ? "var(--vedika-red)" : undefined }}>
+            <HeartIcon className="w-4 h-4" />
           </button>
         )}
       </div>
-      <div className="product-info" style={{ padding: 20 }}>
-        {product.categoryName && <div className="cat-label" style={{ fontSize: ".74rem", color: "var(--vedika-ink-soft)", marginBottom: 8 }}>{product.categoryName}</div>}
-        <h4 style={{ fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "1.05rem", marginBottom: 4, color: "var(--vedika-green-dark)" }}>{product.name}</h4>
-        <div className="price-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
-          <div className="price" style={{ fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "1.15rem", fontWeight: 600, color: "var(--vedika-green-dark)" }}>
+      <div className="p-5">
+        {product.categoryName && <div className="text-xs text-vedika-ink-soft mb-2">{product.categoryName}</div>}
+        <h4 className="font-fraunces text-lg mb-1 text-vedika-green-dark">{product.name}</h4>
+        <div className="flex items-center justify-between mt-2.5">
+          <div className="font-fraunces text-xl font-semibold text-vedika-green-dark">
             {formatPrice ? formatPrice(product.price) : `₹${product.price}`}
             {product.comparePrice && (
-              <span className="was" style={{ fontSize: ".82rem", color: "var(--vedika-sand)", textDecoration: "line-through", marginLeft: 6, fontFamily: "var(--font-work-sans), sans-serif" }}>
+              <span className="text-xs text-vedika-sand line-through ml-1.5 font-work-sans">
                 {formatPrice ? formatPrice(product.comparePrice) : `₹${product.comparePrice}`}
               </span>
             )}
           </div>
           {onAddToCart && (
-            <button onClick={() => onAddToCart(product)} className="add-btn" style={{ width: 38, height: 38, borderRadius: "50%", background: "var(--vedika-green)", color: "var(--vedika-paper)", display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", transition: "background .2s ease" }}
-              onMouseEnter={(e) => e.currentTarget.style.background = "var(--vedika-green-dark)"}
-              onMouseLeave={(e) => e.currentTarget.style.background = "var(--vedika-green)"}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 16, height: 16 }}>
+            <button onClick={() => onAddToCart(product)} className="icon-circle hover:bg-vedika-green-dark transition-colors duration-200">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
                 <path d="M12 5v14M5 12h14"/>
               </svg>
             </button>

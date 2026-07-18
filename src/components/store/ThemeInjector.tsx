@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { buildCssVariables, DEFAULT_THEME } from "@/lib/themes";
+import { buildCssVariables, DEFAULT_THEME } from "@/lib/themes/client";
 
 export function ThemeInjector() {
   const [ready, setReady] = useState(false);

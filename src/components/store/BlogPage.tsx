@@ -43,44 +43,44 @@ export function BlogPage({ onNavigate }: BlogPageProps) {
   return (
     <div>
       {/* HERO */}
-      <section className="page-hero" style={{ background: "var(--vedika-green-dark)", color: "var(--vedika-bg)", padding: "70px 0 60px", position: "relative", overflow: "hidden" }}>
-        <div className="vedika-container" style={{ position: "relative", zIndex: 1 }}>
-          <div className="vedika-eyebrow" style={{ color: "var(--vedika-gold)" }}>The Journal</div>
-          <h1 style={{ color: "#fff", fontSize: "clamp(2.4rem,4.5vw,3.8rem)", lineHeight: 1.05, maxWidth: 640 }}>Notes on Ayurveda,<br />ingredients &amp; ritual.</h1>
-          <p style={{ color: "#B7C0B4", maxWidth: 560, marginTop: 12 }}>Long-form writing on doshas, sourcing trips, and the science behind formulas that are centuries old.</p>
+      <section className="page-hero bg-vedika-green-dark text-vedika-bg py-[70px] pb-[60px] relative overflow-hidden">
+        <div className="vedika-container relative z-[1]">
+          <div className="vedika-eyebrow text-vedika-gold">The Journal</div>
+          <h1 className="text-white max-w-[640px]" style={{ fontSize: "clamp(2.4rem,4.5vw,3.8rem)", lineHeight: 1.05 }}>Notes on Ayurveda,<br />ingredients &amp; ritual.</h1>
+          <p className="text-[#B7C0B4] max-w-[560px] mt-3">Long-form writing on doshas, sourcing trips, and the science behind formulas that are centuries old.</p>
         </div>
-        <svg viewBox="0 0 200 200" fill="none" style={{ position: "absolute", right: -60, top: -60, width: 320, height: 320, opacity: 0.12 }}>
+        <svg viewBox="0 0 200 200" fill="none" className="absolute -right-[60px] -top-[60px] w-[320px] h-[320px] opacity-[0.12]">
           <path d="M100 20c-20 40-50 50-50 90s30 60 50 70c20-10 50-30 50-70s-30-50-50-90z" stroke="currentColor" strokeWidth=".6"/>
         </svg>
       </section>
 
       <div className="vedika-container">
-        <div className="breadcrumb" style={{ padding: "20px 0", fontSize: ".82rem", color: "var(--vedika-ink-soft)", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-          <button onClick={() => onNavigate("home")} style={{ background: "none", border: "none", cursor: "pointer", font: "inherit", color: "inherit" }}>Home</button>
-          <span style={{ color: "var(--vedika-sand)" }}>/</span>
-          <span style={{ color: "var(--vedika-red)" }}>Journal</span>
+        <div className="breadcrumb py-5 text-xs text-vedika-ink-soft flex gap-2 items-center flex-wrap">
+          <button onClick={() => onNavigate("home")} className="bg-transparent border-none cursor-pointer font-[inherit] text-inherit">Home</button>
+          <span className="text-vedika-sand">/</span>
+          <span className="text-vedika-red">Journal</span>
         </div>
       </div>
 
       <section className="vedika-container vedika-section-tight">
         {/* FEATURED POST */}
         {featured && (
-          <div className="blog-featured" style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 0, background: "var(--vedika-paper)", border: "1px solid var(--vedika-line)", borderRadius: "28px", overflow: "hidden", marginBottom: 64 }}>
-            <div className="blog-media" style={{ background: "linear-gradient(150deg, var(--vedika-gold-tint), var(--vedika-bg-alt))", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 300 }}>
-              <svg viewBox="0 0 100 100" fill="none" style={{ width: "40%", height: "40%" }}>
+          <div className="blog-featured grid grid-cols-[1.1fr_.9fr] bg-vedika-paper border border-vedika-line rounded-xl overflow-hidden mb-16">
+            <div className="blog-media flex items-center justify-center min-h-[300px]" style={{ background: "linear-gradient(150deg, var(--vedika-gold-tint), var(--vedika-bg-alt))" }}>
+              <svg viewBox="0 0 100 100" fill="none" className="w-2/5 h-2/5">
                 <circle cx="50" cy="50" r="26" fill="#FFFDF6" stroke="#2F4A3C" strokeWidth="2"/>
                 <path d="M50 24v52M24 50h52" stroke="#2F4A3C" strokeWidth="1"/>
               </svg>
             </div>
-            <div className="blog-featured-body" style={{ padding: 48, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-              {featured.category && <span className="blog-cat" style={{ fontSize: ".7rem", letterSpacing: ".06em", textTransform: "uppercase", color: "var(--vedika-red)", fontWeight: 700, marginBottom: 10, display: "block" }}>{featured.category}</span>}
-              <h2 style={{ marginBottom: 12, lineHeight: 1.2 }}>{featured.title}</h2>
-              {featured.excerpt && <p style={{ color: "var(--vedika-ink-soft)", marginBottom: 16 }}>{featured.excerpt}</p>}
-              <div className="blog-meta" style={{ display: "flex", gap: 14, fontSize: ".78rem", color: "var(--vedika-ink-soft)", alignItems: "center" }}>
-                {featured.date && <span className="m-item" style={{ display: "flex", alignItems: "center", gap: 5 }}><ClockIcon className="w-[13px] h-[13px]" style={{ color: "var(--vedika-sand)" }} />{featured.date}</span>}
-                {featured.readTime && <span className="m-item" style={{ display: "flex", alignItems: "center", gap: 5 }}><ClockIcon className="w-[13px] h-[13px]" style={{ color: "var(--vedika-sand)" }} />{featured.readTime}</span>}
+            <div className="blog-featured-body p-12 flex flex-col justify-center">
+              {featured.category && <span className="blog-cat text-xs tracking-wider uppercase text-vedika-red font-bold mb-2.5 block">{featured.category}</span>}
+              <h2 className="mb-3 leading-[1.2]">{featured.title}</h2>
+              {featured.excerpt && <p className="text-vedika-ink-soft mb-4">{featured.excerpt}</p>}
+              <div className="blog-meta flex gap-3.5 text-[.78rem] text-vedika-ink-soft items-center">
+                {featured.date && <span className="m-item flex items-center gap-1.25"><ClockIcon className="w-[13px] h-[13px] text-vedika-sand" />{featured.date}</span>}
+                {featured.readTime && <span className="m-item flex items-center gap-1.25"><ClockIcon className="w-[13px] h-[13px] text-vedika-sand" />{featured.readTime}</span>}
               </div>
-              <div style={{ marginTop: 24 }}>
+              <div className="mt-6">
                 <button className="vedika-btn vedika-btn-outline vedika-btn-sm" onClick={() => onNavigate("blog-post", featured.slug)}>Read Article</button>
               </div>
             </div>
@@ -88,20 +88,17 @@ export function BlogPage({ onNavigate }: BlogPageProps) {
         )}
 
         {/* FILTER TAGS */}
-        <div className="blog-tags-row" style={{ display: "flex", gap: 10, marginBottom: 28, flexWrap: "wrap" }}>
+        <div className="blog-tags-row flex gap-2.5 mb-7 flex-wrap">
           {allTags.map((tag) => (
             <button
               key={tag}
               onClick={() => setSelectedTag(tag)}
               className="blog-filter-tag"
-              style={{
-                padding: "9px 18px", borderRadius: 100, border: "1px solid var(--vedika-line)",
-                fontSize: ".82rem", fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                background: selectedTag === tag ? "var(--vedika-green)" : "transparent",
-                color: selectedTag === tag ? "#fff" : "var(--vedika-ink-soft)",
-                borderColor: selectedTag === tag ? "var(--vedika-green)" : "var(--vedika-line)",
-                transition: "all .2s ease",
-              }}
+              className={`blog-filter-tag px-[18px] py-[9px] rounded-full border text-xs font-semibold cursor-pointer font-inherit transition-all duration-200 ${
+                selectedTag === tag
+                  ? "bg-vedika-green text-white border-vedika-green"
+                  : "bg-transparent text-vedika-ink-soft border-vedika-line"
+              }`}
             >
               {tag}
             </button>
@@ -116,13 +113,13 @@ export function BlogPage({ onNavigate }: BlogPageProps) {
             ))}
           </div>
         ) : (
-          <div style={{ textAlign: "center", padding: "60px 0", color: "var(--vedika-ink-soft)" }}>
+          <div className="text-center py-[60px] text-vedika-ink-soft">
             <p>No posts found for this category.</p>
           </div>
         )}
 
         {rest.length > 6 && (
-          <div style={{ textAlign: "center", marginTop: 56 }}>
+          <div className="text-center mt-14">
             <button className="vedika-btn vedika-btn-outline">Load More Articles</button>
           </div>
         )}

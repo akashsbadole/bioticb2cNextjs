@@ -38,6 +38,19 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-vedika-bg: var(--vedika-bg);
+  --color-vedika-bg-alt: var(--vedika-bg-alt);
+  --color-vedika-paper: var(--vedika-paper);
+  --color-vedika-ink: var(--vedika-ink);
+  --color-vedika-ink-soft: var(--vedika-ink-soft);
+  --color-vedika-green: var(--vedika-green);
+  --color-vedika-green-dark: var(--vedika-green-dark);
+  --color-vedika-green-tint: var(--vedika-green-tint);
+  --color-vedika-gold: var(--vedika-gold);
+  --color-vedika-gold-tint: var(--vedika-gold-tint);
+  --color-vedika-red: var(--vedika-red);
+  --color-vedika-sand: var(--vedika-sand);
+  --color-vedika-line: var(--vedika-line);
 }
 
 /* Vedika Ayurveda — design tokens */
@@ -488,6 +501,52 @@
 .vedika-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
 .vedika-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
 .vedika-product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+
+/* Vedika form inputs */
+.input-vedika {
+  border: 1px solid var(--vedika-line);
+  border-radius: 100px;
+  padding: 10px 16px;
+  background: var(--vedika-paper);
+  font: inherit;
+  color: var(--vedika-ink);
+  font-size: .88rem;
+  outline: none;
+  width: 100%;
+}
+.input-vedika:focus {
+  outline: 2px solid var(--vedika-green);
+}
+
+/* Icon circle button */
+.icon-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  background: var(--vedika-green);
+  color: var(--vedika-paper);
+}
+.icon-circle-sm {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  background: rgba(255, 253, 246, 0.9);
+  color: var(--vedika-green-dark);
+  z-index: 2;
+}
+.icon-circle-sm:hover {
+  background: var(--vedika-paper);
+}
 
 /* Header responsive */
 .nav-links { display: flex; }

@@ -42,27 +42,27 @@ export function ContactPage({ onNavigate, data: _data }: ContactPageProps) {
   return (
     <div>
       {/* HERO */}
-      <section className="page-hero" style={{ background: "var(--vedika-green-dark)", color: "var(--vedika-bg)", padding: "70px 0 60px", position: "relative", overflow: "hidden" }}>
-        <div className="vedika-container" style={{ position: "relative", zIndex: 1 }}>
-          <div className="vedika-eyebrow" style={{ color: "var(--vedika-gold)" }}>Get in Touch</div>
-          <h1 style={{ color: "#fff", fontSize: "clamp(2.4rem,4.5vw,3.8rem)", lineHeight: 1.05, maxWidth: 640 }}>We reply within one business day.</h1>
-          <p style={{ color: "#B7C0B4", maxWidth: 560, marginTop: 12 }}>Questions on dosha matching, an order, or a bulk/wholesale enquiry — write to us directly, no chatbot in between.</p>
+      <section className="page-hero bg-vedika-green-dark text-vedika-bg py-[70px] pb-[60px] relative overflow-hidden">
+        <div className="vedika-container relative z-[1]">
+          <div className="vedika-eyebrow text-vedika-gold">Get in Touch</div>
+          <h1 className="text-white max-w-[640px]" style={{ fontSize: "clamp(2.4rem,4.5vw,3.8rem)", lineHeight: 1.05 }}>We reply within one business day.</h1>
+          <p className="text-[#B7C0B4] max-w-[560px] mt-3">Questions on dosha matching, an order, or a bulk/wholesale enquiry — write to us directly, no chatbot in between.</p>
         </div>
-        <svg viewBox="0 0 200 200" fill="none" style={{ position: "absolute", right: -60, top: -60, width: 320, height: 320, opacity: 0.12 }}>
+        <svg viewBox="0 0 200 200" fill="none" className="absolute -right-[60px] -top-[60px] w-[320px] h-[320px] opacity-[0.12]">
           <path d="M100 20c-20 40-50 50-50 90s30 60 50 70c20-10 50-30 50-70s-30-50-50-90z" stroke="currentColor" strokeWidth=".6"/>
         </svg>
       </section>
 
       <div className="vedika-container">
-        <div className="breadcrumb" style={{ padding: "20px 0", fontSize: ".82rem", color: "var(--vedika-ink-soft)", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-          <button onClick={() => onNavigate("home")} style={{ background: "none", border: "none", cursor: "pointer", font: "inherit", color: "inherit" }}>Home</button>
-          <span style={{ color: "var(--vedika-sand)" }}>/</span>
-          <span style={{ color: "var(--vedika-red)" }}>Contact Us</span>
+        <div className="breadcrumb py-5 text-xs text-vedika-ink-soft flex gap-2 items-center flex-wrap">
+          <button onClick={() => onNavigate("home")} className="bg-transparent border-none cursor-pointer font-[inherit] text-inherit">Home</button>
+          <span className="text-vedika-sand">/</span>
+          <span className="text-vedika-red">Contact Us</span>
         </div>
       </div>
 
       <section className="vedika-container vedika-section-tight">
-        <div className="contact-layout grid grid-cols-1 lg:grid-cols-[.9fr_1.1fr]" style={{ gap: 56 }}>
+        <div className="contact-layout grid grid-cols-1 lg:grid-cols-[.9fr_1.1fr] gap-14">
           {/* LEFT: Contact Info */}
           <div>
             <VedikaContactCard icon={<MailIcon className="w-5 h-5" />} label="Email" value="hello@vedikaayurveda.com" href="mailto:hello@vedikaayurveda.com" />
@@ -71,7 +71,7 @@ export function ContactPage({ onNavigate, data: _data }: ContactPageProps) {
             <VedikaContactCard icon={<LeafIcon className="w-5 h-5" />} label="Social" value="@vedikaayurveda" />
 
             {/* FAQ */}
-            <div style={{ marginTop: 48 }}>
+            <div className="mt-12">
               <VedikaSectionTitle eyebrow="Quick Answers" title="FAQs" align="left" />
               {faqItems.map((item, i) => (
                 <VedikaFAQItem key={i} question={item.question} answer={item.answer} />
@@ -81,43 +81,41 @@ export function ContactPage({ onNavigate, data: _data }: ContactPageProps) {
 
           {/* RIGHT: Contact Form */}
           <div>
-            <div style={{ background: "var(--vedika-paper)", border: "1px solid var(--vedika-line)", borderRadius: "14px", padding: "36px" }}>
+            <div className="bg-vedika-paper border border-vedika-line rounded-xl p-9">
               <VedikaSectionTitle eyebrow="Send a Message" title="Write to us" align="left" />
               <form onSubmit={handleSubmit}>
-                <div className="form-grid grid grid-cols-1 md:grid-cols-2" style={{ gap: 20 }}>
+                <div className="form-grid grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="form-field">
-                    <label style={{ display: "block", fontSize: ".84rem", fontWeight: 600, color: "var(--vedika-green-dark)", marginBottom: 8 }}>Full Name *</label>
+                    <label className="block text-sm font-semibold text-vedika-green-dark mb-2">Full Name *</label>
                     <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      style={{ width: "100%", border: "1px solid var(--vedika-line)", borderRadius: "6px", padding: "13px 16px", background: "var(--vedika-paper)", color: "var(--vedika-ink)", font: "inherit", fontSize: ".92rem" }} />
+                      className="w-full border border-vedika-line rounded-[6px] px-4 py-[13px] bg-vedika-paper text-vedika-ink font-inherit text-[.92rem]" />
                   </div>
                   <div className="form-field">
-                    <label style={{ display: "block", fontSize: ".84rem", fontWeight: 600, color: "var(--vedika-green-dark)", marginBottom: 8 }}>Email *</label>
+                    <label className="block text-sm font-semibold text-vedika-green-dark mb-2">Email *</label>
                     <input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      style={{ width: "100%", border: "1px solid var(--vedika-line)", borderRadius: "6px", padding: "13px 16px", background: "var(--vedika-paper)", color: "var(--vedika-ink)", font: "inherit", fontSize: ".92rem" }} />
+                      className="w-full border border-vedika-line rounded-[6px] px-4 py-[13px] bg-vedika-paper text-vedika-ink font-inherit text-[.92rem]" />
                   </div>
                   <div className="form-field full">
-                    <label style={{ display: "block", fontSize: ".84rem", fontWeight: 600, color: "var(--vedika-green-dark)", marginBottom: 8 }}>Subject</label>
+                    <label className="block text-sm font-semibold text-vedika-green-dark mb-2">Subject</label>
                     <input type="text" value={formData.subject} onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      style={{ width: "100%", border: "1px solid var(--vedika-line)", borderRadius: "6px", padding: "13px 16px", background: "var(--vedika-paper)", color: "var(--vedika-ink)", font: "inherit", fontSize: ".92rem" }} />
+                      className="w-full border border-vedika-line rounded-[6px] px-4 py-[13px] bg-vedika-paper text-vedika-ink font-inherit text-[.92rem]" />
                   </div>
                   <div className="form-field full">
-                    <label style={{ display: "block", fontSize: ".84rem", fontWeight: 600, color: "var(--vedika-green-dark)", marginBottom: 8 }}>Message *</label>
+                    <label className="block text-sm font-semibold text-vedika-green-dark mb-2">Message *</label>
                     <textarea required rows={5} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      style={{ width: "100%", border: "1px solid var(--vedika-line)", borderRadius: "6px", padding: "13px 16px", background: "var(--vedika-paper)", color: "var(--vedika-ink)", font: "inherit", fontSize: ".92rem", resize: "vertical" }} />
+                      className="w-full border border-vedika-line rounded-[6px] px-4 py-[13px] bg-vedika-paper text-vedika-ink font-inherit text-[.92rem] resize-y" />
                   </div>
                 </div>
-                <button type="submit" className="vedika-btn vedika-btn-primary" style={{ marginTop: 12 }}>Send Message</button>
+                <button type="submit" className="vedika-btn vedika-btn-primary mt-3">Send Message</button>
               </form>
             </div>
 
             {/* MAP */}
-            <div className="map-box" style={{
-              aspectRatio: "16/8", borderRadius: "14px", overflow: "hidden", marginTop: 40,
+            <div className="map-box aspect-[16/8] rounded-xl overflow-hidden mt-10 flex items-center justify-center relative" style={{
               background: "linear-gradient(var(--vedika-line) 1px, transparent 1px) 0 0/40px 40px, linear-gradient(90deg, var(--vedika-line) 1px, transparent 1px) 0 0/40px 40px, var(--vedika-bg-alt)",
-              display: "flex", alignItems: "center", justifyContent: "center", position: "relative",
             }}>
-              <PinIcon className="w-[52px] h-[52px]" style={{ color: "var(--vedika-red)" }} />
-              <span style={{ position: "absolute", bottom: 16, left: "50%", transform: "translateX(-50%)", fontSize: ".78rem", color: "var(--vedika-ink-soft)", background: "var(--vedika-paper)", padding: "6px 14px", borderRadius: 100, whiteSpace: "nowrap" }}>
+              <PinIcon className="w-[52px] h-[52px] text-vedika-red" />
+              <span className="absolute bottom-4 left-1/2 text-[.78rem] text-vedika-ink-soft bg-vedika-paper px-3.5 py-1.5 rounded-full whitespace-nowrap" style={{ transform: "translateX(-50%)" }}>
                 42, Hawa Sadak, Bani Park, Jaipur
               </span>
             </div>
