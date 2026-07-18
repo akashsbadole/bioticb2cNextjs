@@ -4,7 +4,6 @@ import { createToken } from '@/lib/jwt-helper';
 import { db } from '@/lib/db';
 import { logActivity } from '@/lib/activity-log';
 import { ACTIVITY } from '@/lib/constants';
-import { randomUUID } from 'crypto';
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,7 +28,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    const jti = randomUUID();
+    const jti = crypto.randomUUID();
     const token = await createToken({ userId: user.id, email: user.email, role: user.role, jti });
 
     // Track active session (audit 6.2)

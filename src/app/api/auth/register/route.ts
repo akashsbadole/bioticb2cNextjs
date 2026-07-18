@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { randomUUID } from "crypto";
 import { db } from "@/lib/db";
 import { createUser } from "@/lib/auth";
 import { createToken } from "@/lib/jwt-helper";
@@ -40,7 +39,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const token = await createToken({ userId: user.id, email: user.email, role: user.role, jti: randomUUID() });
+    const token = await createToken({ userId: user.id, email: user.email, role: user.role, jti: crypto.randomUUID() });
 
     return NextResponse.json({
       success: true,
