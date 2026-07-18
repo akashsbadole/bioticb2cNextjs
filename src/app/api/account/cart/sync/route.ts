@@ -40,35 +40,29 @@ export async function POST(request: NextRequest) {
         quantity: Math.min(Math.max(Math.floor(i.quantity), 1), 999),
       }));
 
+    const productIds = [...new Set(sanitizedItems.map((i) => i.productId))];
+    const variantIds = [...new Set(sanitizedItems.map((i) => i.variantId).filter(Boolean))] as string[];
+
+    const [products, variants] = await Promise.all([
+      db.product.findMany({ where: { id: { in: productIds } }, select: { id: true, stock: true } }),
+      variantIds.length > 0
+        ? db.productVariant.findMany({ where: { id: { in: variantIds } }, select: { id: true, stock: true } })
+        : Promise.resolve([] as Array<{ id: string; stock: number }>),
+    ]);
+
+    const productStock = new Map(products.map((p) => [p.id, p.stock]));
+    const variantStock = new Map(variants.map((v) => [v.id, v.stock]));
+
     const validatedItems: typeof sanitizedItems = [];
     for (const item of sanitizedItems) {
-      const product = await db.product.findUnique({
-        where: { id: item.productId },
-        select: { stock: true },
-      });
-      if (!product) continue;
+      const product = productStock.get(item.productId);
+      if (product === undefined) continue;
 
-      let availableStock = product.stock;
+      const availableStock = item.variantId ? (variantStock.get(item.variantId) ?? product) : product;
 
-      if (item.variantId) {
-        const variant = await db.productVariant.findUnique({
-          where: { id: item.variantId },
-          select: { stock: true },
-        });
-        if (variant) {
-          availableStock = variant.stock;
-        }
-      }
+      if (availableStock <= 0) continue;
 
-      if (availableStock <= 0) {
-        continue;
-      }
-
-      const validatedQty = Math.min(item.quantity, availableStock);
-      validatedItems.push({
-        ...item,
-        quantity: validatedQty,
-      });
+      validatedItems.push({ ...item, quantity: Math.min(item.quantity, availableStock) });
     }
 
     const cart = await db.cart.upsert({

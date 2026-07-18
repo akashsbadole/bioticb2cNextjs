@@ -24,7 +24,8 @@
     "seed:blog": "npx tsx scripts/seed-blog-posts.ts",
     "seed:blog:csv": "npx tsx scripts/seed-blog-from-csv.ts",
     "migrate:turso": "npx tsx scripts/migrate-to-turso.ts",
-    "build:prod": "prisma generate --schema=prisma/schema.postgres.prisma && next build"
+    "build:prod": "prisma generate --schema=prisma/schema.postgres.prisma && next build",
+    "backup:automate": "node scripts/backup-automate.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

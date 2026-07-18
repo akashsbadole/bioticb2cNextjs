@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { QuickViewModal } from "./QuickViewModal";
 import { VedikaFilterSidebar, VedikaFilterGroup } from "./vedika-components";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
   const { auth, settings, navigate, addToCart, addToCompare, wishlistIds, toggleWishlistId } = useAppStore();
@@ -277,7 +278,18 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
             </div>
 
             {loading ? (
-              <div style={{ textAlign: "center", padding: "80px 0", color: "var(--vedika-ink-soft)" }}>Loading products...</div>
+              <div className="vedika-product-grid">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    <Skeleton className="aspect-[4/5] w-full rounded-2xl bg-muted" />
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "0 4px" }}>
+                      <Skeleton className="h-4 w-1/3 bg-muted" />
+                      <Skeleton className="h-5 w-full bg-muted" />
+                      <Skeleton className="h-6 w-1/2 bg-muted" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : products.length === 0 ? (
               <div style={{ textAlign: "center", padding: "80px 0" }}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" style={{ width: 64, height: 64, margin: "0 auto 16px", color: "var(--vedika-sand)" }}>

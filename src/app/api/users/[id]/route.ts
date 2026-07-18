@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { userUpdateSchema } from '@/lib/validations';
+import { logActivity } from '@/lib/activity-log';
+import { ACTIVITY } from '@/lib/constants';
+import { validateBody } from '@/lib/validate';
 
 export async function GET(
   request: NextRequest,
@@ -44,8 +48,10 @@ export async function PUT(
   try {
     const { id } = await params;
     const userId = request.headers.get('x-user-id');
-    const body = await request.json();
-    const { name, email, role, isActive, password, bio, avatar } = body;
+
+    const parsed = await validateBody(request, userUpdateSchema);
+    if (parsed.response) return parsed.response;
+    const { name, email, role, isActive, isVerified, password, bio, avatar } = parsed.data;
 
     // Check user exists
     const existing = await db.user.findFirst({
@@ -75,13 +81,10 @@ export async function PUT(
       if (userRole !== 'admin') {
         return NextResponse.json({ error: 'Only admins can change user roles' }, { status: 403 });
       }
-      if (!['admin', 'editor', 'customer'].includes(role)) {
-        return NextResponse.json({ error: 'Invalid role. Must be admin, editor, or customer' }, { status: 400 });
-      }
       data.role = role;
     }
     if (isActive !== undefined) data.isActive = isActive;
-    if (body.isVerified !== undefined) data.isVerified = body.isVerified;
+    if (isVerified !== undefined) data.isVerified = isVerified;
     if (bio !== undefined) data.bio = bio;
     if (avatar !== undefined) data.avatar = avatar;
 
@@ -106,6 +109,16 @@ export async function PUT(
         updatedAt: true,
       },
     });
+
+    logActivity({
+      action: ACTIVITY.USER_UPDATE,
+      entity: 'User',
+      entityId: user.id,
+      userId: userId || undefined,
+      userName: user.email,
+      ipAddress: request.headers.get('x-forwarded-for') || undefined,
+      details: { changed: Object.keys(data) },
+    }).catch(() => {});
 
     return NextResponse.json({ user });
   } catch (error) {

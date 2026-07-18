@@ -215,6 +215,7 @@ export default auth(async (req) => {
   requestHeaders.delete("x-user-id");
   requestHeaders.delete("x-user-role");
   requestHeaders.delete("x-user-email");
+  requestHeaders.delete("x-user-jti");
 
   if (storeId) {
     requestHeaders.set("x-store-id", storeId);
@@ -228,6 +229,9 @@ export default auth(async (req) => {
       requestHeaders.set("x-user-id", decoded.userId);
       requestHeaders.set("x-user-role", decoded.role || "customer");
       requestHeaders.set("x-user-email", decoded.email || "");
+      if (decoded.jti) {
+        requestHeaders.set("x-user-jti", decoded.jti);
+      }
     }
   } else if (session?.user) {
     requestHeaders.set("x-user-id", session.user.id);

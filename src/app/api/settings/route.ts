@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { sendEmail } from '@/lib/email';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { logActivity } from '@/lib/activity-log';
+import { ACTIVITY } from '@/lib/constants';
+import { encryptSetting, decryptSetting } from '@/lib/encryption';
 
 // Settings keys that should never be exposed to the public
 const SENSITIVE_KEYS = [
@@ -17,7 +20,7 @@ export async function GET(request: NextRequest) {
     const settings = await db.siteSetting.findMany();
     const settingsMap: Record<string, string> = {};
     for (const s of settings) {
-      settingsMap[s.key] = s.value;
+      settingsMap[s.key] = decryptSetting(s.value);
     }
     return NextResponse.json({ settings: settingsMap });
   } catch (error) {
@@ -46,13 +49,27 @@ export async function PUT(request: NextRequest) {
 
     const results = await Promise.all(
       Object.entries(settings).map(async ([key, value]) => {
+        const storedValue = SENSITIVE_KEYS.some((k) => key.toLowerCase().includes(k))
+          ? encryptSetting(value as string)
+          : (value as string);
         const existing = await db.siteSetting.findFirst({ where: { storeId: null, key } });
         if (existing) {
-          return db.siteSetting.update({ where: { id: existing.id }, data: { value: value as string } });
+          return db.siteSetting.update({ where: { id: existing.id }, data: { value: storedValue } });
         }
-        return db.siteSetting.create({ data: { key, value: value as string } });
+        return db.siteSetting.create({ data: { key, value: storedValue } });
       })
     );
+
+    const userId = request.headers.get('x-user-id') || undefined;
+    const userName = request.headers.get('x-user-email') || undefined;
+    logActivity({
+      action: ACTIVITY.SETTINGS_UPDATE,
+      entity: 'SiteSetting',
+      userId,
+      userName,
+      ipAddress: request.headers.get('x-forwarded-for') || undefined,
+      details: { keys: Object.keys(settings) },
+    }).catch(() => {});
 
     return NextResponse.json({ settings: results });
   } catch (error) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { sendNewsletterConfirmation } from '@/lib/email';
 
 const NEWSLETTER_RATE_LIMIT = { maxRequests: 10, windowMs: 15 * 60 * 1000, prefix: 'newsletter-subscribe' };
 
@@ -19,6 +20,10 @@ export async function POST(request: NextRequest) {
       where: { email },
       update: { isActive: true },
       create: { email, isActive: true },
+    });
+
+    sendNewsletterConfirmation({ email: subscriber.email }).catch(() => {
+      console.error('Failed to send newsletter confirmation email');
     });
 
     return NextResponse.json({ success: true, subscriber });

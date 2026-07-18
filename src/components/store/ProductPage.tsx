@@ -98,23 +98,46 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
     return () => clearInterval(interval);
   }, [flashDisc]);
 
+  const images = (() => {
+    try {
+      const parsed = JSON.parse(product?.images || "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch { return []; }
+  })();
+
+  const productJsonLd = product
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        description: product.shortDescription || product.description || undefined,
+        sku: product.sku || undefined,
+        image: images[0] || product.ogImage || undefined,
+        offers: {
+          '@type': 'Offer',
+          price: product.price,
+          priceCurrency: currency,
+          availability:
+            product.stock != null && product.stock > 0
+              ? 'https://schema.org/InStock'
+              : 'https://schema.org/OutOfStock',
+          url: typeof window !== 'undefined' ? window.location.href : undefined,
+        },
+      }
+    : null;
+
   useSeo(`product-${slug}`, {
     title: product?.metaTitle || product?.name,
     description: product?.metaDescription || product?.shortDescription,
     ogImage: product?.ogImage,
+    jsonLd: productJsonLd,
+    canonical: typeof window !== 'undefined' ? window.location.href : undefined,
   });
 
   const { getPrice: getCustomerPrice } = useCustomerPrices();
 
   if (loading) return <ProductSkeleton />;
   if (!product) return <div className="py-20 text-center">Product not found</div>;
-
-  const images = (() => {
-    try {
-      const parsed = JSON.parse(product.images || "[]");
-      return Array.isArray(parsed) ? parsed : [];
-    } catch { return []; }
-  })();
 
   const selectedVariant = product.ProductVariant?.find((v: any) => v.id === selectedVariantId);
   const basePrice = selectedVariant?.price ?? product.price;

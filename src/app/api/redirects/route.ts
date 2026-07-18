@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { validateBody } from '@/lib/validate';
+import { redirectSchema } from '@/lib/validations';
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,19 +29,13 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await requireAdminAuth(request);
     if (!auth.success) return auth.response;
-    const body = await request.json();
-    const { from, to, type, isActive } = body;
 
-    if (!from || !to) {
-      return NextResponse.json(
-        { error: 'From and to paths are required' },
-        { status: 400 }
-      );
-    }
+    const parsed = await validateBody(request, redirectSchema);
+    if (parsed.response) return parsed.response;
 
+    const { from, to, type, isActive } = parsed.data;
     const storeId = getStoreId(request);
 
-    // Check uniqueness per store
     const existing = await db.redirect.findFirst({
       where: { from, ...(storeId ? { storeId } : {}) }
     });
@@ -48,13 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     const redirect = await db.redirect.create({
-      data: {
-        from,
-        to,
-        type: type || '301',
-        isActive: isActive ?? true,
-        ...(storeId ? { storeId } : {}),
-      },
+      data: { from, to, type, isActive, ...(storeId ? { storeId } : {}) },
     });
 
     return NextResponse.json({ redirect }, { status: 201 });

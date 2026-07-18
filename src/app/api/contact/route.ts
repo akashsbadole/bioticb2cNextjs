@@ -4,6 +4,7 @@ import { sendEnquiryNotificationToAdmin, sendEnquiryConfirmation } from '@/lib/e
 import { checkRateLimit } from '@/lib/rate-limit';
 import { isHoneypotFilled } from '@/lib/honeypot';
 import { verifyRecaptcha } from '@/lib/recaptcha';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 // Max 10 contact form submissions per hour per IP
 const CONTACT_RATE_LIMIT = { maxRequests: 10, windowMs: 60 * 60 * 1000, prefix: 'contact' };
@@ -58,11 +59,11 @@ export async function POST(request: NextRequest) {
 
     const enquiry = await db.enquiry.create({
       data: {
-        name,
+        name: sanitizeHtml(name),
         email,
         phone: phone || null,
-        subject,
-        message,
+        subject: sanitizeHtml(subject),
+        message: sanitizeHtml(message),
         productId: productId || null,
         productName: productName || null,
         status: 'new',

@@ -4,18 +4,15 @@ import { db } from "@/lib/db";
 import { createUser } from "@/lib/auth";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { verifyRecaptcha } from "@/lib/recaptcha";
+import { sendWelcomeEmail } from "@/lib/email";
+import { passwordSchema } from "@/lib/validations";
 
 const REGISTER_RATE_LIMIT = { maxRequests: 5, windowMs: 60 * 60 * 1000, prefix: "auth-register" };
 
 const schema = z.object({
   name: z.string().min(1).max(100),
   email: z.string().email(),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain an uppercase letter')
-    .regex(/[a-z]/, 'Password must contain a lowercase letter')
-    .regex(/[0-9]/, 'Password must contain a number'),
+  password: passwordSchema,
   phone: z.string().optional(),
   recaptchaToken: z.string().optional(),
 });
@@ -51,6 +48,10 @@ export async function POST(request: NextRequest) {
     }
 
     const user = await createUser({ name, email: normalized, password, phone: phone || null });
+
+    sendWelcomeEmail({ name: user.name, email: user.email }).catch(() => {
+      console.error('Failed to send welcome email');
+    });
 
     return NextResponse.json({
       success: true,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { createUser } from "@/lib/auth";
 import { createToken } from "@/lib/jwt-helper";
+import { passwordSchema } from "@/lib/validations";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,6 +11,14 @@ export async function POST(request: NextRequest) {
 
     if (!name || !email || !password || !companyName) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const passwordCheck = passwordSchema.safeParse(password);
+    if (!passwordCheck.success) {
+      return NextResponse.json(
+        { error: "Invalid password", details: passwordCheck.error.issues.map((i) => i.message) },
+        { status: 400 }
+      );
     }
 
     const normalized = email.trim().toLowerCase();

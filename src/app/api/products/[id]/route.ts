@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { logError } from '@/lib/error-logger';
+import { sendLowStockAlert } from '@/lib/email';
 
 async function resolveProduct(idOrSlug: string, includeDeleted = false) {
   const where = {
@@ -149,6 +150,26 @@ export async function PUT(
       },
       include: { Category: true },
     });
+
+    const newStock = product.stock;
+    const threshold = product.lowStockThreshold ?? 0;
+    if (
+      body.stock !== undefined &&
+      newStock <= threshold &&
+      existing.stock > threshold
+    ) {
+      sendLowStockAlert({
+        productName: product.name,
+        sku: product.sku,
+        stock: newStock,
+        lowStockThreshold: threshold,
+      }).catch(() => {
+        logError('Failed to send low stock alert', {
+          category: 'email',
+          context: `PUT /api/products/[id] (${product.id})`,
+        });
+      });
+    }
 
     return NextResponse.json({ product });
   } catch (error) {

@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
+import { USER_ROLE, ORDER_STATUS, PAYMENT_STATUS } from "@/lib/constants";
 
 interface MigrationResult {
   success: boolean;
@@ -183,7 +184,7 @@ export async function migrateWooCommerceUsers(
         create: {
           email,
           name,
-          role: "customer",
+          role: USER_ROLE.CUSTOMER,
           phone: row.Phone || row.billing_phone || undefined,
           currentStoreId: storeId,
         },
@@ -209,7 +210,7 @@ export async function migrateWooCommerceOrders(
       const orderNumber = row["Order number"] || row.id;
       const total = parseFloat(row["Order total"] || row.total || "0");
       const email = row["Billing email"] || row.billing_email || "";
-      const status = row["Order status"] || row.status || "pending";
+      const status = row["Order status"] || row.status || ORDER_STATUS.PENDING;
 
       await db.order.create({
         data: {
@@ -218,7 +219,7 @@ export async function migrateWooCommerceOrders(
           subtotal: total,
           customerEmail: email,
           status,
-          paymentStatus: "paid",
+          paymentStatus: PAYMENT_STATUS.PAID,
           customerName: `${row["Billing first name"] || ""} ${row["Billing last name"] || ""}`.trim(),
           createdAt: row["Order date"] ? new Date(row["Order date"]) : new Date(),
         },

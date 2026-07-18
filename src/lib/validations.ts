@@ -1,5 +1,16 @@
 import { z } from 'zod';
 
+// Password policy (audit 6.4): minimum 12 chars with at least one uppercase
+// letter, one lowercase letter, one digit, and one symbol.
+export const passwordSchema = z
+  .string()
+  .min(12, 'Password must be at least 12 characters')
+  .max(128, 'Password is too long')
+  .regex(/[a-z]/, 'Password must contain a lowercase letter')
+  .regex(/[A-Z]/, 'Password must contain an uppercase letter')
+  .regex(/[0-9]/, 'Password must contain a number')
+  .regex(/[^a-zA-Z0-9]/, 'Password must contain a symbol');
+
 export const loginSchema = z.object({
   email: z.string().email('Invalid email'),
   password: z.string().min(1, 'Password is required'),
@@ -76,7 +87,7 @@ export const categorySchema = z.object({
 export const userCreateSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: passwordSchema,
   role: z.enum(['admin', 'editor', 'customer']).default('customer'),
 });
 
@@ -85,7 +96,10 @@ export const userUpdateSchema = z.object({
   email: z.string().email().optional(),
   role: z.enum(['admin', 'editor', 'customer']).optional(),
   isActive: z.boolean().optional(),
-  password: z.string().min(8).optional(),
+  isVerified: z.boolean().optional(),
+  password: passwordSchema.optional(),
+  bio: z.string().max(2000).optional().nullable(),
+  avatar: z.string().optional().nullable(),
 });
 
 export const contentPageSchema = z.object({
@@ -128,9 +142,50 @@ export const forgotPasswordSchema = z.object({
 
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, 'Token is required'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: passwordSchema,
 });
 
 export const newsletterSubscribeSchema = z.object({
   email: z.string().email('Invalid email'),
+});
+
+export const returnRequestSchema = z.object({
+  orderId: z.string().min(1, 'Order ID is required'),
+  reason: z.string().max(1000).optional().nullable(),
+});
+
+export const reviewSchema = z.object({
+  rating: z.number().int().min(1, 'Rating must be at least 1').max(5, 'Rating must be at most 5'),
+  comment: z.string().max(2000, 'Comment is too long').optional().nullable(),
+});
+
+export const brandSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  slug: z.string().max(100).optional().nullable(),
+  description: z.string().max(2000).optional().nullable(),
+  image: z.string().optional().nullable(),
+});
+
+export const redirectSchema = z.object({
+  from: z.string().min(1, 'From path is required').max(500),
+  to: z.string().min(1, 'To path is required').max(500),
+  type: z.enum(['301', '302', '307', '308']).optional().default('301'),
+  isActive: z.boolean().optional().default(true),
+});
+
+export const redirectUpdateSchema = z.object({
+  from: z.string().min(1).max(500).optional(),
+  to: z.string().min(1).max(500).optional(),
+  type: z.enum(['301', '302', '307', '308']).optional(),
+  isActive: z.boolean().optional(),
+});
+
+export const mediaUpdateSchema = z.object({
+  id: z.string().min(1, 'ID is required'),
+  alt: z.string().max(500).optional(),
+  folder: z.string().max(200).optional(),
+});
+
+export const folderCreateSchema = z.object({
+  folder: z.string().min(1, 'Folder name is required').max(200),
 });

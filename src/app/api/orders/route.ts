@@ -7,6 +7,7 @@ import { requireAuth } from '@/lib/admin-auth';
 import { sendOrderConfirmation } from '@/lib/email';
 import { createNotification } from '@/lib/notifications';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { ORDER_STATUS, PAYMENT_STATUS } from '@/lib/constants';
 
 const ORDER_RATE_LIMIT = { maxRequests: 10, windowMs: 60 * 60 * 1000, prefix: 'order-create' };
 
@@ -205,8 +206,8 @@ export async function POST(request: NextRequest) {
           discount: discount,
           couponCode: couponCode || null,
           paymentMethod,
-          paymentStatus: 'unpaid',
-          status: 'pending',
+          paymentStatus: PAYMENT_STATUS.UNPAID,
+          status: ORDER_STATUS.PENDING,
           customerName: customer.name,
           customerEmail: customer.email,
           customerPhone: customer.phone,

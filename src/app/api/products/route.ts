@@ -5,6 +5,8 @@ import { productSchema } from '@/lib/validations';
 import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { logError } from '@/lib/error-logger';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { ACTIVITY } from '@/lib/constants';
 
 const PRODUCTS_RATE_LIMIT = { maxRequests: 120, windowMs: 60 * 1000, prefix: 'products-search' };
 
@@ -254,7 +256,7 @@ export async function POST(request: NextRequest) {
     const userName = request.headers.get('x-user-email') || undefined;
     const ipAddress = request.headers.get('x-forwarded-for') || undefined;
     logActivity({
-      action: 'product.create',
+      action: ACTIVITY.PRODUCT_CREATE,
       entity: 'Product',
       entityId: product.id,
       userId,

@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { SessionProvider } from "next-auth/react";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { ThemeInjectorWrapper } from "@/components/store/ThemeInjectorWrapper";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -113,7 +114,9 @@ export default function RootLayout({
         <SessionProvider>
           <QueryProvider>
             <ThemeProvider>
-              {children}
+              <ErrorBoundary>
+                {children}
+              </ErrorBoundary>
               <Toaster position="top-right" richColors closeButton />
               <ThemeInjectorWrapper />
             </ThemeProvider>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/admin-auth';
 import { db } from '@/lib/db';
 import { hash, compare } from '@/lib/auth';
+import { passwordSchema } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
   const auth = await requireAuth(request);
@@ -25,8 +26,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Incorrect current password' }, { status: 400 });
     }
 
-    if (newPassword.length < 8) {
-      return NextResponse.json({ error: 'New password must be at least 8 characters long' }, { status: 400 });
+    const passwordCheck = passwordSchema.safeParse(newPassword);
+    if (!passwordCheck.success) {
+      return NextResponse.json(
+        { error: 'New password is too weak', details: passwordCheck.error.issues.map((i) => i.message) },
+        { status: 400 }
+      );
     }
 
     const hashedPassword = await hash(newPassword, 12);

@@ -156,6 +156,10 @@ model Product {
 
   @@index([deletedAt])
   @@index([storeId])
+  @@index([isActive, isFeatured])
+  @@index([categoryId, isActive])
+  @@index([price])
+  @@index([createdAt])
 }
 
 model Category {
@@ -260,6 +264,7 @@ model Order {
   refundAmount    Float       @default(0)
   trackingNumber  String?
   gstin           String?
+  deletedAt       DateTime?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   Store           Store?      @relation(fields: [storeId], references: [id])
@@ -269,6 +274,8 @@ model Order {
 
   @@index([storeId])
   @@index([userId])
+  @@index([status, createdAt])
+  @@index([paymentStatus])
 }
 
 model OrderItem {
@@ -297,6 +304,7 @@ model Cart {
   email         String?
   phone         String?
   reminderSentAt DateTime?
+  deletedAt     DateTime?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   items         CartItem[]
@@ -606,8 +614,9 @@ model User {
   avatar                  String?
   bio                     String?
   currentStoreId          String?
+  deletedAt               DateTime?
   createdAt               DateTime             @default(now())
-  updatedAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
   ActivityLog             ActivityLog[]
   BlogPost                BlogPost[]
   PasswordResetToken      PasswordResetToken[]
@@ -620,6 +629,24 @@ model User {
   Store                   Store?               @relation("CurrentUserStore", fields: [currentStoreId], references: [id])
   OwnedStores             Store[]              @relation("StoreOwner")
   CustomerPrice           CustomerPrice[]
+  Sessions                Session[]
+}
+
+// Active login sessions (audit 6.2). One row per issued device/token so admins
+// can list and remotely terminate sessions. Soft-deletable via revokedAt.
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenId     String   @unique // opaque id embedded in the JWT (jti) for revocation
+  ipAddress   String?
+  userAgent   String?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  revokedAt   DateTime?
+
+  @@index([userId])
+  @@index([tokenId])
 }
 
 model ActivityLog {

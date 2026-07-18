@@ -4,6 +4,7 @@ import { verifyPayUHash } from '@/lib/payments/payu';
 import { sendOrderConfirmation } from '@/lib/email';
 import { sendWhatsApp } from '@/lib/sms';
 import { createNotification } from '@/lib/notifications';
+import { PAYMENT_STATUS } from '@/lib/constants';
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
         const updated = await tx.order.update({
           where: { id: orderId },
           data: {
-            paymentStatus: 'paid',
+            paymentStatus: PAYMENT_STATUS.PAID,
             paymentId: data.mihpayid,
           },
           include: { items: true }
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
       await db.order.update({
         where: { id: orderId },
         data: {
-          paymentStatus: 'failed',
+          paymentStatus: PAYMENT_STATUS.FAILED,
         },
       });
       return NextResponse.redirect(new URL(`/checkout?error=payment_failed&orderId=${orderId}`, request.url));

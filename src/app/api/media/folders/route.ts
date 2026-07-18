@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { validateBody } from '@/lib/validate';
+import { folderCreateSchema } from '@/lib/validations';
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,18 +29,15 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await requireAdminAuth(request);
     if (!auth.success) return auth.response;
-    const { folder } = await request.json();
 
-    if (!folder || typeof folder !== 'string') {
-      return NextResponse.json({ error: 'Folder name is required' }, { status: 400 });
-    }
+    const parsed = await validateBody(request, folderCreateSchema);
+    if (parsed.response) return parsed.response;
 
-    const sanitized = folder.trim().replace(/[^a-zA-Z0-9_\-\/ ]/g, '');
+    const sanitized = parsed.data.folder.trim().replace(/[^a-zA-Z0-9_\-\/ ]/g, '');
     if (!sanitized.startsWith('/')) {
       return NextResponse.json({ error: 'Folder must start with /' }, { status: 400 });
     }
 
-    // Check if folder already exists
     const existing = await db.media.findFirst({
       where: { folder: sanitized },
       select: { folder: true },
@@ -52,7 +51,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Create a placeholder entry so the folder appears in the list
     await db.media.create({
       data: {
         filename: '.keep',

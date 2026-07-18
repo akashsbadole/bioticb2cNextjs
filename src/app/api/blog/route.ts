@@ -6,6 +6,7 @@ import { getStoreId } from '@/lib/store-db';
 import { normalizeBlocksForStorage } from '@/lib/page-blocks';
 import { normalizeImageUrl } from '@/lib/utils';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { ACTIVITY } from '@/lib/constants';
 import { sanitizeHtml, sanitizeBlocks } from '@/lib/sanitize';
 
 export async function GET(request: NextRequest) {
@@ -18,7 +19,8 @@ export async function GET(request: NextRequest) {
     const tag = searchParams.get('tag');
     const slug = searchParams.get('slug');
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '12');
+    const limit = Math.min(parseInt(searchParams.get('limit') || '12'), 100);
+    const cursor = searchParams.get('cursor') || undefined;
 
     const where: Record<string, unknown> = {};
 
@@ -52,6 +54,10 @@ export async function GET(request: NextRequest) {
 
     const scopedWhere = { ...where, ...(storeId ? { storeId } : {}) };
 
+    const orderBy = published === 'true' || !all
+      ? { publishedAt: 'desc' as const }
+      : { createdAt: 'desc' as const };
+
     const [blogPosts, total] = await Promise.all([
       db.blogPost.findMany({
         where: scopedWhere,
@@ -73,14 +79,15 @@ export async function GET(request: NextRequest) {
           updatedAt: true,
           User: { select: { id: true, name: true, email: true, avatar: true, bio: true } },
         },
-        orderBy: published === 'true' || !all
-          ? { publishedAt: 'desc' }
-          : { createdAt: 'desc' },
-        skip: (page - 1) * limit,
+        orderBy,
+        ...(cursor ? { cursor: { id: cursor }, skip: 1 } : { skip: (page - 1) * limit }),
         take: limit,
       }),
       db.blogPost.count({ where: scopedWhere }),
     ]);
+
+    const lastPost = blogPosts[blogPosts.length - 1];
+    const nextCursor = blogPosts.length === limit && lastPost ? lastPost.id : null;
 
     return NextResponse.json({
       blogPosts,
@@ -89,6 +96,7 @@ export async function GET(request: NextRequest) {
         limit,
         total,
         totalPages: Math.ceil(total / limit),
+        ...(nextCursor ? { nextCursor } : {}),
       },
     });
   } catch (error) {
@@ -165,7 +173,7 @@ export async function POST(request: NextRequest) {
     const userName = request.headers.get('x-user-email') || undefined;
     const ipAddress = request.headers.get('x-forwarded-for') || undefined;
     logActivity({
-      action: 'blog.create',
+      action: ACTIVITY.BLOG_CREATE,
       entity: 'Blog',
       entityId: blogPost.id,
       userId,

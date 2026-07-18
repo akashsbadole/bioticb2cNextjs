@@ -87,6 +87,7 @@ export async function rateLimit(
 /**
  * Helper to apply rate limiting at the top of a route handler.
  * Returns a 429 NextResponse if rate limited, or null if OK.
+ * On success, attaches X-RateLimit headers to the response.
  */
 export async function checkRateLimit(
   request: NextRequest,
@@ -107,9 +108,25 @@ export async function checkRateLimit(
         status: 429,
         headers: {
           'Retry-After': String(result.retryAfter),
+          'X-RateLimit-Limit': String(options.maxRequests),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': String(Math.ceil((Date.now() + (result.retryAfter ?? 0) * 1000) / 1000)),
         },
       }
     );
   }
   return null;
+}
+
+/**
+ * Attaches X-RateLimit headers to a successful response.
+ * Call this after checkRateLimit returns null.
+ */
+export function addRateLimitHeaders(
+  response: NextResponse,
+  options: { maxRequests: number; windowMs: number; prefix: string }
+): NextResponse {
+  response.headers.set('X-RateLimit-Limit', String(options.maxRequests));
+  response.headers.set('X-RateLimit-Reset', String(Math.ceil((Date.now() + options.windowMs) / 1000)));
+  return response;
 }

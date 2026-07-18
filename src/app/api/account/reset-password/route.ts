@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hash } from '@/lib/auth';
+import { passwordSchema } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,9 +22,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (password.length < 8) {
+    const passwordCheck = passwordSchema.safeParse(password);
+    if (!passwordCheck.success) {
       return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
+        { error: 'Password is too weak', details: passwordCheck.error.issues.map((i) => i.message) },
         { status: 400 }
       );
     }

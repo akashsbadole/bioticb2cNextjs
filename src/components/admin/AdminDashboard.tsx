@@ -39,29 +39,35 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { AdminDashboardHome } from "@/components/admin/AdminDashboardHome";
-import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
-import { AdminProducts } from "@/components/admin/AdminProducts";
-import { AdminCategories } from "@/components/admin/AdminCategories";
-import { AdminBrands } from "@/components/admin/AdminBrands";
-import { AdminOrders } from "@/components/admin/AdminOrders";
-import { AdminCoupons } from "@/components/admin/AdminCoupons";
-import { AdminReviews } from "@/components/admin/AdminReviews";
-import { AdminSettings } from "@/components/admin/AdminSettings";
-import { AdminMedia } from "@/components/admin/AdminMedia";
-import { AdminPages } from "@/components/admin/AdminPages";
-import { AdminSearchDialog } from "@/components/admin/AdminSearchDialog";
-import { AdminMenus } from "@/components/admin/AdminMenus";
-import { AdminNewsletter } from "@/components/admin/AdminNewsletter";
-import { AdminAbandonedCarts } from "@/components/admin/AdminAbandonedCarts";
-import { AdminPopups } from "@/components/admin/AdminPopups";
-import { AdminBlog } from "@/components/admin/AdminBlog";
-import { AdminFlashSales } from "@/components/admin/AdminFlashSales";
-import { AdminSupport } from "@/components/admin/AdminSupport";
-import { AdminPlugins } from "@/components/admin/AdminPlugins";
-import { AdminThemeCustomizer } from "@/components/admin/AdminThemeCustomizer";
-import { AdminCustomerPrices } from "@/components/admin/AdminCustomerPrices";
-import { AdminBundles } from "@/components/admin/AdminBundles";
+import dynamic from "next/dynamic";
+
+function lazyNamed<T extends Record<string, unknown>>(importFn: () => Promise<T>, name: keyof T & string) {
+  return dynamic(() => importFn().then(m => ({ default: m[name] as React.ComponentType<any> })), { ssr: false });
+}
+
+const AdminDashboardHome = lazyNamed(() => import("@/components/admin/AdminDashboardHome"), "AdminDashboardHome");
+const AdminAnalytics = lazyNamed(() => import("@/components/admin/AdminAnalytics"), "AdminAnalytics");
+const AdminProducts = lazyNamed(() => import("@/components/admin/AdminProducts"), "AdminProducts");
+const AdminCategories = lazyNamed(() => import("@/components/admin/AdminCategories"), "AdminCategories");
+const AdminBrands = lazyNamed(() => import("@/components/admin/AdminBrands"), "AdminBrands");
+const AdminOrders = lazyNamed(() => import("@/components/admin/AdminOrders"), "AdminOrders");
+const AdminCoupons = lazyNamed(() => import("@/components/admin/AdminCoupons"), "AdminCoupons");
+const AdminReviews = lazyNamed(() => import("@/components/admin/AdminReviews"), "AdminReviews");
+const AdminSettings = lazyNamed(() => import("@/components/admin/AdminSettings"), "AdminSettings");
+const AdminMedia = lazyNamed(() => import("@/components/admin/AdminMedia"), "AdminMedia");
+const AdminPages = lazyNamed(() => import("@/components/admin/AdminPages"), "AdminPages");
+const AdminSearchDialog = lazyNamed(() => import("@/components/admin/AdminSearchDialog"), "AdminSearchDialog");
+const AdminMenus = lazyNamed(() => import("@/components/admin/AdminMenus"), "AdminMenus");
+const AdminNewsletter = lazyNamed(() => import("@/components/admin/AdminNewsletter"), "AdminNewsletter");
+const AdminAbandonedCarts = lazyNamed(() => import("@/components/admin/AdminAbandonedCarts"), "AdminAbandonedCarts");
+const AdminPopups = lazyNamed(() => import("@/components/admin/AdminPopups"), "AdminPopups");
+const AdminBlog = lazyNamed(() => import("@/components/admin/AdminBlog"), "AdminBlog");
+const AdminFlashSales = lazyNamed(() => import("@/components/admin/AdminFlashSales"), "AdminFlashSales");
+const AdminSupport = lazyNamed(() => import("@/components/admin/AdminSupport"), "AdminSupport");
+const AdminPlugins = lazyNamed(() => import("@/components/admin/AdminPlugins"), "AdminPlugins");
+const AdminThemeCustomizer = lazyNamed(() => import("@/components/admin/AdminThemeCustomizer"), "AdminThemeCustomizer");
+const AdminCustomerPrices = lazyNamed(() => import("@/components/admin/AdminCustomerPrices"), "AdminCustomerPrices");
+const AdminBundles = lazyNamed(() => import("@/components/admin/AdminBundles"), "AdminBundles");
 import { NotificationBell } from "@/components/admin/NotificationBell";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Ticket, Star, Headphones, Clock, DollarSign, Gift } from "lucide-react";

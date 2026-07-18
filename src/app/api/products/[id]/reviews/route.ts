@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
 import { requireAuth } from '@/lib/admin-auth';
+import { sanitizeHtml } from '@/lib/sanitize';
+import { reviewSchema } from '@/lib/validations';
 
 export async function GET(
   request: NextRequest,
@@ -36,20 +38,22 @@ export async function POST(
     const { id } = await params;
     const storeId = getStoreId(request);
     const body = await request.json();
-    const { rating, comment } = body;
 
-    if (!rating) {
-        return NextResponse.json({ error: 'Missing rating' }, { status: 400 });
+    const parsed = reviewSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
+
+    const { rating, comment } = parsed.data;
 
     const review = await db.review.create({
       data: {
         productId: id,
         storeId,
         userId: auth.payload.userId,
-        rating: Number(rating),
-        comment,
-        isActive: false // Default to false for moderation
+        rating,
+        comment: comment ? sanitizeHtml(comment) : null,
+        isActive: false
       }
     });
 

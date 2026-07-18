@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { validateBody } from '@/lib/validate';
+import { mediaUpdateSchema } from '@/lib/validations';
 
 export async function GET(request: NextRequest) {
   try {
@@ -46,10 +48,10 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, alt, folder } = await request.json();
-    if (!id) {
-      return NextResponse.json({ error: 'ID required' }, { status: 400 });
-    }
+    const parsed = await validateBody(request, mediaUpdateSchema);
+    if (parsed.response) return parsed.response;
+
+    const { id, alt, folder } = parsed.data;
     const media = await db.media.update({
       where: { id },
       data: { ...(alt !== undefined && { alt }), ...(folder !== undefined && { folder }) },

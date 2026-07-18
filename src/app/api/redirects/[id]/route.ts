@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { validateBody } from '@/lib/validate';
+import { redirectUpdateSchema } from '@/lib/validations';
 
 export async function PUT(
   request: NextRequest,
@@ -10,7 +12,9 @@ export async function PUT(
     const auth = await requireAdminAuth(request);
     if (!auth.success) return auth.response;
     const { id } = await params;
-    const body = await request.json();
+
+    const parsed = await validateBody(request, redirectUpdateSchema);
+    if (parsed.response) return parsed.response;
 
     const existing = await db.redirect.findFirst({ where: { id } });
     if (!existing) {
@@ -22,12 +26,7 @@ export async function PUT(
 
     const redirect = await db.redirect.update({
       where: { id },
-      data: {
-        ...(body.from !== undefined && { from: body.from }),
-        ...(body.to !== undefined && { to: body.to }),
-        ...(body.type !== undefined && { type: body.type }),
-        ...(body.isActive !== undefined && { isActive: body.isActive }),
-      },
+      data: parsed.data,
     });
 
     return NextResponse.json({ redirect });

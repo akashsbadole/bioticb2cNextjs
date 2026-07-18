@@ -1,15 +1,7 @@
 import { db } from '@/lib/db';
+import { ACTIVITY, type ActivityType } from '@/lib/constants';
 
-type LogAction =
-  | 'user.login' | 'user.logout' | 'user.create' | 'user.update' | 'user.delete'
-  | 'product.create' | 'product.update' | 'product.delete' | 'product.bulk'
-  | 'category.create' | 'category.update' | 'category.delete' | 'category.bulk'
-  | 'blog.create' | 'blog.update' | 'blog.delete' | 'blog.bulk'
-  | 'page.create' | 'page.update' | 'page.delete'
-  | 'banner.create' | 'banner.update' | 'banner.delete'
-  | 'media.upload' | 'media.delete'
-  | 'redirect.create' | 'redirect.update' | 'redirect.delete'
-  | 'settings.update';
+type LogAction = ActivityType;
 
 export async function logActivity(params: {
   action: LogAction;

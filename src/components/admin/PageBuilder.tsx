@@ -90,6 +90,33 @@ import {
 
 import WysiwygEditor from "@/components/admin/WysiwygEditor";
 
+function validateBlocks(blocks: PageBlock[]): { valid: boolean; errors: string[]; blocks: PageBlock[] } {
+  const errors: string[] = [];
+  const ids = new Set<string>();
+  const validated = blocks.map((block) => {
+    if (!block.id || typeof block.id !== "string") {
+      block = { ...block, id: `block-${Date.now()}-${Math.random().toString(36).slice(2, 8)}` };
+    }
+    if (ids.has(block.id)) {
+      block = { ...block, id: `block-${Date.now()}-${Math.random().toString(36).slice(2, 8)}` };
+      errors.push(`Duplicate block ID resolved`);
+    }
+    ids.add(block.id);
+    if (!block.type) {
+      errors.push(`Block missing type (id: ${block.id})`);
+      return null;
+    }
+    if (!block.data || typeof block.data !== "object") {
+      block = { ...block, data: {} };
+      errors.push(`Block missing data (id: ${block.id})`);
+    }
+    block = { ...block, data: normalizeBlockData(block.data) };
+    return block;
+  });
+  const filtered = validated.filter((b): b is PageBlock => b !== null);
+  return { valid: errors.length === 0, errors, blocks: filtered };
+}
+
 const PreviewRenderer = dynamic(
   () =>
     import("@/components/store/PageBlockRenderer").then((m) => ({
@@ -3015,7 +3042,10 @@ export function PageBuilder({
       if (index !== -1) {
         const newBlocks = [...blocks];
         newBlocks.splice(index + 1, 0, duplicated);
-        onChange(newBlocks);
+        const result = validateBlocks(newBlocks);
+        if (result.valid) {
+          onChange(result.blocks);
+        }
       }
     },
     [blocks, onChange],
@@ -3023,15 +3053,22 @@ export function PageBuilder({
 
   const handleDeleteBlock = useCallback(() => {
     if (!deleteBlock) return;
-    onChange(blocks.filter((b) => b.id !== deleteBlock.id));
+    const newBlocks = blocks.filter((b) => b.id !== deleteBlock.id);
+    const result = validateBlocks(newBlocks);
+    if (result.valid) {
+      onChange(result.blocks);
+    }
     setDeleteBlock(null);
   }, [blocks, deleteBlock, onChange]);
 
   const handleEditSave = useCallback(
     (updatedBlock: PageBlock) => {
-      onChange(
-        blocks.map((b) => (b.id === updatedBlock.id ? updatedBlock : b)),
-      );
+      const normalized = { ...updatedBlock, data: normalizeBlockData(updatedBlock.data) };
+      const newBlocks = blocks.map((b) => (b.id === normalized.id ? normalized : b));
+      const result = validateBlocks(newBlocks);
+      if (result.valid) {
+        onChange(result.blocks);
+      }
       setEditingBlock(null);
     },
     [blocks, onChange],
@@ -3040,12 +3077,16 @@ export function PageBuilder({
   const handleMoveUp = useCallback(
     (index: number) => {
       if (index <= 0) return;
+      if (index >= blocks.length) return;
       const newBlocks = [...blocks];
       [newBlocks[index - 1], newBlocks[index]] = [
         newBlocks[index],
         newBlocks[index - 1],
       ];
-      onChange(newBlocks);
+      const result = validateBlocks(newBlocks);
+      if (result.valid) {
+        onChange(result.blocks);
+      }
     },
     [blocks, onChange],
   );
@@ -3053,12 +3094,16 @@ export function PageBuilder({
   const handleMoveDown = useCallback(
     (index: number) => {
       if (index >= blocks.length - 1) return;
+      if (index < 0) return;
       const newBlocks = [...blocks];
       [newBlocks[index], newBlocks[index + 1]] = [
         newBlocks[index + 1],
         newBlocks[index],
       ];
-      onChange(newBlocks);
+      const result = validateBlocks(newBlocks);
+      if (result.valid) {
+        onChange(result.blocks);
+      }
     },
     [blocks, onChange],
   );
@@ -3069,11 +3114,14 @@ export function PageBuilder({
       if (over && active.id !== over.id) {
         const oldIndex = blocks.findIndex((b) => b.id === active.id);
         const newIndex = blocks.findIndex((b) => b.id === over.id);
-        if (oldIndex !== -1 && newIndex !== -1) {
+        if (oldIndex !== -1 && newIndex !== -1 && oldIndex < blocks.length && newIndex < blocks.length) {
           const newBlocks = [...blocks];
           const [moved] = newBlocks.splice(oldIndex, 1);
           newBlocks.splice(newIndex, 0, moved);
-          onChange(newBlocks);
+          const result = validateBlocks(newBlocks);
+          if (result.valid) {
+            onChange(result.blocks);
+          }
         }
       }
     },

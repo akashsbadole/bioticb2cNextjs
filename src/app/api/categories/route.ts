@@ -5,6 +5,7 @@ import { categorySchema } from '@/lib/validations';
 import { getStoreId } from '@/lib/store-db';
 import { normalizeImageUrl } from '@/lib/utils';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { ACTIVITY } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,6 +14,8 @@ export async function GET(request: NextRequest) {
     const all = searchParams.get('all');
     const includeDeleted = searchParams.get('includeDeleted');
     const slug = searchParams.get('slug');
+    const limitParam = parseInt(searchParams.get('limit') || '0');
+    const limit = limitParam > 0 ? Math.min(limitParam, 100) : undefined;
     const where: Record<string, unknown> = {};
 
     // Always exclude soft-deleted unless explicitly requested
@@ -31,6 +34,7 @@ export async function GET(request: NextRequest) {
     const categories = await db.category.findMany({
       where: { ...where, ...(storeId ? { storeId } : {}) },
       orderBy: { sortOrder: 'asc' },
+      take: limit,
       include: all ? { _count: { select: { Product: true } } } : undefined,
     });
 
@@ -143,7 +147,7 @@ export async function POST(request: NextRequest) {
     const userName = request.headers.get('x-user-email') || undefined;
     const ipAddress = request.headers.get('x-forwarded-for') || undefined;
     logActivity({
-      action: 'category.create',
+      action: ACTIVITY.CATEGORY_CREATE,
       entity: 'Category',
       entityId: category.id,
       userId,

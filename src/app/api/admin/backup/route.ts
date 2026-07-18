@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { logActivity } from '@/lib/activity-log';
+import { ACTIVITY } from '@/lib/constants';
 
 // GET /api/admin/backup - Export all data as JSON
 export async function GET(request: NextRequest) {
@@ -70,6 +72,17 @@ export async function GET(request: NextRequest) {
         notifications,
       },
     };
+
+    const userId = request.headers.get('x-user-id') || undefined;
+    const userName = request.headers.get('x-user-email') || undefined;
+    logActivity({
+      action: ACTIVITY.BACKUP_EXPORT,
+      entity: 'Backup',
+      userId,
+      userName,
+      ipAddress: request.headers.get('x-forwarded-for') || undefined,
+      details: { version: backup.version },
+    }).catch(() => {});
 
     return new NextResponse(JSON.stringify(backup, null, 2), {
       headers: {
@@ -319,6 +332,17 @@ export async function POST(request: NextRequest) {
     }, {
       timeout: 60000 // Increase timeout for large backups
     });
+
+    const userId = request.headers.get('x-user-id') || undefined;
+    const userName = request.headers.get('x-user-email') || undefined;
+    logActivity({
+      action: ACTIVITY.BACKUP_IMPORT,
+      entity: 'Backup',
+      userId,
+      userName,
+      ipAddress: request.headers.get('x-forwarded-for') || undefined,
+      details: { restored: results },
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

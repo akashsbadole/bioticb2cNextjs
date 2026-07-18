@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { parseCSV } from '@/lib/utils';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { getStoreId } from '@/lib/store-db';
+import { USER_ROLE } from '@/lib/constants';
 
 // POST /api/import/woocommerce/users - Import customers from WooCommerce CSV
 export async function POST(request: NextRequest) {
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
                 data: {
                     email,
                     name,
-                    role: 'customer',
+                    role: USER_ROLE.CUSTOMER,
                     isActive: true,
                     currentStoreId: storeId || null,
                     // Note: No password imported from CSV

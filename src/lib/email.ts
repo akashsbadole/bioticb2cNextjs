@@ -1,9 +1,13 @@
 import nodemailer from 'nodemailer';
 import { db } from './db';
+import { decryptSetting } from './encryption';
 
 export async function getSiteSettings() {
   const settings = await db.siteSetting.findMany();
-  return (key: string) => settings.find((s) => s.key === key)?.value || '';
+  return (key: string) => {
+    const val = settings.find((s) => s.key === key)?.value || '';
+    return decryptSetting(val);
+  };
 }
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
@@ -196,4 +200,128 @@ export async function sendEnquiryNotification(enquiry: {
   type: string;
 }) {
   return sendEnquiryNotificationToAdmin(enquiry);
+}
+
+// Welcome email on registration
+export async function sendWelcomeEmail(user: {
+  name: string;
+  email: string;
+}) {
+  const getSetting = await getSiteSettings();
+  const siteName = getSetting('site_name') || 'Store';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+  const content = `
+    <h2 style="margin-top:0">Welcome to ${siteName}!</h2>
+    <p>Dear ${user.name},</p>
+    <p>Thank you for creating an account with us. We're excited to have you on board!</p>
+    <p>With your account you can:</p>
+    <ul>
+      <li>Browse our full product catalog</li>
+      <li>Track your orders in real-time</li>
+      <li>Save items to your wishlist</li>
+      <li>Access exclusive B2B pricing (if applicable)</li>
+    </ul>
+    <div style="margin-top:24px;text-align:center">
+      <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/catalogue" class="btn">Start Shopping</a>
+    </div>
+  `;
+
+  return sendEmail(
+    user.email,
+    `Welcome to ${siteName}!`,
+    emailWrapper(siteName, content)
+  );
+}
+
+// Newsletter subscription confirmation
+export async function sendNewsletterConfirmation(subscriber: {
+  email: string;
+}) {
+  const getSetting = await getSiteSettings();
+  const siteName = getSetting('site_name') || 'Store';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+  const content = `
+    <h2 style="margin-top:0">You're Subscribed!</h2>
+    <p>Thank you for subscribing to the ${siteName} newsletter.</p>
+    <p>You'll be the first to hear about new products, offers, and updates.</p>
+    <div style="margin-top:24px;text-align:center">
+      <a href="${siteUrl}/catalogue" class="btn">Browse Products</a>
+    </div>
+  `;
+
+  return sendEmail(
+    subscriber.email,
+    `Newsletter subscription confirmed - ${siteName}`,
+    emailWrapper(siteName, content)
+  );
+}
+
+// Low stock alert to admin
+export async function sendLowStockAlert(alert: {
+  productName: string;
+  sku?: string | null;
+  stock: number;
+  lowStockThreshold: number;
+}) {
+  const getSetting = await getSiteSettings();
+  const siteEmail = getSetting('site_email') || 'admin@store.com';
+  const siteName = getSetting('site_name') || 'Store';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+  const content = `
+    <h2 style="margin-top:0">⚠️ Low Stock Alert</h2>
+    <p>The following product is running low on stock:</p>
+    <div class="field-label">Product</div><div class="field-value">${alert.productName}</div>
+    ${alert.sku ? `<div class="field-label">SKU</div><div class="field-value">${alert.sku}</div>` : ''}
+    <div class="field-label">Current Stock</div><div class="field-value">${alert.stock}</div>
+    <div class="field-label">Threshold</div><div class="field-value">${alert.lowStockThreshold}</div>
+    <div style="margin-top:24px;text-align:center">
+      <a href="${siteUrl}/admin/products" class="btn">Restock Now</a>
+    </div>
+  `;
+
+  return sendEmail(
+    siteEmail,
+    `[${siteName}] Low stock: ${alert.productName}`,
+    emailWrapper(siteName, content)
+  );
+}
+
+// Quote created/updated notification (B2B RFQ workflow)
+export async function sendQuoteNotification(quote: {
+  id: string;
+  customerName: string;
+  customerEmail: string;
+  status: 'created' | 'accepted' | 'declined';
+  totalAmount?: number;
+  validUntil?: string;
+}) {
+  const getSetting = await getSiteSettings();
+  const siteName = getSetting('site_name') || 'Store';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+  const statusLabels: Record<string, string> = {
+    created: 'created',
+    accepted: 'accepted',
+    declined: 'declined',
+  };
+
+  const content = `
+    <h2 style="margin-top:0">Quote ${statusLabels[quote.status]}</h2>
+    <p>Dear ${quote.customerName},</p>
+    <p>Your quote <strong>#${quote.id.slice(0, 8)}</strong> has been ${statusLabels[quote.status]}.</p>
+    ${quote.totalAmount != null ? `<div class="field-label">Total</div><div class="field-value">${quote.totalAmount.toFixed(2)}</div>` : ''}
+    ${quote.validUntil ? `<div class="field-label">Valid Until</div><div class="field-value">${quote.validUntil}</div>` : ''}
+    <div style="margin-top:24px;text-align:center">
+      <a href="${siteUrl}/account/quotes/${quote.id}" class="btn">View Quote</a>
+    </div>
+  `;
+
+  return sendEmail(
+    quote.customerEmail,
+    `Quote ${statusLabels[quote.status]} - ${siteName}`,
+    emailWrapper(siteName, content)
+  );
 }

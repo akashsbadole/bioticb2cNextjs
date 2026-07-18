@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { compare, hash } from '@/lib/auth';
+import { passwordSchema } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,8 +16,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Current password and new password are required' }, { status: 400 });
     }
 
-    if (newPassword.length < 8) {
-      return NextResponse.json({ error: 'New password must be at least 8 characters' }, { status: 400 });
+    const passwordCheck = passwordSchema.safeParse(newPassword);
+    if (!passwordCheck.success) {
+      return NextResponse.json(
+        { error: 'New password is too weak', details: passwordCheck.error.issues.map((i) => i.message) },
+        { status: 400 }
+      );
     }
 
     const user = await db.user.findUnique({ where: { id: userId } });
