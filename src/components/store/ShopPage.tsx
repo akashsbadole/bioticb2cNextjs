@@ -48,6 +48,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
 
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const res = await fetch("/api/categories");
       return (await res.json()).categories || [];
@@ -56,6 +57,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
 
   const { data: brands = [] } = useQuery({
     queryKey: ["brands"],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const res = await fetch("/api/brands");
       return (await res.json()).brands || [];
@@ -64,6 +66,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
 
   const { data: products = [], isLoading: loading } = useQuery({
     queryKey: ["products", searchQuery, filters],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const params = new URLSearchParams();
       if (searchQuery) params.set("search", searchQuery);

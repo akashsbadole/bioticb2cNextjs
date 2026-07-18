@@ -10,6 +10,7 @@ interface CategoryGridProps {
 export function CategoryGrid({ onNavigate }: CategoryGridProps) {
   const { data: categories = [], isLoading } = useQuery({
     queryKey: ["home-categories"],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const res = await fetch("/api/categories");
       if (!res.ok) return [];

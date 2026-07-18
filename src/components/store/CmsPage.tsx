@@ -24,6 +24,7 @@ interface CmsPageProps {
 export function CmsPage({ slug, onNavigate, fallbackBlocks }: CmsPageProps) {
   const { data, isLoading: loading } = useQuery({
     queryKey: ['cms-page', slug],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
         const res = await fetch(`/api/content-pages?slug=${encodeURIComponent(slug)}`);
         const data = await res.json();

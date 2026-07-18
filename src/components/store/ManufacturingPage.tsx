@@ -68,6 +68,7 @@ export function ManufacturingPage({
   const { data: cmsData } = useQuery({
     queryKey: ["manufacturing-cms"],
     enabled: !externalData,
+    staleTime: 10 * 60 * 1000,
     queryFn: async () => {
       const res = await fetch("/api/content-pages?slug=manufacturing");
       const json = await res.json();

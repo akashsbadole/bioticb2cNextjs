@@ -44,6 +44,7 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
   const currency = settings?.currency || "INR";
   const { data: product, isLoading: loading } = useQuery({
     queryKey: ["product", slug],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
         const res = await fetch(`/api/products?slug=${slug}`);
         const data = await res.json();
@@ -64,6 +65,7 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
   const { data: relatedProducts = [] } = useQuery({
     queryKey: ["related-products", product?.id],
     enabled: !!product?.categoryId,
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
         const res = await fetch(`/api/products?categoryId=${product.categoryId}&inStock=true&limit=5`);
         const data = await res.json();

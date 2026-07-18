@@ -42,7 +42,10 @@ export async function GET(request: NextRequest) {
       orderBy: { sortOrder: 'asc' },
     });
 
-    return NextResponse.json({ contentPages });
+    const response = NextResponse.json({ contentPages });
+    response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
+    response.headers.set('Vary', 'host');
+    return response;
   } catch (error) {
     console.error('Get content pages error:', error);
     return NextResponse.json(

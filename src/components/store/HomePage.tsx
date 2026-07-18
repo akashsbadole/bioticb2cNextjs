@@ -142,6 +142,7 @@ export function HomePage({
 
   const { data: categories = [], isLoading: catLoading } = useQuery({
     queryKey: ["categories"],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const res = await fetch("/api/categories");
       if (res.ok) {
@@ -154,6 +155,7 @@ export function HomePage({
 
   const { data: products = [], isLoading: prodLoading } = useQuery({
     queryKey: ["featured-products"],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const res = await fetch(
         "/api/products?featured=true&limit=8&inStock=true",
@@ -164,6 +166,7 @@ export function HomePage({
 
   const { data: allProducts = [], isLoading: allProdLoading } = useQuery({
     queryKey: ["all-storefront-products"],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const res = await fetch("/api/products?limit=100&inStock=true");
       return res.ok ? (await res.json()).products || [] : [];

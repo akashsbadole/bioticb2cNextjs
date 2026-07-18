@@ -24,6 +24,7 @@ export function BlogPage({ onNavigate }: BlogPageProps) {
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ["blog-posts"],
+    staleTime: 10 * 60 * 1000,
     queryFn: async () => {
       const res = await fetch("/api/blog-posts");
       const data = await res.json();
@@ -93,7 +94,6 @@ export function BlogPage({ onNavigate }: BlogPageProps) {
             <button
               key={tag}
               onClick={() => setSelectedTag(tag)}
-              className="blog-filter-tag"
               className={`blog-filter-tag px-[18px] py-[9px] rounded-full border text-xs font-semibold cursor-pointer font-inherit transition-all duration-200 ${
                 selectedTag === tag
                   ? "bg-vedika-green text-white border-vedika-green"

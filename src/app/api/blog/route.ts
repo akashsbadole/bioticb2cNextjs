@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
     const lastPost = blogPosts[blogPosts.length - 1];
     const nextCursor = blogPosts.length === limit && lastPost ? lastPost.id : null;
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       blogPosts,
       pagination: {
         page,
@@ -99,6 +99,9 @@ export async function GET(request: NextRequest) {
         ...(nextCursor ? { nextCursor } : {}),
       },
     });
+    response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
+    response.headers.set('Vary', 'host');
+    return response;
   } catch (error) {
     console.error('Get blog posts error:', error);
     return NextResponse.json(

@@ -232,7 +232,7 @@ export function AccountPage() {
           {activeTab === "dashboard" && (
             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
               {/* Welcome Banner */}
-              <div className="p-8 rounded-[2.5rem] bg-gradient-to-r from-emerald-800 to-emerald-600 text-white shadow-xl">
+              <div className="p-8 rounded-[2.5rem] text-white shadow-xl">
                 <h2 className="text-3xl font-black mb-2">
                   Welcome back,{" "}
                   {profile?.name || auth.user?.name || "Valued Customer"}!

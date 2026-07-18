@@ -24,6 +24,7 @@ interface ProductsOverviewPageProps {
 export function ProductsOverviewPage({ onNavigate }: ProductsOverviewPageProps) {
   const { data: categories = [], isLoading: loading } = useQuery({
     queryKey: ["categories-all"],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
         const res = await fetch("/api/categories?all=true");
         return (await res.json()).categories || [];

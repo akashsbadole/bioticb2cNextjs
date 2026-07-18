@@ -33,6 +33,7 @@ export function CategoryPage({ slug, onNavigate }: CategoryPageProps) {
 
   const { data, isLoading: loading } = useQuery({
     queryKey: ["category-page", slug, sortBy],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const catRes = await fetch(`/api/categories?slug=${slug}`);
       const catData = await catRes.json();

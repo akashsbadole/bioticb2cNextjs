@@ -8,11 +8,14 @@ import { brandSchema } from '@/lib/validations';
 export async function GET(request: NextRequest) {
   try {
     const storeId = getStoreId(request);
-    const brands = await db.brand.findMany({
-      where: storeId ? { storeId } : {},
-      orderBy: { name: 'asc' },
-    });
-    return NextResponse.json({ brands });
+  const brands = await db.brand.findMany({
+    where: storeId ? { storeId } : {},
+    orderBy: { name: 'asc' },
+  });
+  const response = NextResponse.json({ brands });
+  response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
+  response.headers.set('Vary', 'host');
+  return response;
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
