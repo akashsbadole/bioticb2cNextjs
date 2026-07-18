@@ -258,6 +258,32 @@ export async function sendNewsletterConfirmation(subscriber: {
   );
 }
 
+// Back-in-stock notification to customer
+export async function sendBackInStockNotification(subscriber: {
+  email: string;
+  productName: string;
+  productSlug: string;
+}) {
+  const getSetting = await getSiteSettings();
+  const siteName = getSetting('site_name') || 'Store';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+  const content = `
+    <h2 style="margin-top:0">Back in Stock!</h2>
+    <p>Great news — <strong>${subscriber.productName}</strong> is back in stock!</p>
+    <p>You requested to be notified when this product became available again.</p>
+    <div style="margin-top:24px;text-align:center">
+      <a href="${siteUrl}/products/${subscriber.productSlug}" class="btn">Shop Now</a>
+    </div>
+  `;
+
+  return sendEmail(
+    subscriber.email,
+    `${subscriber.productName} is back in stock - ${siteName}`,
+    emailWrapper(siteName, content)
+  );
+}
+
 // Low stock alert to admin
 export async function sendLowStockAlert(alert: {
   productName: string;
@@ -289,39 +315,4 @@ export async function sendLowStockAlert(alert: {
   );
 }
 
-// Quote created/updated notification (B2B RFQ workflow)
-export async function sendQuoteNotification(quote: {
-  id: string;
-  customerName: string;
-  customerEmail: string;
-  status: 'created' | 'accepted' | 'declined';
-  totalAmount?: number;
-  validUntil?: string;
-}) {
-  const getSetting = await getSiteSettings();
-  const siteName = getSetting('site_name') || 'Store';
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-  const statusLabels: Record<string, string> = {
-    created: 'created',
-    accepted: 'accepted',
-    declined: 'declined',
-  };
-
-  const content = `
-    <h2 style="margin-top:0">Quote ${statusLabels[quote.status]}</h2>
-    <p>Dear ${quote.customerName},</p>
-    <p>Your quote <strong>#${quote.id.slice(0, 8)}</strong> has been ${statusLabels[quote.status]}.</p>
-    ${quote.totalAmount != null ? `<div class="field-label">Total</div><div class="field-value">${quote.totalAmount.toFixed(2)}</div>` : ''}
-    ${quote.validUntil ? `<div class="field-label">Valid Until</div><div class="field-value">${quote.validUntil}</div>` : ''}
-    <div style="margin-top:24px;text-align:center">
-      <a href="${siteUrl}/account/quotes/${quote.id}" class="btn">View Quote</a>
-    </div>
-  `;
-
-  return sendEmail(
-    quote.customerEmail,
-    `Quote ${statusLabels[quote.status]} - ${siteName}`,
-    emailWrapper(siteName, content)
-  );
-}

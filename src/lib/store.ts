@@ -39,7 +39,7 @@ function scheduleCartSync() {
           : {}),
       },
       body: JSON.stringify({ items, guestToken: deviceId }),
-    }).catch(() => {});
+    }).catch(() => { });
   }, 800);
 }
 
@@ -266,7 +266,12 @@ export const useAppStore = create<AppState>()(
           case "orders":
             set({ currentPage: { type: "orders" } });
             if (typeof window !== "undefined")
-              window.history.pushState({}, "", "/account");
+              window.history.pushState({}, "", "/orders");
+            break;
+          case "bundles":
+            set({ currentPage: { type: "bundles" } });
+            if (typeof window !== "undefined")
+              window.history.pushState({}, "", "/bundles");
             break;
           case "wishlist":
             set({ currentPage: { type: "wishlist" } });

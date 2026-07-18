@@ -29,34 +29,67 @@ export async function POST(request: NextRequest) {
     const status = data.status; // success or failure
 
     if (status === 'success') {
+      // Guard against duplicate callbacks (PayU retries on network timeouts).
+      // Only process if the order is still in unpaid state — if it's already
+      // paid, skip straight to the success redirect without re-decrementing stock.
+      const existingOrder = await db.order.findUnique({
+        where: { id: orderId },
+        select: { id: true, paymentStatus: true },
+      });
+
+      if (!existingOrder) {
+        console.error(`PayU callback: order ${orderId} not found`);
+        return NextResponse.redirect(new URL('/checkout?error=order_not_found', request.url));
+      }
+
+      if (existingOrder.paymentStatus === PAYMENT_STATUS.PAID) {
+        // Already processed — idempotent redirect to success page
+        console.warn(`PayU callback: duplicate callback for already-paid order ${orderId}, skipping`);
+        return NextResponse.redirect(new URL(`/order-success/${orderId}`, request.url));
+      }
+
       const order = await db.$transaction(async (tx) => {
+        // Re-check inside the transaction to close the TOCTOU race window
+        const locked = await tx.order.findUnique({
+          where: { id: orderId },
+          select: { paymentStatus: true },
+        });
+
+        if (!locked || locked.paymentStatus === PAYMENT_STATUS.PAID) {
+          // Another request already committed — return null to signal skip
+          return null;
+        }
+
         const updated = await tx.order.update({
           where: { id: orderId },
           data: {
             paymentStatus: PAYMENT_STATUS.PAID,
             paymentId: data.mihpayid,
           },
-          include: { items: true }
+          include: { items: true },
         });
 
         for (const item of updated.items) {
           if (item.variantId) {
             await tx.productVariant.update({
               where: { id: item.variantId },
-              data: { stock: { decrement: item.quantity } }
+              data: { stock: { decrement: item.quantity } },
             });
           } else {
             await tx.product.update({
               where: { id: item.productId },
-              data: {
-                stock: { decrement: item.quantity }
-              }
+              data: { stock: { decrement: item.quantity } },
             });
           }
         }
 
         return updated;
       });
+
+      // Null means the transaction detected a concurrent payment — still redirect to success
+      if (!order) {
+        return NextResponse.redirect(new URL(`/order-success/${orderId}`, request.url));
+      }
 
       try {
         await sendOrderConfirmation({
@@ -79,7 +112,7 @@ export async function POST(request: NextRequest) {
         sendWhatsApp(
           order.customerPhone,
           `Thank you for your order ${order.orderNumber || order.id.slice(0, 8)}! Your payment of ₹${order.totalAmount.toFixed(2)} has been received. We will notify you once it ships.`,
-        ).catch(() => {});
+        ).catch(() => { });
       }
 
       try {

@@ -42,6 +42,18 @@ export async function GET(request: NextRequest) {
     const inStockCount = await db.product.count({ where: { ...baseWhere, stock: { gt: 0 } } });
     const outOfStockCount = await db.product.count({ where: { ...baseWhere, stock: { lte: 0 } } });
 
+    // Get brands with product counts
+    const brands = await db.brand.findMany({
+      where: { ...storeFilter, isActive: true },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        _count: { select: { Product: { where: baseWhere } } },
+      },
+      orderBy: { name: 'asc' },
+    });
+
     return NextResponse.json({
       categories: categories.map(c => ({ id: c.id, name: c.name, slug: c.slug, count: (c as any)._count.Product })),
       priceRange: {
@@ -49,7 +61,7 @@ export async function GET(request: NextRequest) {
         max: priceStats._max.price || 0,
         avg: priceStats._avg.price || 0,
       },
-      brands: [],
+      brands: brands.map(b => ({ id: b.id, name: b.name, slug: b.slug, count: (b as any)._count.Product })),
       availability: { inStock: inStockCount, outOfStock: outOfStockCount },
     });
   } catch (error) {

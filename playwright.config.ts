@@ -8,7 +8,7 @@ const envPath = fs.existsSync(path.resolve('.env')) ? '.env' : '.env.example';
 dotenv.config({ path: path.resolve(envPath) });
 
 // Set default fallback env vars for test processes
-process.env.DATABASE_URL = process.env.DATABASE_URL || 'file:/app/prisma/dev.db';
+process.env.DATABASE_URL = process.env.DATABASE_URL || 'file:./prisma/dev.db';
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'change-me-to-a-random-64-char-string-for-security-hardening-12345678';
 process.env.AUTH_SECRET = process.env.AUTH_SECRET || 'change-me-to-a-random-64-char-string-for-security-hardening-12345678';
 process.env.OTP_SECRET = process.env.OTP_SECRET || 'change-me-to-a-random-32-char-string';
@@ -36,7 +36,7 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     env: {
-      DATABASE_URL: 'file:/app/prisma/dev.db',
+      DATABASE_URL: 'file:./prisma/dev.db',
       AUTH_SECRET: 'change-me-to-a-random-64-char-string-for-security-hardening-12345678',
       JWT_SECRET: 'change-me-to-a-random-64-char-string-for-security-hardening-12345678',
       OTP_SECRET: 'change-me-to-a-random-32-char-string',

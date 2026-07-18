@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
+import { checkRateLimit } from '@/lib/rate-limit';
+
+const SEARCH_RATE_LIMIT = { maxRequests: 60, windowMs: 60 * 1000, prefix: 'public-search' };
 
 export async function GET(request: NextRequest) {
+  const rateLimitResponse = await checkRateLimit(request, SEARCH_RATE_LIMIT);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const { searchParams } = new URL(request.url);
     const q = (searchParams.get('q') || '').trim();

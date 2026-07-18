@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { logError } from '@/lib/error-logger';
-import { sendLowStockAlert } from '@/lib/email';
+import { sendLowStockAlert, sendBackInStockNotification } from '@/lib/email';
 
 async function resolveProduct(idOrSlug: string, includeDeleted = false) {
   const where = {
@@ -12,7 +12,7 @@ async function resolveProduct(idOrSlug: string, includeDeleted = false) {
     ],
     ...(includeDeleted ? {} : { deletedAt: null }),
   };
-  
+
   return db.product.findFirst({
     where,
     include: { Category: true },
@@ -169,6 +169,47 @@ export async function PUT(
           context: `PUT /api/products/[id] (${product.id})`,
         });
       });
+    }
+
+    // Dispatch back-in-stock notification emails when stock transitions
+    // from out-of-stock (<=0) to a positive value.
+    if (
+      body.stock !== undefined &&
+      product.stock > 0 &&
+      existing.stock <= 0
+    ) {
+      (async () => {
+        try {
+          const subscribers = await db.stockNotification.findMany({
+            where: { productId: product.id, notified: false },
+          });
+          if (subscribers.length === 0) return;
+
+          const notifiedIds: string[] = [];
+          await Promise.allSettled(
+            subscribers.map(async (sub) => {
+              const sent = await sendBackInStockNotification({
+                email: sub.email,
+                productName: product.name,
+                productSlug: product.slug,
+              });
+              if (sent) notifiedIds.push(sub.id);
+            })
+          );
+
+          if (notifiedIds.length > 0) {
+            await db.stockNotification.updateMany({
+              where: { id: { in: notifiedIds } },
+              data: { notified: true, notifiedAt: new Date() },
+            });
+          }
+        } catch (err) {
+          logError(err, {
+            category: 'email',
+            context: `stock-notification dispatch (${product.id})`,
+          });
+        }
+      })();
     }
 
     return NextResponse.json({ product });
