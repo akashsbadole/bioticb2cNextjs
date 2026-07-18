@@ -10,11 +10,10 @@ if (!secret) {
 
 const JWT_SECRET = new TextEncoder().encode(secret);
 
-export type TokenPayload = { userId: string; email: string; role: string; jti?: string };
+export type TokenPayload = { userId: string; email: string; role: string; jti: string };
 
 export async function createToken(payload: TokenPayload) {
-  const jti = payload.jti || crypto.randomUUID();
-  return await new SignJWT({ ...payload, jti })
+  return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
