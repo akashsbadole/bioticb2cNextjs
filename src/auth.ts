@@ -46,8 +46,9 @@ const config: NextAuthConfig = {
         const { verifyOtp } = await import("@/lib/otp");
         const email = String(credentials?.email ?? "").trim().toLowerCase();
         const code = String(credentials?.code ?? "").trim();
+        const phone = credentials?.phone ? String(credentials?.phone) : undefined;
         if (!email || !code) return null;
-        const user = await verifyOtp(email, code);
+        const user = await verifyOtp(email, code, phone);
         if (!user) return null;
         return {
           id: user.id,

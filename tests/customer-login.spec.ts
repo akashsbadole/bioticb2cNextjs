@@ -103,6 +103,9 @@ test.describe('Customer Login Features', () => {
     // Fill email
     await page.fill('input[id="email"]', 'customer@store.com');
 
+    // Fill phone (matches the test account's stored phone)
+    await page.fill('input[id="phone"]', '+1234567890');
+
     // Capture request-otp response to retrieve devCode
     const otpResponsePromise = page.waitForResponse('**/api/account/request-otp');
     await page.getByRole('button', { name: 'Send code' }).click();

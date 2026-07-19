@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
+import { Loader2, Mail, Lock, ArrowRight, Phone } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const RecaptchaWidget = dynamic(() => import("./RecaptchaWidget").then((m) => m.RecaptchaWidget), { ssr: false });
@@ -20,6 +20,7 @@ export function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("password");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [otpChannel, setOtpChannel] = useState<"email" | "sms">("email");
@@ -65,6 +66,10 @@ export function LoginPage() {
       toast.error("Enter your email first");
       return;
     }
+    if (otpChannel === "sms" && !phone) {
+      toast.error("Enter your phone number to receive the SMS code");
+      return;
+    }
     if (settings?.recaptcha_site_key && !recaptchaToken) {
       toast.error("Please complete the reCAPTCHA");
       return;
@@ -74,7 +79,7 @@ export function LoginPage() {
       const res = await fetch("/api/account/request-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, channel: otpChannel, recaptchaToken }),
+        body: JSON.stringify({ email, phone, channel: otpChannel, recaptchaToken }),
       });
       const data = await res.json();
       if (!res.ok && data.error) {
@@ -95,7 +100,7 @@ export function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await signIn("otp", { email, code, redirect: false });
+      const res = await signIn("otp", { email, phone, code, redirect: false });
       if (!res || res.error) {
         toast.error("Invalid or expired code");
         return;
@@ -181,6 +186,16 @@ export function LoginPage() {
                 <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 pl-10 rounded-xl" placeholder="you@example.com" required disabled={otpSent} />
               </div>
             </div>
+            {otpChannel === "sms" && (
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone number</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-12 pl-10 rounded-xl" placeholder="+91..." disabled={otpSent} />
+                </div>
+                <p className="text-xs text-muted-foreground">We&apos;ll send your verification code to this number.</p>
+              </div>
+            )}
             {!otpSent ? (
               <>
                 <div className="space-y-2">

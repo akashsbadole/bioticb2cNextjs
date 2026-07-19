@@ -22,9 +22,14 @@ function generateCode(): string {
  * channel: "email" | "sms". For "sms" the user's phone (from the User record) is used.
  * Always returns success:true to avoid account enumeration.
  */
+function normalizePhone(phone: string): string {
+  return phone.replace(/[\s()-]/g, "");
+}
+
 export async function requestOtp(
   email: string,
   channel: "email" | "sms" = "email",
+  phone?: string,
 ): Promise<{ success: boolean; code?: string; error?: string }> {
   const normalized = email.trim().toLowerCase();
   const user = await db.user.findUnique({ where: { email: normalized } });
@@ -50,12 +55,16 @@ export async function requestOtp(
     if (!user.phone) {
       return { success: false, error: "No phone number on file for this account" };
     }
+    if (phone && normalizePhone(phone) !== normalizePhone(user.phone)) {
+      return { success: false, error: "Phone number does not match this account" };
+    }
+    const destination = phone ? normalizePhone(phone) : user.phone;
     const result = await sendSms(
-      user.phone,
+      destination,
       `Your verification code is ${code}. It expires in 10 minutes.`,
     );
     if (!result.success) {
-      console.log(`[OTP DEV] Code ${code} would have been sent via SMS to ${user.phone}`);
+      console.log(`[OTP DEV] Code ${code} would have been sent via SMS to ${destination}`);
       if (process.env.NODE_ENV !== "production") {
         return { success: true, code };
       }
@@ -85,7 +94,7 @@ export async function requestOtp(
  * Verify an OTP code and return the associated user if valid.
  * Marks the token as used so it cannot be replayed.
  */
-export async function verifyOtp(email: string, code: string): Promise<AuthUser | null> {
+export async function verifyOtp(email: string, code: string, phone?: string): Promise<AuthUser | null> {
   const normalized = email.trim().toLowerCase();
   const token = await db.otpToken.findFirst({
     where: {

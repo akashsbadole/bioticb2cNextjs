@@ -8,6 +8,7 @@ const OTP_RATE_LIMIT = { maxRequests: 5, windowMs: 15 * 60 * 1000, prefix: "otp-
 
 const schema = z.object({
   email: z.string().email(),
+  phone: z.string().optional(),
   channel: z.enum(["email", "sms"]).default("email"),
   recaptchaToken: z.string().nullable().optional(),
 });
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const result = await requestOtp(parsed.data.email, parsed.data.channel);
+    const result = await requestOtp(parsed.data.email, parsed.data.channel, parsed.data.phone);
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
