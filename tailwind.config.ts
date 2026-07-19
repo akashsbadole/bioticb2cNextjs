@@ -62,8 +62,8 @@ const config: Config = {
           "4": "var(--chart-4)",
           "5": "var(--chart-5)",
         },
-        // Vedika Ayurveda palette
-        vedika: {
+        // Biotic Ayurveda palette
+        biotic: {
           bg: "#F7F1DE",
           "bg-alt": "#EFE6C8",
           paper: "#FFFDF6",
@@ -104,7 +104,7 @@ const config: Config = {
       boxShadow: {
         card: "0 4px 20px rgba(0, 0, 0, 0.05)",
         "card-hover": "0 8px 30px rgba(0, 0, 0, 0.08)",
-        vedika: "0 12px 30px -14px rgba(28,44,35,.28)",
+        biotic: "0 12px 30px -14px rgba(28,44,35,.28)",
       },
       transitionDuration: {
         "300": "300ms",

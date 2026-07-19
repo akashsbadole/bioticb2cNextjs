@@ -40,8 +40,8 @@ export default defineConfig({
       AUTH_SECRET: 'change-me-to-a-random-64-char-string-for-security-hardening-12345678',
       JWT_SECRET: 'change-me-to-a-random-64-char-string-for-security-hardening-12345678',
       OTP_SECRET: 'change-me-to-a-random-32-char-string',
-      NEXT_PUBLIC_STORE_SLUG: 'vedika-ayurveda',
-      DEFAULT_STORE_SLUG: 'vedika-ayurveda',
+      NEXT_PUBLIC_STORE_SLUG: 'biotic-naturals',
+      DEFAULT_STORE_SLUG: 'biotic-naturals',
       DISABLE_RATE_LIMIT: 'true',
       NEXT_PUBLIC_DISABLE_POPUPS: 'true',
     }

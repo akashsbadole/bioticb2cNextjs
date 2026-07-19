@@ -123,7 +123,7 @@ export function StoreLayout({
   }, [settings?.chat_widget_id]);
 
   return (
-    <div className="vedika-theme vedika-grain flex min-h-screen flex-col">
+    <div className="biotic-theme biotic-grain flex min-h-screen flex-col">
       {/* Announcement Bar */}
       {settings?.announcement_text ? (
         <div className="bg-primary text-center text-xs py-2 px-4">

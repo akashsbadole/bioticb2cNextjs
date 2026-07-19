@@ -129,8 +129,8 @@
 
 ---
 
-### 🟢 IF6 — `vedika-components.tsx` — Orphaned File
-**File:** `src/components/store/vedika-components.tsx`
+### 🟢 IF6 — `biotic-components.tsx` — Orphaned File
+**File:** `src/components/store/biotic-components.tsx`
 - ~500-line alternate UI theme; not imported anywhere in the app
 - **Status:** Delete or integrate.
 

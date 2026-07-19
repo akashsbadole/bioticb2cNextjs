@@ -3,7 +3,7 @@ import { parseCSV } from "../src/lib/utils";
 import * as fs from "fs";
 import * as path from "path";
 
-const STORE_SLUG = process.env.DEFAULT_STORE_SLUG || "vedika-ayurveda";
+const STORE_SLUG = process.env.DEFAULT_STORE_SLUG || "biotic-naturals";
 
 const COLUMNS: Record<string, number> = {};
 

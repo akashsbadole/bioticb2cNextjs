@@ -3,7 +3,7 @@ import { parseCSV } from "../src/lib/utils";
 import * as fs from "fs";
 
 const CSV_PATH = "C:\\Users\\akash\\Downloads\\woocommer-product.csv";
-const STORE_SLUG = process.env.DEFAULT_STORE_SLUG || "vedika-ayurveda";
+const STORE_SLUG = process.env.DEFAULT_STORE_SLUG || "biotic-naturals";
 
 async function getStoreId(): Promise<string | null> {
   const store = await db.store.findFirst({ where: { slug: STORE_SLUG } });

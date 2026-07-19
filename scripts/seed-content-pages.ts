@@ -1,6 +1,6 @@
 import { db } from "../src/lib/db";
 
-const STORE_SLUG = process.env.DEFAULT_STORE_SLUG || "vedika-ayurveda";
+const STORE_SLUG = process.env.DEFAULT_STORE_SLUG || "biotic-naturals";
 
 async function getStoreId(): Promise<string | null> {
   const store = await db.store.findFirst({ where: { slug: STORE_SLUG } });
@@ -38,7 +38,7 @@ async function main() {
     storeId,
     "homepage",
     "Homepage",
-    `<p>Welcome to Vedika Ayurveda — rooted in classical Ayurvedic texts, tested against modern lab standards. Explore our dosha-balanced formulations for skin, hair, and wellness.</p>`,
+    `<p>Welcome to Biotic Ayurveda — rooted in classical Ayurvedic texts, tested against modern lab standards. Explore our dosha-balanced formulations for skin, hair, and wellness.</p>`,
     JSON.stringify([
       {
         id: "homepage-hero",
@@ -51,7 +51,7 @@ async function main() {
             buttonLink: "/shop",
           },
           features: {
-            title: "The Vedika Standard",
+            title: "The Biotic Standard",
             items: [
               { title: "Lab-Tested", description: "Every batch third-party tested for potency, heavy metals, and microbial safety.", icon: "FlaskConical" },
               { title: "Small-Batch", description: "Made in small quantities by hand, with the attention a vaidya gives a patient they know.", icon: "FlaskRound" },
@@ -67,7 +67,7 @@ async function main() {
         },
       },
     ]),
-    "Vedika Ayurveda — Rooted in Wellness",
+    "Biotic Ayurveda — Rooted in Wellness",
     "Ayurvedic formulations for skin, hair and wellness. Small-batch, lab-tested, dosha-balanced. Made in India.",
     1
   );
@@ -80,7 +80,7 @@ async function main() {
     storeId,
     "about-us",
     "About Us",
-    `<p>Every formula we make begins with a classical Ayurvedic text and ends with a lab report. Founded in 2012 in Jaipur, Rajasthan — Vedika Ayurveda bridges ancient wisdom and modern quality standards.</p>`,
+    `<p>Every formula we make begins with a classical Ayurvedic text and ends with a lab report. Founded in 2012 in Jaipur, Rajasthan — Biotic Ayurveda bridges ancient wisdom and modern quality standards.</p>`,
     JSON.stringify([
       {
         id: "about-hero-1",
@@ -104,7 +104,7 @@ async function main() {
             { value: "100%", label: "Lab-tested batches" },
           ],
           story: {
-            heading: "The Vedika difference",
+            heading: "The Biotic difference",
             subtitle: "Ayurveda that honours both the past and the proof",
             narrative: [
               "Every formulation we make begins with a classical Ayurvedic text — the Charaka Samhita, the Sushruta Samhita, or the Ashtanga Hridayam. From there, we work with vaidyas who have spent decades studying these texts, not interpreting them through a modern lens.",
@@ -117,7 +117,7 @@ async function main() {
               { year: "2012", title: "Founded in Jaipur", desc: "A small workshop with two Ayurvedic vaidyas and a belief that classical formulas deserved a modern audience." },
               { year: "2015", title: "First lab partnership", desc: "Partnered with an NABL-accredited lab in Pune to test every batch for safety and potency." },
               { year: "2018", title: "40,000th ritual shipped", desc: "Crossed a milestone that proved people were ready for long-term wellness routines." },
-              { year: "2026", title: "Vedika today", desc: "Still small-batch. Still rooted in the texts. Still made by people who care about the process.", current: true },
+              { year: "2026", title: "Biotic today", desc: "Still small-batch. Still rooted in the texts. Still made by people who care about the process.", current: true },
             ],
           },
           directors: [
@@ -147,19 +147,19 @@ async function main() {
           },
           missionVisionValues: [
             {
-              icon: "Leaf", color: "text-vedika-green", bg: "bg-vedika-green-tint",
+              icon: "Leaf", color: "text-biotic-green", bg: "bg-biotic-green-tint",
               label: "Mission",
               title: "Make classical Ayurveda accessible",
               desc: "To formulate authentic Ayurvedic products that are lab-tested, traceable, and made for modern rituals.",
             },
             {
-              icon: "Eye", color: "text-vedika-gold", bg: "bg-vedika-gold-tint",
+              icon: "Eye", color: "text-biotic-gold", bg: "bg-biotic-gold-tint",
               label: "Vision",
               title: "Restore trust in Ayurvedic wellness",
               desc: "To set a new standard for transparency in Ayurvedic manufacturing — where every claim is backed by a test report.",
             },
             {
-              icon: "HeartHandshake", color: "text-vedika-red", bg: "bg-rose-50",
+              icon: "HeartHandshake", color: "text-biotic-red", bg: "bg-rose-50",
               label: "Values",
               title: "Text first · Lab always · People matter",
               desc: "We don't cut corners. If it isn't in the classical texts, it doesn't go in. If it isn't lab-tested, it doesn't ship.",
@@ -178,7 +178,7 @@ async function main() {
             dispatchDesc: "We dispatch to all major markets across India via road and rail freight. Consignments dispatched within agreed lead times.",
           },
           cta: {
-            title: "Experience Vedika Ayurveda",
+            title: "Experience Biotic Ayurveda",
             cards: [
               { icon: "Package", title: "Browse formulations", desc: "Explore our full range of skin, hair and wellness products.", cta: "Shop now →", page: "shop", useForm: false },
               { icon: "Mail", title: "Bulk / wholesale enquiry", desc: "Looking for bulk supply or partnership? Send us your requirement.", cta: "Send enquiry →", page: "contact", useForm: true },
@@ -188,7 +188,7 @@ async function main() {
         },
       },
     ]),
-    "About Us — Vedika Ayurveda",
+    "About Us — Biotic Ayurveda",
     "Rooted in classical Ayurvedic texts, tested against modern lab standards. Small-batch formulations made with integrity.",
     2
   );
@@ -234,7 +234,7 @@ async function main() {
         },
       },
     ]),
-    "Shop — Vedika Ayurveda",
+    "Shop — Biotic Ayurveda",
     "Browse our complete range of Ayurvedic formulations for skin, hair, and wellness. Dosha-balanced and lab-tested.",
     3
   );
@@ -247,7 +247,7 @@ async function main() {
     storeId,
     "contact",
     "Contact Us",
-    `<p>Get in touch with the Vedika team. Questions on dosha matching, an order, or a bulk/wholesale enquiry — write to us directly. We reply within one business day.</p>`,
+    `<p>Get in touch with the Biotic team. Questions on dosha matching, an order, or a bulk/wholesale enquiry — write to us directly. We reply within one business day.</p>`,
     JSON.stringify([
       {
         id: "contact-hero-1",
@@ -322,8 +322,8 @@ async function main() {
         },
       },
     ]),
-    "Contact Us — Vedika Ayurveda",
-    "Get in touch with the Vedika team. Questions on dosha matching, orders, or bulk enquiries — we reply within one business day.",
+    "Contact Us — Biotic Ayurveda",
+    "Get in touch with the Biotic team. Questions on dosha matching, orders, or bulk enquiries — we reply within one business day.",
     4
   );
   console.log("  ✅ Contact (contact-page-content block)\n");
@@ -341,7 +341,7 @@ async function main() {
         id: "blog-hero-1",
         type: "hero",
         data: {
-          title: "Journal — Vedika Ayurveda",
+          title: "Journal — Biotic Ayurveda",
           subtitle: "Long-form writing on doshas, ingredients, and the science behind formulas that are centuries old.",
           buttonText: "Read Latest",
           buttonLink: "/blog",
@@ -369,7 +369,7 @@ async function main() {
         },
       },
     ]),
-    "Journal — Vedika Ayurveda",
+    "Journal — Biotic Ayurveda",
     "Long-form writing on doshas, ingredients, and the science behind formulas that are centuries old.",
     5
   );

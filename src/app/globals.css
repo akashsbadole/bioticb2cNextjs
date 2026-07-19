@@ -38,36 +38,36 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-vedika-bg: var(--vedika-bg);
-  --color-vedika-bg-alt: var(--vedika-bg-alt);
-  --color-vedika-paper: var(--vedika-paper);
-  --color-vedika-ink: var(--vedika-ink);
-  --color-vedika-ink-soft: var(--vedika-ink-soft);
-  --color-vedika-green: var(--vedika-green);
-  --color-vedika-green-dark: var(--vedika-green-dark);
-  --color-vedika-green-tint: var(--vedika-green-tint);
-  --color-vedika-gold: var(--vedika-gold);
-  --color-vedika-gold-tint: var(--vedika-gold-tint);
-  --color-vedika-red: var(--vedika-red);
-  --color-vedika-sand: var(--vedika-sand);
-  --color-vedika-line: var(--vedika-line);
+  --color-biotic-bg: var(--biotic-bg);
+  --color-biotic-bg-alt: var(--biotic-bg-alt);
+  --color-biotic-paper: var(--biotic-paper);
+  --color-biotic-ink: var(--biotic-ink);
+  --color-biotic-ink-soft: var(--biotic-ink-soft);
+  --color-biotic-green: var(--biotic-green);
+  --color-biotic-green-dark: var(--biotic-green-dark);
+  --color-biotic-green-tint: var(--biotic-green-tint);
+  --color-biotic-gold: var(--biotic-gold);
+  --color-biotic-gold-tint: var(--biotic-gold-tint);
+  --color-biotic-red: var(--biotic-red);
+  --color-biotic-sand: var(--biotic-sand);
+  --color-biotic-line: var(--biotic-line);
 }
 
-/* Vedika Ayurveda — design tokens */
+/* Biotic Ayurveda — design tokens */
 :root {
-  --vedika-bg: #F7F1DE;
-  --vedika-bg-alt: #EFE6C8;
-  --vedika-paper: #FFFDF6;
-  --vedika-ink: #241D14;
-  --vedika-ink-soft: #5B5240;
-  --vedika-green: #2F4A3C;
-  --vedika-green-dark: #1C2C23;
-  --vedika-green-tint: #DCE6DA;
-  --vedika-gold: #C68A2E;
-  --vedika-gold-tint: #F1DFB4;
-  --vedika-red: #A6402F;
-  --vedika-sand: #D9C7A3;
-  --vedika-line: #E1D6B8;
+  --biotic-bg: #F7F1DE;
+  --biotic-bg-alt: #EFE6C8;
+  --biotic-paper: #FFFDF6;
+  --biotic-ink: #241D14;
+  --biotic-ink-soft: #5B5240;
+  --biotic-green: #2F4A3C;
+  --biotic-green-dark: #1C2C23;
+  --biotic-green-tint: #DCE6DA;
+  --biotic-gold: #C68A2E;
+  --biotic-gold-tint: #F1DFB4;
+  --biotic-red: #A6402F;
+  --biotic-sand: #D9C7A3;
+  --biotic-line: #E1D6B8;
 }
 
 :root {
@@ -335,54 +335,54 @@
 } */
 
 /* =========================================================
-   VEDIKA AYURVEDA — Store Theme Layer
-   Applied via .vedika-theme on the store wrapper
+   BIOTIC NATURALS — Store Theme Layer
+   Applied via .biotic-theme on the store wrapper
    ========================================================= */
-.vedika-theme {
-  --background: var(--vedika-bg);
-  --foreground: var(--vedika-ink);
-  --primary: var(--vedika-green);
+.biotic-theme {
+  --background: var(--biotic-bg);
+  --foreground: var(--biotic-ink);
+  --primary: var(--biotic-green);
   --primary-foreground: #FFFDF6;
-  --secondary: var(--vedika-gold);
+  --secondary: var(--biotic-gold);
   --secondary-foreground: #1C2C23;
-  --muted: var(--vedika-bg-alt);
-  --muted-foreground: var(--vedika-ink-soft);
-  --accent: var(--vedika-gold);
+  --muted: var(--biotic-bg-alt);
+  --muted-foreground: var(--biotic-ink-soft);
+  --accent: var(--biotic-gold);
   --accent-foreground: #1C2C23;
-  --destructive: var(--vedika-red);
+  --destructive: var(--biotic-red);
   --destructive-foreground: #FFFFFF;
-  --border: var(--vedika-line);
-  --input: var(--vedika-line);
-  --ring: var(--vedika-green);
-  --card: var(--vedika-paper);
-  --card-foreground: var(--vedika-ink);
-  --popover: var(--vedika-paper);
-  --popover-foreground: var(--vedika-ink);
+  --border: var(--biotic-line);
+  --input: var(--biotic-line);
+  --ring: var(--biotic-green);
+  --card: var(--biotic-paper);
+  --card-foreground: var(--biotic-ink);
+  --popover: var(--biotic-paper);
+  --popover-foreground: var(--biotic-ink);
   --radius: 0.5rem;
 }
 
-.vedika-theme body,
-.vedika-body {
-  background: var(--vedika-bg);
-  color: var(--vedika-ink);
+.biotic-theme body,
+.biotic-body {
+  background: var(--biotic-bg);
+  color: var(--biotic-ink);
   font-family: "Work Sans", var(--font-work-sans), -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.vedika-theme h1,
-.vedika-theme h2,
-.vedika-theme h3,
-.vedika-theme h4,
-.vedika-theme h5,
-.vedika-theme h6,
-.vedika-heading {
+.biotic-theme h1,
+.biotic-theme h2,
+.biotic-theme h3,
+.biotic-theme h4,
+.biotic-theme h5,
+.biotic-theme h6,
+.biotic-heading {
   font-family: "Fraunces", var(--font-fraunces), Georgia, serif;
-  color: var(--vedika-green-dark);
+  color: var(--biotic-green-dark);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
 
 /* Paper grain overlay */
-.vedika-grain::before {
+.biotic-grain::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -393,28 +393,28 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Vedika eyebrow label */
-.vedika-eyebrow {
+/* Biotic eyebrow label */
+.biotic-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--vedika-red);
+  color: var(--biotic-red);
   font-weight: 600;
   margin-bottom: 16px;
 }
-.vedika-eyebrow::before {
+.biotic-eyebrow::before {
   content: "";
   width: 22px;
   height: 1px;
-  background: var(--vedika-red);
+  background: var(--biotic-red);
   display: inline-block;
 }
 
-/* Vedika buttons */
-.vedika-btn {
+/* Biotic buttons */
+.biotic-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -429,93 +429,93 @@
   white-space: nowrap;
   cursor: pointer;
 }
-.vedika-btn:active { transform: scale(0.97); }
-.vedika-btn-primary { background: var(--vedika-green); color: var(--vedika-paper); }
-.vedika-btn-primary:hover { background: var(--vedika-green-dark); }
-.vedika-btn-gold { background: var(--vedika-gold); color: var(--vedika-green-dark); }
-.vedika-btn-gold:hover { background: #B57C22; }
-.vedika-btn-outline { background: transparent; color: var(--vedika-green-dark); border-color: var(--vedika-green-dark); }
-.vedika-btn-outline:hover { background: var(--vedika-green-dark); color: var(--vedika-paper); }
-.vedika-btn-sm { padding: 10px 20px; font-size: 0.8rem; }
+.biotic-btn:active { transform: scale(0.97); }
+.biotic-btn-primary { background: var(--biotic-green); color: var(--biotic-paper); }
+.biotic-btn-primary:hover { background: var(--biotic-green-dark); }
+.biotic-btn-gold { background: var(--biotic-gold); color: var(--biotic-green-dark); }
+.biotic-btn-gold:hover { background: #B57C22; }
+.biotic-btn-outline { background: transparent; color: var(--biotic-green-dark); border-color: var(--biotic-green-dark); }
+.biotic-btn-outline:hover { background: var(--biotic-green-dark); color: var(--biotic-paper); }
+.biotic-btn-sm { padding: 10px 20px; font-size: 0.8rem; }
 
-/* Vedika card */
-.vedika-card {
-  background: var(--vedika-paper);
-  border: 1px solid var(--vedika-line);
+/* Biotic card */
+.biotic-card {
+  background: var(--biotic-paper);
+  border: 1px solid var(--biotic-line);
   border-radius: 14px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.vedika-card:hover {
+.biotic-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 30px -14px rgba(28,44,35,0.28);
 }
 
-/* Vedika container */
-.vedika-container {
+/* Biotic container */
+.biotic-container {
   max-width: 1240px;
   margin: 0 auto;
   padding: 0 16px;
 }
 
 @media (min-width: 640px) {
-  .vedika-container {
+  .biotic-container {
     padding: 0 32px;
   }
 }
 
-/* Vedika section */
-.vedika-section { padding: 96px 0; }
-.vedika-section-tight { padding: 64px 0; }
+/* Biotic section */
+.biotic-section { padding: 96px 0; }
+.biotic-section-tight { padding: 64px 0; }
 
-/* Vedika section heading */
-.vedika-section-head {
+/* Biotic section heading */
+.biotic-section-head {
   text-align: center;
   max-width: 640px;
   margin: 0 auto 56px;
 }
-.vedika-section-head.left {
+.biotic-section-head.left {
   text-align: left;
   margin: 0 0 48px;
 }
 
 /* Botanical divider */
-.vedika-divider {
+.biotic-divider {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 18px;
   margin: 0 auto 56px;
-  color: var(--vedika-sand);
+  color: var(--biotic-sand);
 }
-.vedika-divider::before,
-.vedika-divider::after {
+.biotic-divider::before,
+.biotic-divider::after {
   content: "";
   flex: 1;
   max-width: 120px;
   height: 1px;
-  background: var(--vedika-line);
+  background: var(--biotic-line);
 }
 
-/* Vedika grid helpers */
-.vedika-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-.vedika-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-.vedika-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
-.vedika-product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+/* Biotic grid helpers */
+.biotic-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.biotic-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.biotic-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+.biotic-product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
 
-/* Vedika form inputs */
-.input-vedika {
-  border: 1px solid var(--vedika-line);
+/* Biotic form inputs */
+.input-biotic {
+  border: 1px solid var(--biotic-line);
   border-radius: 100px;
   padding: 10px 16px;
-  background: var(--vedika-paper);
+  background: var(--biotic-paper);
   font: inherit;
-  color: var(--vedika-ink);
+  color: var(--biotic-ink);
   font-size: .88rem;
   outline: none;
   width: 100%;
 }
-.input-vedika:focus {
-  outline: 2px solid var(--vedika-green);
+.input-biotic:focus {
+  outline: 2px solid var(--biotic-green);
 }
 
 /* Icon circle button */
@@ -528,8 +528,8 @@
   justify-content: center;
   border: none;
   cursor: pointer;
-  background: var(--vedika-green);
-  color: var(--vedika-paper);
+  background: var(--biotic-green);
+  color: var(--biotic-paper);
 }
 .icon-circle-sm {
   width: 34px;
@@ -541,11 +541,11 @@
   border: none;
   cursor: pointer;
   background: rgba(255, 253, 246, 0.9);
-  color: var(--vedika-green-dark);
+  color: var(--biotic-green-dark);
   z-index: 2;
 }
 .icon-circle-sm:hover {
-  background: var(--vedika-paper);
+  background: var(--biotic-paper);
 }
 
 /* Header responsive */
@@ -559,8 +559,8 @@
 
 /* Responsive */
 @media (max-width: 1080px) {
-  .vedika-grid-4 { grid-template-columns: repeat(2, 1fr); }
-  .vedika-product-grid { grid-template-columns: repeat(2, 1fr); }
+  .biotic-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .biotic-product-grid { grid-template-columns: repeat(2, 1fr); }
   .shop-layout { grid-template-columns: 1fr; }
   .contact-layout { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -569,8 +569,8 @@
   .hero { grid-template-columns: 1fr !important; }
   .hero .hero-art { order: -1; max-width: 340px; margin: 0 auto; }
   .spotlight { grid-template-columns: 1fr !important; padding: 24px 16px !important; }
-  .vedika-grid-3 { grid-template-columns: 1fr; }
-  .vedika-grid-2 { grid-template-columns: 1fr; }
+  .biotic-grid-3 { grid-template-columns: 1fr; }
+  .biotic-grid-2 { grid-template-columns: 1fr; }
   .ritual { grid-template-columns: 1fr !important; }
   .blog-featured { grid-template-columns: 1fr !important; }
   .newsletter { flex-direction: column !important; text-align: center; }
@@ -578,9 +578,9 @@
   .form-grid { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 680px) {
-  .vedika-grid-4 { grid-template-columns: 1fr; }
-  .vedika-product-grid { grid-template-columns: 1fr; }
-  .vedika-section { padding: 64px 0 !important; }
+  .biotic-grid-4 { grid-template-columns: 1fr; }
+  .biotic-product-grid { grid-template-columns: 1fr; }
+  .biotic-section { padding: 64px 0 !important; }
   .trust-row { justify-content: center !important; text-align: center; }
 }
 
@@ -589,21 +589,21 @@
 
 /* Nav link states */
 .nav-link {
-  color: var(--vedika-ink);
+  color: var(--biotic-ink);
 }
 .nav-link:hover,
 .nav-link.nav-link-active {
-  color: var(--vedika-red);
+  color: var(--biotic-red);
 }
 
 /* Dropdown item hover */
 .dropdown-item:hover {
-  background: var(--vedika-bg-alt);
+  background: var(--biotic-bg-alt);
 }
 
 /* Icon button hover */
 .icon-btn:hover {
-  background: var(--vedika-sand);
+  background: var(--biotic-sand);
 }
 
 /* Mobile Sheet width */

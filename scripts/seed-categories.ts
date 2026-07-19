@@ -1,6 +1,6 @@
 import { db } from "../src/lib/db";
 
-const STORE_SLUG = process.env.NEXT_PUBLIC_STORE_SLUG || "vedika-ayurveda";
+const STORE_SLUG = process.env.NEXT_PUBLIC_STORE_SLUG || "biotic-naturals";
 
 async function main() {
   const store = await db.store.findFirst({ where: { slug: STORE_SLUG } });

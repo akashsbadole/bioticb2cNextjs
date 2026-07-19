@@ -1,6 +1,6 @@
 import { db } from "../src/lib/db";
 
-const STORE_SLUG = process.env.DEFAULT_STORE_SLUG || "vedika-ayurveda";
+const STORE_SLUG = process.env.DEFAULT_STORE_SLUG || "biotic-naturals";
 
 async function getStoreId(): Promise<string | null> {
   const store = await db.store.findFirst({ where: { slug: STORE_SLUG } });
@@ -103,7 +103,7 @@ const POSTS = [
   {
     slug: "why-we-still-formulate-by-hand-and-by-text",
     title: "Why we still formulate by hand (and by text)",
-    excerpt: "In an age of machine blending, every Vedika formulation is still hand-weighed and hand-mixed in small batches.",
+    excerpt: "In an age of machine blending, every Biotic formulation is still hand-weighed and hand-mixed in small batches.",
     category: "Behind the Brand",
     content: `<p>If you visit our Jaipur workshop on a production day, the first thing you will notice is the quiet. There are no automated blenders running 50-kilo batches. There is no conveyor belt. There are people — weighing ingredients by hand on calibrated scales, mixing them in copper vessels, and checking the texture, colour, and aroma of every batch before it moves to the next stage.</p>
 <p>This is not a marketing choice. It is a formulation choice.</p>
@@ -111,11 +111,11 @@ const POSTS = [
 <p>Ayurvedic powders are not homogeneous in the way a synthetic compound is. When you combine Licorice root powder with Manjistha and Turmeric, the particle sizes, densities, and moisture contents are different. A machine blending 50 kg at once will separate these by density during transport and storage. The end user might get a jar that is mostly one ingredient at the top and another at the bottom.</p>
 <p>Hand-mixing in small batches — 2 to 5 kg at a time — allows our formulators to ensure uniform distribution of every ingredient. They can feel when the blend is consistent. They can see it. That sensory feedback is lost in automation.</p>
 <h2>Following the text, not the trend</h2>
-<p>Every Vedika formula begins with a classical source: the Charaka Samhita, the Sushruta Samhita, or the Ashtanga Hridayam. These texts specify not just the ingredients and their proportions, but also the method of preparation (<em>kalpana</em>). Some preparations require specific grinding media, specific soaking times, or specific sequences of adding ingredients.</p>
+<p>Every Biotic formula begins with a classical source: the Charaka Samhita, the Sushruta Samhita, or the Ashtanga Hridayam. These texts specify not just the ingredients and their proportions, but also the method of preparation (<em>kalpana</em>). Some preparations require specific grinding media, specific soaking times, or specific sequences of adding ingredients.</p>
 <p>These instructions exist for a reason. The order in which ingredients are combined can affect the bioavailability of the active compounds. The grinding method can change the particle size distribution, which affects absorption. When you scale up a classical formula for mass production, these details are often the first to be sacrificed. We refuse to sacrifice them.</p>
 <h2>The cost of doing it right</h2>
 <p>Hand-formulating is slower and more expensive. It limits our production capacity. It means we cannot compete on price with mass-market brands that use spray-dried extracts and flow agents.</p>
-<p>But it also means that when you open a jar of a Vedika formulation, you are getting exactly what the text intended — not a commercial approximation. Every batch is weighed, mixed, inspected, and tested before it ships. That is a standard we will not compromise on.</p>`,
+<p>But it also means that when you open a jar of a Biotic formulation, you are getting exactly what the text intended — not a commercial approximation. Every batch is weighed, mixed, inspected, and tested before it ships. That is a standard we will not compromise on.</p>`,
     tags: JSON.stringify(["Behind the Brand", "Formulation", "Quality"]),
     publishedAt: "2026-05-10T00:00:00.000Z",
     isPublished: true,

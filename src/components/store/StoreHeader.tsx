@@ -348,20 +348,20 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
   return (
     <>
       {/* === ANNOUNCEMENT BAR === */}
-      <div className="bg-vedika-green-dark text-vedika-gold-tint text-center text-xs tracking-wide px-3 py-[9px]">
+      <div className="bg-biotic-green-dark text-biotic-gold-tint text-center text-xs tracking-wide px-3 py-[9px]">
         Free shipping across India on orders above ₹799 &nbsp;•&nbsp; Formulated
         per classical Ayurvedic texts
       </div>
 
       {/* === MAIN NAVIGATION BAR === */}
       <header
-        className="site-header sticky top-0 z-[500] bg-[rgba(247,241,222,0.92)] backdrop-blur border-b border-vedika-line"
+        className="site-header sticky top-0 z-[500] bg-[rgba(247,241,222,0.92)] backdrop-blur border-b border-biotic-line"
       >
         <div className="nav flex items-center justify-between px-3 py-3 md:px-8 md:py-[18px] max-w-[1240px] mx-auto gap-3 md:gap-6">
           {/* Logo */}
           <Link
             href={"/"}
-            className="logo flex items-center gap-1.5 md:gap-2.5 shrink-0 font-fraunces text-vedika-green-dark"
+            className="logo flex items-center gap-1.5 md:gap-2.5 shrink-0 font-fraunces text-biotic-green-dark"
           >
             <button
               onClick={() => onNavigate("home")}
@@ -387,7 +387,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
                 />
                 <path d="M16 24V10" stroke="#2F4A3C" strokeWidth="1.3" />
               </svg>
-              {settings?.site_name || "Vedika"}
+              {settings?.site_name || "Biotic"}
             </button>
           </Link>
 
@@ -398,7 +398,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
             {menuLoading
               ? Array.from({ length: 5 }).map((_, i) => (
                   <li key={i}>
-                    <div className="w-15 h-4 bg-vedika-sand rounded opacity-30" />
+                    <div className="w-15 h-4 bg-biotic-sand rounded opacity-30" />
                   </li>
                 ))
               : primaryMenuItems.length > 0
@@ -421,7 +421,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
                         </button>
                         {hasChildren && (
                           <div
-                            className="dropdown-menu absolute top-full left-0 mt-2 bg-vedika-paper border border-vedika-line rounded-lg shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)] min-w-[180px] p-2 z-100 hidden"
+                            className="dropdown-menu absolute top-full left-0 mt-2 bg-biotic-paper border border-biotic-line rounded-lg shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)] min-w-[180px] p-2 z-100 hidden"
                           >
                             {item.children?.map((child) => (
                               <button
@@ -462,7 +462,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
             {/* Search Button */}
             <button
               onClick={() => setSearchOpen(true)}
-              className="icon-btn w-9 h-9 rounded-full flex items-center justify-center text-vedika-green-dark bg-transparent border-none cursor-pointer transition-colors duration-200 hover:bg-vedika-sand"
+              className="icon-btn w-9 h-9 rounded-full flex items-center justify-center text-biotic-green-dark bg-transparent border-none cursor-pointer transition-colors duration-200 hover:bg-biotic-sand"
               aria-label="Search"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-[18px] h-[18px] sm:w-[19px] sm:h-[19px]">
@@ -474,7 +474,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
             {/* Account Button */}
             <button
               onClick={() => onNavigate(auth?.user ? "account" : "login")}
-              className="icon-btn hidden sm:w-9 sm:h-9 sm:rounded-full sm:flex items-center justify-center text-vedika-green-dark bg-transparent border-none cursor-pointer transition-colors duration-200 hover:bg-vedika-sand"
+              className="icon-btn hidden sm:w-9 sm:h-9 sm:rounded-full sm:flex items-center justify-center text-biotic-green-dark bg-transparent border-none cursor-pointer transition-colors duration-200 hover:bg-biotic-sand"
               aria-label="Account"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-[18px] h-[18px] sm:w-[19px] sm:h-[19px]">
@@ -486,7 +486,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
             {/* Cart Button */}
             <button
               onClick={() => onNavigate("cart")}
-              className="icon-btn w-9 h-9 rounded-full flex items-center justify-center text-vedika-green-dark bg-transparent border-none cursor-pointer transition-colors duration-200 hover:bg-vedika-sand relative"
+              className="icon-btn w-9 h-9 rounded-full flex items-center justify-center text-biotic-green-dark bg-transparent border-none cursor-pointer transition-colors duration-200 hover:bg-biotic-sand relative"
               aria-label="Cart"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-[18px] h-[18px] sm:w-[19px] sm:h-[19px]">
@@ -495,7 +495,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
                 <circle cx="18" cy="21" r="1" />
               </svg>
               {cartItemCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-vedika-red text-white text-[.62rem] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="absolute -top-0.5 -right-0.5 bg-biotic-red text-white text-[.62rem] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {cartItemCount}
                 </span>
               )}
@@ -505,7 +505,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
                 <button
-                  className="menu-toggle bg-transparent border-none cursor-pointer text-vedika-green-dark"
+                  className="menu-toggle bg-transparent border-none cursor-pointer text-biotic-green-dark"
                   aria-label="Menu"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-[26px] h-[26px]">
@@ -515,22 +515,22 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="w-80 p-0 bg-vedika-paper border-l border-vedika-line z-[999]"
+                className="w-80 p-0 bg-biotic-paper border-l border-biotic-line z-[999]"
               >
-                <SheetHeader className="border-b px-4 py-3 border-vedika-line">
-                  <SheetTitle className="flex items-center gap-2 text-base font-fraunces text-vedika-green-dark text-xl">
+                <SheetHeader className="border-b px-4 py-3 border-biotic-line">
+                  <SheetTitle className="flex items-center gap-2 text-base font-fraunces text-biotic-green-dark text-xl">
                     <svg viewBox="0 0 32 32" fill="none" className="w-6 h-6">
                       <circle cx="16" cy="16" r="15" stroke="#2F4A3C" strokeWidth="1.4"/>
                       <path d="M16 24C16 24 9 20.5 9 13.5C9 9.5 12 7 16 7C20 7 23 9.5 23 13.5C23 20.5 16 24 16 24Z" stroke="#2F4A3C" strokeWidth="1.3" strokeLinejoin="round"/>
                       <path d="M16 24V10" stroke="#2F4A3C" strokeWidth="1.3"/>
                     </svg>
-                    {settings?.site_name || "Vedika"}
+                    {settings?.site_name || "Biotic"}
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col gap-1 px-3 pt-3" role="navigation" aria-label="Mobile navigation">
                   {menuLoading
                     ? Array.from({ length: 5 }).map((_, i) => (
-                        <div key={i} className="h-9 bg-vedika-bg-alt rounded opacity-30" />
+                        <div key={i} className="h-9 bg-biotic-bg-alt rounded opacity-30" />
                       ))
                     : primaryMenuItems.length > 0
                       ? primaryMenuItems.map((item) => {
@@ -540,7 +540,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
                             <div key={item.id}>
                               {hasChildren ? (
                                 <button onClick={(e) => { e.preventDefault(); toggleExpanded(item.id); }}
-                                  className="flex justify-between items-center w-full px-3 py-2.5 text-sm font-medium text-vedika-ink bg-transparent border-none cursor-pointer font-inherit rounded-md"
+                                  className="flex justify-between items-center w-full px-3 py-2.5 text-sm font-medium text-biotic-ink bg-transparent border-none cursor-pointer font-inherit rounded-md"
                                 >
                                   <span>{item.label}</span>
                                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
@@ -551,16 +551,16 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
                                 </button>
                               ) : (
                                 <button onClick={() => { navigateOrOpen(item); setMobileOpen(false); }}
-                                  className="block w-full text-left px-3 py-2.5 text-sm font-medium text-vedika-ink bg-transparent border-none cursor-pointer font-inherit rounded-md"
+                                  className="block w-full text-left px-3 py-2.5 text-sm font-medium text-biotic-ink bg-transparent border-none cursor-pointer font-inherit rounded-md"
                                 >
                                   {item.label}
                                 </button>
                               )}
                               {hasChildren && isExpanded && (
-                                <div className="ml-3 border-l border-vedika-line pl-2">
+                                <div className="ml-3 border-l border-biotic-line pl-2">
                                   {item.children?.map((child) => (
                                     <button key={child.id} onClick={() => { navigateOrOpen(child); setMobileOpen(false); }}
-                                      className="block w-full text-left px-3 py-2 text-sm text-vedika-ink-soft bg-transparent border-none cursor-pointer font-inherit rounded-md"
+                                      className="block w-full text-left px-3 py-2 text-sm text-biotic-ink-soft bg-transparent border-none cursor-pointer font-inherit rounded-md"
                                     >
                                       {child.label}
                                     </button>
@@ -574,17 +574,17 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
                           <button key={link.slug || link.page}
                             onClick={() => { onNavigate(link.page, link.slug); setMobileOpen(false); }}
                             className={`block w-full text-left px-3 py-2.5 text-sm font-medium bg-transparent border-none cursor-pointer font-inherit rounded-md ${
-                              currentPage.type === link.page ? "text-vedika-red" : "text-vedika-ink"
+                              currentPage.type === link.page ? "text-biotic-red" : "text-biotic-ink"
                             }`}
                           >
                             {link.label}
                           </button>
                         ))}
 
-                  <div className="h-px bg-vedika-line my-3" />
+                  <div className="h-px bg-biotic-line my-3" />
 
                   <button onClick={() => { onNavigate("cart"); setMobileOpen(false); }}
-                    className="flex items-center gap-2.5 w-full text-left px-3 py-2.5 text-sm text-vedika-ink bg-transparent border border-vedika-line cursor-pointer font-inherit rounded-md font-medium"
+                    className="flex items-center gap-2.5 w-full text-left px-3 py-2.5 text-sm text-biotic-ink bg-transparent border border-biotic-line cursor-pointer font-inherit rounded-md font-medium"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
                       <path d="M4 6h2l1.6 10.2A2 2 0 0 0 9.6 18h7.8a2 2 0 0 0 2-1.7L21 8H7" />
@@ -594,7 +594,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
                   </button>
 
                   <button onClick={() => { onNavigate(auth?.user ? "account" : "login"); setMobileOpen(false); }}
-                    className="flex items-center gap-2.5 w-full text-left px-3 py-2.5 text-sm text-vedika-ink bg-transparent border-none cursor-pointer font-inherit rounded-md"
+                    className="flex items-center gap-2.5 w-full text-left px-3 py-2.5 text-sm text-biotic-ink bg-transparent border-none cursor-pointer font-inherit rounded-md"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
                       <circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
@@ -603,7 +603,7 @@ export function StoreHeader({ onNavigate }: StoreHeaderProps) {
                   </button>
 
                   <button onClick={() => setSearchOpen(true)}
-                    className="flex items-center gap-2.5 w-full text-left px-3 py-2.5 text-sm text-vedika-ink bg-transparent border border-vedika-line cursor-pointer font-inherit rounded-md"
+                    className="flex items-center gap-2.5 w-full text-left px-3 py-2.5 text-sm text-biotic-ink bg-transparent border border-biotic-line cursor-pointer font-inherit rounded-md"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
                       <circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" />

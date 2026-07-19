@@ -5,11 +5,11 @@ async function main() {
 
   // 1. Find or create the main store
   let store = await db.store.findFirst({
-    where: { slug: "vedika-ayurveda" }
+    where: { slug: "biotic-naturals" },
   });
 
   if (!store) {
-    console.log("Store 'vedika-ayurveda' not found. Creating it...");
+    console.log("Store 'biotic-naturals' not found. Creating it...");
     const admin = await db.user.findFirst({ where: { role: "admin" } });
     if (!admin) {
       console.error("No admin user found to associate with the store!");
@@ -17,10 +17,11 @@ async function main() {
     }
     store = await db.store.create({
       data: {
-        name: "Vedika Ayurveda",
-        slug: "vedika-ayurveda",
+        name: "Biotic Ayurveda",
+        slug: "biotic-naturals",
         domain: "localhost",
-        description: "Rooted in Wellness — Authentic Ayurvedic wellness products",
+        description:
+          "Rooted in Wellness — Authentic Ayurvedic wellness products",
         ownerUserId: admin.id,
         settings: JSON.stringify({ currency: "INR", tax_rate: 0 }),
       },
@@ -61,7 +62,7 @@ async function main() {
         slug: cat.slug,
         storeId,
         isActive: true,
-      }
+      },
     });
     console.log(`- Seeded category: ${cat.name}`);
   }
@@ -69,7 +70,7 @@ async function main() {
   // 3. Clear existing primary menu items and set up nested Shop -> Categories -> Ailments care & General Health menu
   console.log("Rebuilding primary menu navigation...");
   let primaryMenu = await db.menu.findFirst({
-    where: { storeId, location: "primary" }
+    where: { storeId, location: "primary" },
   });
 
   if (primaryMenu) {
@@ -82,7 +83,7 @@ async function main() {
         slug: "primary-menu",
         location: "primary",
         isActive: true,
-      }
+      },
     });
   }
 
@@ -96,7 +97,7 @@ async function main() {
       page: "shop",
       sortOrder: 1,
       isActive: true,
-    }
+    },
   });
 
   // Level 2: Categories (under Shop)
@@ -108,7 +109,7 @@ async function main() {
       page: "shop",
       sortOrder: 1,
       isActive: true,
-    }
+    },
   });
 
   // Level 3: Ailments care (under Categories)
@@ -121,7 +122,7 @@ async function main() {
       slug: "ailments-care",
       sortOrder: 1,
       isActive: true,
-    }
+    },
   });
 
   // Level 3: General Health (under Categories)
@@ -134,7 +135,7 @@ async function main() {
       slug: "general-health",
       sortOrder: 2,
       isActive: true,
-    }
+    },
   });
 
   // Other Level 1 items
@@ -145,7 +146,7 @@ async function main() {
       page: "blog",
       sortOrder: 2,
       isActive: true,
-    }
+    },
   });
 
   await db.menuItem.create({
@@ -155,7 +156,7 @@ async function main() {
       page: "about",
       sortOrder: 3,
       isActive: true,
-    }
+    },
   });
 
   await db.menuItem.create({
@@ -165,7 +166,7 @@ async function main() {
       page: "contact",
       sortOrder: 4,
       isActive: true,
-    }
+    },
   });
 
   console.log("Primary menu navigation seeded successfully!");
@@ -176,18 +177,21 @@ async function main() {
     {
       title: "About Us",
       slug: "about",
-      content: "We formulate organic and authentic Ayurvedic wellness products, crafted according to traditional techniques.",
+      content:
+        "We formulate organic and authentic Ayurvedic wellness products, crafted according to traditional techniques.",
     },
     {
       title: "Terms and Conditions",
       slug: "terms",
-      content: "Welcome to Vedika Ayurveda. By accessing our shop, you agree to our terms and conditions.",
+      content:
+        "Welcome to Biotic Ayurveda. By accessing our shop, you agree to our terms and conditions.",
     },
     {
       title: "Contact Us",
       slug: "contact",
-      content: "Get in touch with our customer service team. Phone: +91 141 403 7200, Email: hello@vedikaayurveda.com",
-    }
+      content:
+        "Get in touch with our customer service team. Phone: +91 141 403 7200, Email: info@bioticnaturals.com",
+    },
   ];
 
   for (const page of pagesToSeed) {
@@ -204,7 +208,7 @@ async function main() {
         slug: page.slug,
         content: page.content,
         isActive: true,
-      }
+      },
     });
     console.log(`- Seeded content page: ${page.title}`);
   }
@@ -218,7 +222,7 @@ async function main() {
       items: [
         { label: "About Us", page: "about", slug: "about" },
         { label: "Blog Journal", page: "blog" },
-      ]
+      ],
     },
     {
       location: "footer_2",
@@ -226,13 +230,13 @@ async function main() {
       items: [
         { label: "Contact Us", page: "contact" },
         { label: "Terms & Conditions", page: "content-page", slug: "terms" },
-      ]
-    }
+      ],
+    },
   ];
 
   for (const config of footerConfigs) {
     let menu = await db.menu.findFirst({
-      where: { storeId, location: config.location }
+      where: { storeId, location: config.location },
     });
 
     if (menu) {
@@ -245,7 +249,7 @@ async function main() {
           slug: config.location,
           location: config.location,
           isActive: true,
-        }
+        },
       });
     }
 
@@ -259,7 +263,7 @@ async function main() {
           slug: item.slug || null,
           sortOrder: i + 1,
           isActive: true,
-        }
+        },
       });
     }
     console.log(`- Seeded footer menu: ${config.name}`);
@@ -268,16 +272,48 @@ async function main() {
   // 6. Create sample products under custom categories to ensure multiple category selections on Homepage
   console.log("Adding sample products under categories for home page view...");
   const sampleProducts = [
-    { name: "Premium Shilajit Resin", slug: "premium-shilajit-resin", price: 999, categorySlug: "shilajit" },
-    { name: "Organic Ashwagandha Powder", slug: "organic-ashwagandha-powder", price: 299, categorySlug: "ayurvedic-powder" },
-    { name: "Amla Fruit Powder", slug: "amla-fruit-powder", price: 199, categorySlug: "fruit-powder" },
-    { name: "Triphala Extract Capsules", slug: "triphala-extract-capsules", price: 499, categorySlug: "herbal-extract-capsules" },
-    { name: "Raw Mulethi Root (Licorice)", slug: "raw-mulethi-root", price: 150, categorySlug: "raw-herbs" },
-    { name: "Ginger Tea Flower Infusion", slug: "ginger-tea-flower", price: 349, categorySlug: "herbal-flower-leaf-tea" },
+    {
+      name: "Premium Shilajit Resin",
+      slug: "premium-shilajit-resin",
+      price: 999,
+      categorySlug: "shilajit",
+    },
+    {
+      name: "Organic Ashwagandha Powder",
+      slug: "organic-ashwagandha-powder",
+      price: 299,
+      categorySlug: "ayurvedic-powder",
+    },
+    {
+      name: "Amla Fruit Powder",
+      slug: "amla-fruit-powder",
+      price: 199,
+      categorySlug: "fruit-powder",
+    },
+    {
+      name: "Triphala Extract Capsules",
+      slug: "triphala-extract-capsules",
+      price: 499,
+      categorySlug: "herbal-extract-capsules",
+    },
+    {
+      name: "Raw Mulethi Root (Licorice)",
+      slug: "raw-mulethi-root",
+      price: 150,
+      categorySlug: "raw-herbs",
+    },
+    {
+      name: "Ginger Tea Flower Infusion",
+      slug: "ginger-tea-flower",
+      price: 349,
+      categorySlug: "herbal-flower-leaf-tea",
+    },
   ];
 
   for (const prod of sampleProducts) {
-    const category = await db.category.findUnique({ where: { slug: prod.categorySlug } });
+    const category = await db.category.findUnique({
+      where: { slug: prod.categorySlug },
+    });
     if (!category) continue;
 
     await db.product.upsert({
@@ -298,7 +334,7 @@ async function main() {
         categoryId: category.id,
         isActive: true,
         images: JSON.stringify(["/images/products/placeholder.jpg"]),
-      }
+      },
     });
     console.log(`- Seeded sample product: ${prod.name}`);
   }

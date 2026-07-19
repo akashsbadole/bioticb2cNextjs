@@ -41,6 +41,7 @@ const config: NextAuthConfig = {
       credentials: {
         email: { label: "Email", type: "email" },
         code: { label: "Code", type: "text" },
+        phone: { label: "Phone", type: "tel" },
       },
       async authorize(credentials) {
         const { verifyOtp } = await import("@/lib/otp");

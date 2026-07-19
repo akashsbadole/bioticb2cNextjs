@@ -16,7 +16,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { QuickViewModal } from "./QuickViewModal";
-import { VedikaFilterSidebar, VedikaFilterGroup } from "./vedika-components";
+import { BioticFilterSidebar, BioticFilterGroup } from "./biotic-components";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
@@ -123,16 +123,16 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
 
   const filterContent = (
     <div>
-      <VedikaFilterGroup title="Categories">
+      <BioticFilterGroup title="Categories">
         <button
           onClick={() => setFilters({ ...filters, categoryId: "all" })}
-          className={`flex items-center gap-2.5 text-sm text-vedika-ink-soft mb-3 cursor-pointer bg-transparent border-none font-inherit ${filters.categoryId === "all" ? "font-bold" : ""}`}
+          className={`flex items-center gap-2.5 text-sm text-biotic-ink-soft mb-3 cursor-pointer bg-transparent border-none font-inherit ${filters.categoryId === "all" ? "font-bold" : ""}`}
         >
           <input
             type="checkbox"
             checked={filters.categoryId === "all"}
             onChange={() => {}}
-            className="accent-vedika-green w-[15px] h-[15px]"
+            className="accent-biotic-green w-[15px] h-[15px]"
           />
           All Products
         </button>
@@ -140,24 +140,24 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
           <button
             key={cat.id}
             onClick={() => setFilters({ ...filters, categoryId: cat.id })}
-            className={`flex items-center gap-2.5 text-sm text-vedika-ink-soft mb-3 cursor-pointer bg-transparent border-none font-inherit ${filters.categoryId === cat.id ? "font-bold" : ""}`}
+            className={`flex items-center gap-2.5 text-sm text-biotic-ink-soft mb-3 cursor-pointer bg-transparent border-none font-inherit ${filters.categoryId === cat.id ? "font-bold" : ""}`}
           >
             <input
               type="checkbox"
               checked={filters.categoryId === cat.id}
               onChange={() => {}}
-              className="accent-vedika-green w-[15px] h-[15px]"
+              className="accent-biotic-green w-[15px] h-[15px]"
             />
             {cat.name}
           </button>
         ))}
-      </VedikaFilterGroup>
+      </BioticFilterGroup>
 
-      <VedikaFilterGroup title="Brands">
+      <BioticFilterGroup title="Brands">
         <select
           value={filters.brandId}
           onChange={(e) => setFilters({ ...filters, brandId: e.target.value })}
-          className="input-vedika"
+          className="input-biotic"
         >
           <option value="all">All Brands</option>
           {brands.map((b: any) => (
@@ -166,23 +166,23 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
             </option>
           ))}
         </select>
-      </VedikaFilterGroup>
+      </BioticFilterGroup>
 
-      <VedikaFilterGroup title="Availability">
+      <BioticFilterGroup title="Availability">
         <select
           value={filters.stockStatus}
           onChange={(e) =>
             setFilters({ ...filters, stockStatus: e.target.value })
           }
-          className="input-vedika"
+          className="input-biotic"
         >
           <option value="all">All Items</option>
           <option value="in_stock">In Stock</option>
           <option value="out_of_stock">Out of Stock</option>
         </select>
-      </VedikaFilterGroup>
+      </BioticFilterGroup>
 
-      <VedikaFilterGroup title="Price Range">
+      <BioticFilterGroup title="Price Range">
         <div className="flex items-center gap-2.5">
           <input
             type="number"
@@ -191,7 +191,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
             onChange={(e) =>
               setFilters({ ...filters, minPrice: e.target.value })
             }
-            className="input-vedika !w-1/2 text-xs"
+            className="input-biotic !w-1/2 text-xs"
           />
           <input
             type="number"
@@ -200,10 +200,10 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
             onChange={(e) =>
               setFilters({ ...filters, maxPrice: e.target.value })
             }
-            className="input-vedika !w-1/2 text-xs"
+            className="input-biotic !w-1/2 text-xs"
           />
         </div>
-      </VedikaFilterGroup>
+      </BioticFilterGroup>
 
       <button
         onClick={() => {
@@ -217,7 +217,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
           });
           setSearchQuery("");
         }}
-        className="vedika-btn vedika-btn-outline vedika-btn-sm w-full mt-2"
+        className="biotic-btn biotic-btn-outline biotic-btn-sm w-full mt-2"
       >
         Reset Filters
       </button>
@@ -246,10 +246,10 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
     return (
       <div
         key={product.id}
-        className="bg-vedika-paper rounded-xl border border-vedika-line overflow-hidden relative transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)]"
+        className="bg-biotic-paper rounded-xl border border-biotic-line overflow-hidden relative transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)]"
       >
         <div
-          className={`aspect-[1/1.05] flex items-center justify-center relative overflow-hidden cursor-pointer ${image ? "bg-vedika-bg-alt" : "bg-gradient-to-br from-vedika-bg-alt to-vedika-green-tint"}`}
+          className={`aspect-[1/1.05] flex items-center justify-center relative overflow-hidden cursor-pointer ${image ? "bg-biotic-bg-alt" : "bg-gradient-to-br from-biotic-bg-alt to-biotic-green-tint"}`}
           onClick={() => navigate("product-page", product.slug)}
         >
           {image ? (
@@ -265,13 +265,13 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
               fill="none"
               stroke="currentColor"
               strokeWidth="1.6"
-              className="w-[56%] h-[56%] text-vedika-green opacity-30"
+              className="w-[56%] h-[56%] text-biotic-green opacity-30"
             >
               <path d="M12 22V10M12 10c-3 0-6 1-6 5s3 5 6 5 6-1 6-5-3-5-6-5z" />
             </svg>
           )}
           {discountLabel && (
-            <span className="absolute top-3.5 left-3.5 bg-vedika-red text-white text-[.66rem] font-bold tracking-wider px-2.5 py-1.5 rounded-full uppercase">
+            <span className="absolute top-3.5 left-3.5 bg-biotic-red text-white text-[.66rem] font-bold tracking-wider px-2.5 py-1.5 rounded-full uppercase">
               {discountLabel}
             </span>
           )}
@@ -287,7 +287,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
               e.stopPropagation();
               handleWishlist(product.id);
             }}
-            className={`icon-circle-sm absolute top-3 right-3 ${wishlistIds.includes(product.id) ? "text-vedika-red" : "text-vedika-green-dark"}`}
+            className={`icon-circle-sm absolute top-3 right-3 ${wishlistIds.includes(product.id) ? "text-biotic-red" : "text-biotic-green-dark"}`}
           >
             <svg
               viewBox="0 0 24 24"
@@ -302,22 +302,22 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
         </div>
         <div className="p-5">
           {product.Category && (
-            <div className="text-xs text-vedika-ink-soft mb-2">
+            <div className="text-xs text-biotic-ink-soft mb-2">
               {product.Category.name}
             </div>
           )}
           <h4
-            className="font-fraunces text-lg mb-1 text-vedika-green-dark cursor-pointer line-clamp-3"
+            className="font-fraunces text-lg mb-1 text-biotic-green-dark cursor-pointer line-clamp-3"
             onClick={() => navigate("product-page", product.slug)}
           >
             {product.name}
           </h4>
           <div className="flex items-center justify-between mt-2.5">
-            <div className="font-fraunces text-xl font-semibold text-vedika-green-dark">
+            <div className="font-fraunces text-xl font-semibold text-biotic-green-dark">
               {product.ProductVariant?.length > 0 ? "From " : ""}
               {formatPrice(displayPrice, currency)}
               {displayCompare && (
-                <span className="text-xs text-vedika-sand line-through ml-1.5 font-work-sans">
+                <span className="text-xs text-biotic-sand line-through ml-1.5 font-work-sans">
                   {formatPrice(displayCompare, currency)}
                 </span>
               )}
@@ -346,9 +346,9 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
 
   return (
     <div>
-      <section className="bg-vedika-green-dark text-vedika-bg py-[70px] pb-[60px] relative overflow-hidden">
-        <div className="vedika-container relative z-1">
-          <div className="text-vedika-gold vedika-eyebrow">Products</div>
+      <section className="bg-biotic-green-dark text-biotic-bg py-[70px] pb-[60px] relative overflow-hidden">
+        <div className="biotic-container relative z-1">
+          <div className="text-biotic-gold biotic-eyebrow">Products</div>
           <h1 className="text-white text-[clamp(2.4rem,4.5vw,3.8rem)] leading-[1.05] max-w-[640px] overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
             Shop All
           </h1>
@@ -372,25 +372,25 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
         </svg>
       </section>
 
-      <div className="vedika-container">
-        <div className="py-5 text-xs text-vedika-ink-soft flex items-center gap-2 flex-wrap">
+      <div className="biotic-container">
+        <div className="py-5 text-xs text-biotic-ink-soft flex items-center gap-2 flex-wrap">
           <button
             onClick={() => navigate("home")}
             className="bg-transparent border-none cursor-pointer font-inherit text-inherit"
           >
             Home
           </button>
-          <span className="text-vedika-sand">/</span>
-          <span className="text-vedika-red">Shop</span>
+          <span className="text-biotic-sand">/</span>
+          <span className="text-biotic-red">Shop</span>
         </div>
       </div>
 
-      <div className="vedika-container pb-24">
+      <div className="biotic-container pb-24">
         <div className="shop-layout grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-11 items-start">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block">
             <div className="sticky top-30">
-              <VedikaFilterSidebar>{filterContent}</VedikaFilterSidebar>
+              <BioticFilterSidebar>{filterContent}</BioticFilterSidebar>
             </div>
           </aside>
 
@@ -403,7 +403,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="1.6"
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-vedika-ink-soft pointer-events-none"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-biotic-ink-soft pointer-events-none"
                 >
                   <circle cx="11" cy="11" r="7" />
                   <path d="M21 21l-4.3-4.3" />
@@ -413,14 +413,14 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
                   placeholder="Search products..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input-vedika pl-10"
+                  className="input-biotic pl-10"
                 />
               </div>
               <div className="flex items-center gap-3">
                 <Sheet>
                   <SheetTrigger asChild>
                     <button
-                      className="vedika-btn vedika-btn-outline vedika-btn-sm lg:hidden flex text-xs"
+                      className="biotic-btn biotic-btn-outline biotic-btn-sm lg:hidden flex text-xs"
                       onClick={() => {}}
                     >
                       <svg
@@ -437,10 +437,10 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
                   </SheetTrigger>
                   <SheetContent
                     side="left"
-                    className="w-[300px] bg-vedika-paper"
+                    className="w-[300px] bg-biotic-paper"
                   >
                     <SheetHeader>
-                      <SheetTitle className="font-fraunces text-vedika-green-dark">
+                      <SheetTitle className="font-fraunces text-biotic-green-dark">
                         Filter Products
                       </SheetTitle>
                     </SheetHeader>
@@ -452,7 +452,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
                   onChange={(e) =>
                     setFilters({ ...filters, sortBy: e.target.value })
                   }
-                  className="input-vedika w-auto"
+                  className="input-biotic w-auto"
                 >
                   <option value="featured">Featured</option>
                   <option value="newest">Newest First</option>
@@ -463,7 +463,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
             </div>
 
             {loading ? (
-              <div className="vedika-product-grid">
+              <div className="biotic-product-grid">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div key={i} className="flex flex-col gap-3">
                     <Skeleton className="aspect-[4/5] w-full rounded-2xl bg-muted" />
@@ -482,19 +482,19 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="1.3"
-                  className="w-16 h-16 mx-auto mb-4 text-vedika-sand"
+                  className="w-16 h-16 mx-auto mb-4 text-biotic-sand"
                 >
                   <rect x="3" y="7" width="18" height="13" rx="2" />
                   <path d="M8 7V5a4 4 0 0 1 8 0v2" />
                 </svg>
                 <h3 className="mb-2">No products found</h3>
-                <p className="text-vedika-ink-soft">
+                <p className="text-biotic-ink-soft">
                   Try clearing some filters or searching for something else.
                 </p>
               </div>
             ) : (
               <>
-                <div className="vedika-product-grid">
+                <div className="biotic-product-grid">
                   {products
                     .slice(0, visibleCount)
                     .map((product) => renderProductCard(product))}
@@ -503,7 +503,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
                   <div className="text-center mt-14">
                     <button
                       onClick={() => setVisibleCount((prev) => prev + 12)}
-                      className="vedika-btn vedika-btn-outline"
+                      className="biotic-btn biotic-btn-outline"
                     >
                       Load More Products
                     </button>

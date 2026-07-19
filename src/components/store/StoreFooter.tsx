@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LeafIcon, MailIcon, PhoneIcon, PinIcon } from "./vedika-components";
+import { LeafIcon, MailIcon, PhoneIcon, PinIcon } from "./biotic-components";
 
 interface StoreFooterProps {
   onNavigate: (page: string, data?: unknown) => void;
@@ -26,7 +26,7 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
   const companyEmail = settings?.site_email || settings?.contact_email || "";
   const companyPhone = settings?.site_phone || settings?.contact_phone || "";
   const companyAddress = settings?.site_address || settings?.contact_address || "";
-  const siteName = settings?.site_name || "Vedika Ayurveda";
+  const siteName = settings?.site_name || "Biotic Ayurveda";
 
   const [footerMenus, setFooterMenus] = useState<FooterMenuData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,13 +73,13 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
   };
 
   return (
-    <footer className="bg-vedika-green-dark text-[#CBD3C9] pt-20">
-      <div className="vedika-container">
+    <footer className="bg-biotic-green-dark text-[#CBD3C9] pt-20">
+      <div className="biotic-container">
         <div className="footer-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1.2fr] gap-8 pb-14 border-b border-white/10">
           {/* Brand Column */}
           <div className="footer-col">
             <div className="font-fraunces text-2xl text-white mb-3.5 flex items-center gap-2">
-              <LeafIcon className="w-[26px] h-[26px] text-vedika-gold" />
+              <LeafIcon className="w-[26px] h-[26px] text-biotic-gold" />
               {siteName}
             </div>
             <p className="text-[#98A398] text-sm leading-[1.7]">
@@ -87,12 +87,12 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
             </p>
             <div className="flex gap-2.5 mt-[18px]">
               {facebookUrl !== "#" && (
-                <a href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-[#B7C0B4] transition-all duration-200 hover:bg-vedika-gold hover:text-vedika-green-dark">
+                <a href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-[#B7C0B4] transition-all duration-200 hover:bg-biotic-gold hover:text-biotic-green-dark">
                   <svg viewBox="0 0 24 24" fill="currentColor" className="w-[15px] h-[15px]"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2z"/></svg>
                 </a>
               )}
               {instagramUrl !== "#" && (
-                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-[#B7C0B4] transition-all duration-200 hover:bg-vedika-gold hover:text-vedika-green-dark">
+                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-[#B7C0B4] transition-all duration-200 hover:bg-biotic-gold hover:text-biotic-green-dark">
                   <svg viewBox="0 0 24 24" fill="currentColor" className="w-[15px] h-[15px]"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
                 </a>
               )}
@@ -118,7 +118,7 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
                   {menuData.items.map((item) => (
                     <li key={item.id} className="mb-[11px]">
                       <button onClick={() => navigateItem(item)}
-                        className="text-sm text-[#B7C0B4] transition-colors duration-200 bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold"
+                        className="text-sm text-[#B7C0B4] transition-colors duration-200 bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold"
                       >
                         {item.label}
                       </button>
@@ -127,7 +127,7 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
                           {item.children.map((child) => (
                             <li key={child.id} className="mb-2">
                               <button onClick={() => navigateItem(child)}
-                                className="text-xs text-[#98A398] transition-colors duration-200 bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold"
+                                className="text-xs text-[#98A398] transition-colors duration-200 bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold"
                               >
                                 {child.label}
                               </button>
@@ -144,8 +144,8 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
             <div className="footer-col">
               <h4 className="text-white text-sm tracking-wide uppercase mb-[18px]">Quick Links</h4>
               <ul className="list-none m-0 p-0">
-                <li className="mb-[11px]"><button onClick={() => onNavigate("home")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold">Home</button></li>
-                <li className="mb-[11px]"><button onClick={() => onNavigate("shop")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold">Shop</button></li>
+                <li className="mb-[11px]"><button onClick={() => onNavigate("home")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold">Home</button></li>
+                <li className="mb-[11px]"><button onClick={() => onNavigate("shop")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold">Shop</button></li>
               </ul>
             </div>
           )}
@@ -154,9 +154,9 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
           <div className="footer-col">
             <h4 className="text-white text-sm tracking-wide uppercase mb-[18px]">Support</h4>
             <ul className="list-none m-0 p-0">
-              <li className="mb-[11px]"><button onClick={() => onNavigate("contact")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold">Contact Us</button></li>
-              <li className="mb-[11px]"><button onClick={() => onNavigate("faq")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold">FAQ</button></li>
-              <li className="mb-[11px]"><button onClick={() => onNavigate("tracking")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-vedika-gold">Track Order</button></li>
+              <li className="mb-[11px]"><button onClick={() => onNavigate("contact")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold">Contact Us</button></li>
+              <li className="mb-[11px]"><button onClick={() => onNavigate("faq")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold">FAQ</button></li>
+              <li className="mb-[11px]"><button onClick={() => onNavigate("tracking")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold">Track Order</button></li>
             </ul>
           </div>
 
@@ -166,19 +166,19 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
             <ul className="list-none m-0 p-0">
               {companyEmail && (
                 <li className="mb-[11px] flex items-center gap-2">
-                  <MailIcon className="w-[14px] h-[14px] text-vedika-gold shrink-0" />
-                  <a href={`mailto:${companyEmail}`} className="text-sm text-[#B7C0B4] transition-colors duration-200 no-underline hover:text-vedika-gold">{companyEmail}</a>
+                  <MailIcon className="w-[14px] h-[14px] text-biotic-gold shrink-0" />
+                  <a href={`mailto:${companyEmail}`} className="text-sm text-[#B7C0B4] transition-colors duration-200 no-underline hover:text-biotic-gold">{companyEmail}</a>
                 </li>
               )}
               {companyPhone && (
                 <li className="mb-[11px] flex items-center gap-2">
-                  <PhoneIcon className="w-[14px] h-[14px] text-vedika-gold shrink-0" />
-                  <a href={`tel:${companyPhone}`} className="text-sm text-[#B7C0B4] transition-colors duration-200 no-underline hover:text-vedika-gold">{companyPhone}</a>
+                  <PhoneIcon className="w-[14px] h-[14px] text-biotic-gold shrink-0" />
+                  <a href={`tel:${companyPhone}`} className="text-sm text-[#B7C0B4] transition-colors duration-200 no-underline hover:text-biotic-gold">{companyPhone}</a>
                 </li>
               )}
               {companyAddress && (
                 <li className="mb-[11px] flex items-start gap-2">
-                  <PinIcon className="w-[14px] h-[14px] text-vedika-gold shrink-0 mt-0.5" />
+                  <PinIcon className="w-[14px] h-[14px] text-biotic-gold shrink-0 mt-0.5" />
                   <span className="text-sm text-[#98A398]">{companyAddress}</span>
                 </li>
               )}

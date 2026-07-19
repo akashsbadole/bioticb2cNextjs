@@ -9,19 +9,19 @@ import { getFirstImage } from "@/lib/utils";
 import { StoreLoading } from "./StoreLoading";
 import { RecentlyViewed } from "./RecentlyViewed";
 import {
-  VedikaTrustStrip,
-  VedikaSectionTitle,
-  VedikaCategoryCard,
-  VedikaProductCard,
-  VedikaRitualStep,
-  VedikaTestimonialCard,
-  VedikaBlogCard,
-  VedikaNewsletter,
-  VedikaStarRating,
+  BioticTrustStrip,
+  BioticSectionTitle,
+  BioticCategoryCard,
+  BioticProductCard,
+  BioticRitualStep,
+  BioticTestimonialCard,
+  BioticBlogCard,
+  BioticNewsletter,
+  BioticStarRating,
   LeafDeco,
   LeafSimple,
   HerbDeco,
-} from "./vedika-components";
+} from "./biotic-components";
 
 interface HomePageProps {
   onNavigate: (page: string, data?: unknown) => void;
@@ -202,9 +202,9 @@ export function HomePage({
       <section
         className="hero grid grid-cols-1 lg:grid-cols-[1.05fr_.95fr] px-4 py-10 sm:px-10 sm:py-14 gap-10 items-center"
       >
-        <div className="vedika-container contents">
+        <div className="biotic-container contents">
           <div className="hero-copy">
-            <div className="vedika-eyebrow justify-start">
+            <div className="biotic-eyebrow justify-start">
               Rooted in the Vedas, Made for Today
             </div>
             <h1 className="text-[clamp(2.4rem,4.5vw,3.8rem)] leading-[1.05] m-0 mb-[.2em]">
@@ -212,7 +212,7 @@ export function HomePage({
               <br />
               measured &amp; modern.
             </h1>
-            <p className="lead text-lg max-w-[460px] text-vedika-ink-soft mb-7">
+            <p className="lead text-lg max-w-[460px] text-biotic-ink-soft mb-7">
               Small-batch herbal formulations for skin, hair and wellness — made
               from single-origin botanicals, balanced to your dosha, and
               lab-tested for what actually matters.
@@ -220,39 +220,39 @@ export function HomePage({
             <div className="flex gap-3.5 flex-wrap">
               <button
                 onClick={() => onNavigate("shop")}
-                className="vedika-btn vedika-btn-primary"
+                className="biotic-btn biotic-btn-primary"
               >
                 Shop the Collection
               </button>
               <button
                 onClick={() => onNavigate("about")}
-                className="vedika-btn vedika-btn-outline"
+                className="biotic-btn biotic-btn-outline"
               >
                 Our Sourcing Story
               </button>
             </div>
             <div className="flex gap-9 mt-11">
               <div>
-                <strong className="font-fraunces text-[1.6rem] text-vedika-green-dark block">
+                <strong className="font-fraunces text-[1.6rem] text-biotic-green-dark block">
                   120+
                 </strong>
-                <span className="text-xs text-vedika-ink-soft tracking-wide">
+                <span className="text-xs text-biotic-ink-soft tracking-wide">
                   Formulations
                 </span>
               </div>
               <div>
-                <strong className="font-fraunces text-[1.6rem] text-vedika-green-dark block">
+                <strong className="font-fraunces text-[1.6rem] text-biotic-green-dark block">
                   40k+
                 </strong>
-                <span className="text-xs text-vedika-ink-soft tracking-wide">
+                <span className="text-xs text-biotic-ink-soft tracking-wide">
                   Rituals shipped
                 </span>
               </div>
               <div>
-                <strong className="font-fraunces text-[1.6rem] text-vedika-green-dark block">
+                <strong className="font-fraunces text-[1.6rem] text-biotic-green-dark block">
                   4.8/5
                 </strong>
-                <span className="text-xs text-vedika-ink-soft tracking-wide">
+                <span className="text-xs text-biotic-ink-soft tracking-wide">
                   Average rating
                 </span>
               </div>
@@ -262,7 +262,7 @@ export function HomePage({
             className="hero-art relative aspect-1 rounded-full flex items-center justify-center"
             style={{
               background:
-                "radial-gradient(circle at 32% 28%, var(--vedika-sand) 0%, var(--vedika-gold-tint) 45%, var(--vedika-bg-alt) 100%)",
+                "radial-gradient(circle at 32% 28%, var(--biotic-sand) 0%, var(--biotic-gold-tint) 45%, var(--biotic-bg-alt) 100%)",
               boxShadow: "0 12px 30px -14px rgba(28,44,35,.28)",
             }}
           >
@@ -320,14 +320,14 @@ export function HomePage({
               <circle cx="95" cy="250" r="14" fill="#A6402F" opacity=".85" />
               <circle cx="205" cy="255" r="10" fill="#C68A2E" opacity=".85" />
             </svg>
-            <div className="badge-float b1 absolute top-[8%] right-[2%] bg-vedika-paper rounded-full px-[18px] py-2.5 text-xs font-semibold text-vedika-green-dark shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)] flex items-center gap-2">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-vedika-red">
+            <div className="badge-float b1 absolute top-[8%] right-[2%] bg-biotic-paper rounded-full px-[18px] py-2.5 text-xs font-semibold text-biotic-green-dark shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)] flex items-center gap-2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-biotic-red">
                 <path d="M20 6L9 17l-5-5" />
               </svg>
               100% Natural
             </div>
-            <div className="badge-float b2 absolute bottom-[12%] -left-[2%] bg-vedika-paper rounded-full px-[18px] py-2.5 text-xs font-semibold text-vedika-green-dark shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)] flex items-center gap-2">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-vedika-red">
+            <div className="badge-float b2 absolute bottom-[12%] -left-[2%] bg-biotic-paper rounded-full px-[18px] py-2.5 text-xs font-semibold text-biotic-green-dark shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)] flex items-center gap-2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-biotic-red">
                 <circle cx="12" cy="12" r="9" />
                 <path d="M12 7v5l3 3" />
               </svg>
@@ -338,20 +338,20 @@ export function HomePage({
       </section>
 
       {/* ─── TRUST STRIP ─── */}
-      <VedikaTrustStrip />
+      <BioticTrustStrip />
 
       {/* ─── CATEGORIES ─── */}
-      <section className="vedika-section">
-        <div className="vedika-container">
-          <VedikaSectionTitle
+      <section className="biotic-section">
+        <div className="biotic-container">
+          <BioticSectionTitle
             eyebrow="Shop by Concern"
             title="Formulated around you"
             description="Each range is built on classical Ayurvedic principles and matched to a dosha profile — not a one-size-fits-all routine."
           />
-          <div className="vedika-grid-4">
+          <div className="biotic-grid-4">
             {categories.length > 0
               ? categories.map((cat: any) => (
-                  <VedikaCategoryCard
+                  <BioticCategoryCard
                     key={cat.id}
                     name={cat.name}
                     count={cat._count?.products || 0}
@@ -359,22 +359,22 @@ export function HomePage({
                   />
                 ))
               : ["Skin Care", "Hair Care", "Wellness", "Immunity"].map(
-                  (name) => <VedikaCategoryCard key={name} name={name} />,
+                  (name) => <BioticCategoryCard key={name} name={name} />,
                 )}
           </div>
         </div>
       </section>
 
       {/* ─── BESTSELLERS ─── */}
-      <section className="bg-vedika-bg-alt py-[88px] pb-24">
-        <div className="vedika-container">
-          <VedikaSectionTitle
+      <section className="bg-biotic-bg-alt py-[88px] pb-24">
+        <div className="biotic-container">
+          <BioticSectionTitle
             eyebrow="Community Favourites"
             title="Bestselling formulations"
           />
-          <div className="vedika-product-grid">
+          <div className="biotic-product-grid">
             {products.slice(0, 4).map((product: any) => (
-              <VedikaProductCard
+              <BioticProductCard
                 key={product.id}
                 product={product}
                 onNavigate={onNavigate}
@@ -388,7 +388,7 @@ export function HomePage({
           <div className="text-center mt-12">
             <button
               onClick={() => onNavigate("shop")}
-              className="vedika-btn vedika-btn-outline"
+              className="biotic-btn biotic-btn-outline"
             >
               View All Products
             </button>
@@ -398,22 +398,22 @@ export function HomePage({
 
       {/* ─── DYNAMIC CATEGORY PRODUCTS ─── */}
       {categoryWithProducts.length > 0 && (
-        <section className="vedika-section bg-paper border-y border-vedika-line py-[88px]">
-          <div className="vedika-container space-y-16">
+        <section className="biotic-section bg-paper border-y border-biotic-line py-[88px]">
+          <div className="biotic-container space-y-16">
             {categoryWithProducts.slice(0, 4).map((cat: any) => (
               <div key={cat.id} className="space-y-6">
-                <div className="flex items-center justify-between border-b border-vedika-line pb-3">
+                <div className="flex items-center justify-between border-b border-biotic-line pb-3">
                   <div>
-                    <h3 className="text-2xl font-semibold text-vedika-green-dark font-fraunces">{cat.name}</h3>
+                    <h3 className="text-2xl font-semibold text-biotic-green-dark font-fraunces">{cat.name}</h3>
                     {cat.description && <p className="text-xs text-muted-foreground mt-0.5">{cat.description}</p>}
                   </div>
-                  <button onClick={() => onNavigate("category", cat.slug)} className="text-sm font-semibold text-vedika-red hover:underline">
+                  <button onClick={() => onNavigate("category", cat.slug)} className="text-sm font-semibold text-biotic-red hover:underline">
                     View All {cat.name} →
                   </button>
                 </div>
-                <div className="vedika-product-grid">
+                <div className="biotic-product-grid">
                   {cat.products.slice(0, 4).map((product: any) => (
-                    <VedikaProductCard
+                    <BioticProductCard
                       key={product.id}
                       product={product}
                       onNavigate={onNavigate}
@@ -431,16 +431,16 @@ export function HomePage({
       )}
 
       {/* ─── RITUAL STEPS ─── */}
-      <section className="vedika-section">
-        <div className="vedika-container">
-          <VedikaSectionTitle
+      <section className="biotic-section">
+        <div className="biotic-container">
+          <BioticSectionTitle
             eyebrow="Dinacharya · Daily Ritual"
             title="Three steps, every sunrise"
             description="A minimal routine drawn from the Ashtanga Hridayam — order matters here, so we keep it exactly this simple."
           />
           <div className="ritual grid grid-cols-1 md:grid-cols-3 gap-8">
             {ritualSteps.map((step) => (
-              <VedikaRitualStep
+              <BioticRitualStep
                 key={step.number}
                 number={step.number}
                 title={step.title}
@@ -452,12 +452,12 @@ export function HomePage({
       </section>
 
       {/* ─── INGREDIENT SPOTLIGHT ─── */}
-      <section className="vedika-container">
-        <div className="spotlight grid grid-cols-1 lg:grid-cols-[.85fr_1.15fr] gap-14 items-center bg-vedika-green-dark rounded-[28px] p-16 text-vedika-bg overflow-hidden">
+      <section className="biotic-container">
+        <div className="spotlight grid grid-cols-1 lg:grid-cols-[.85fr_1.15fr] gap-14 items-center bg-biotic-green-dark rounded-[28px] p-16 text-biotic-bg overflow-hidden">
           <div className="spotlight-art aspect-1 rounded-full flex items-center justify-center border border-white/10"
             style={{
               background:
-                "radial-gradient(circle at 35% 30%, #3C5A49, var(--vedika-green-dark) 75%)",
+                "radial-gradient(circle at 35% 30%, #3C5A49, var(--biotic-green-dark) 75%)",
             }}
           >
             <svg viewBox="0 0 200 200" fill="none" className="w-[60%] h-[60%]">
@@ -466,21 +466,21 @@ export function HomePage({
             </svg>
           </div>
           <div>
-            <div className="vedika-eyebrow text-vedika-gold">Ingredient Spotlight</div>
-            <h2 className="text-vedika-gold-tint text-[clamp(1.8rem,3vw,2.6rem)]">Ashwagandha, the vitality root</h2>
+            <div className="biotic-eyebrow text-biotic-gold">Ingredient Spotlight</div>
+            <h2 className="text-biotic-gold-tint text-[clamp(1.8rem,3vw,2.6rem)]">Ashwagandha, the vitality root</h2>
             <p className="text-[#CBD3C9]">Withania somnifera has anchored Ayurvedic wellness formulas for over three thousand years, prized for helping the body adapt to daily stress. We source ours from a single cooperative of farmers in Nagpur who&apos;ve grown it for three generations.</p>
-            <button onClick={() => onNavigate("shop")} className="vedika-btn vedika-btn-gold mt-2">Shop Ashwagandha Range</button>
+            <button onClick={() => onNavigate("shop")} className="biotic-btn biotic-btn-gold mt-2">Shop Ashwagandha Range</button>
             <div className="flex gap-8 mt-7">
               <div>
-                <strong className="font-fraunces text-vedika-gold-tint text-[1.4rem] block">3,000+</strong>
+                <strong className="font-fraunces text-biotic-gold-tint text-[1.4rem] block">3,000+</strong>
                 <span className="text-xs text-[#A9B3A5]">Years in use</span>
               </div>
               <div>
-                <strong className="font-fraunces text-vedika-gold-tint text-[1.4rem] block">1</strong>
+                <strong className="font-fraunces text-biotic-gold-tint text-[1.4rem] block">1</strong>
                 <span className="text-xs text-[#A9B3A5]">Farming cooperative</span>
               </div>
               <div>
-                <strong className="font-fraunces text-vedika-gold-tint text-[1.4rem] block">0</strong>
+                <strong className="font-fraunces text-biotic-gold-tint text-[1.4rem] block">0</strong>
                 <span className="text-xs text-[#A9B3A5]">Fillers added</span>
               </div>
             </div>
@@ -489,15 +489,15 @@ export function HomePage({
       </section>
 
       {/* ─── TESTIMONIALS ─── */}
-      <section className="vedika-section">
-        <div className="vedika-container">
-          <VedikaSectionTitle
+      <section className="biotic-section">
+        <div className="biotic-container">
+          <BioticSectionTitle
             eyebrow="From the Community"
             title="What our customers say"
           />
-          <div className="vedika-grid-3">
+          <div className="biotic-grid-3">
             {testimonials.map((t, i) => (
-              <VedikaTestimonialCard
+              <BioticTestimonialCard
                 key={i}
                 quote={t.quote}
                 name={t.name}
@@ -509,12 +509,12 @@ export function HomePage({
       </section>
 
       {/* ─── BLOG PREVIEW ─── */}
-      <section className="bg-vedika-bg-alt py-24">
-        <div className="vedika-container">
-          <VedikaSectionTitle eyebrow="The Journal" title="Notes on Ayurveda" />
-          <div className="vedika-grid-3">
+      <section className="bg-biotic-bg-alt py-24">
+        <div className="biotic-container">
+          <BioticSectionTitle eyebrow="The Journal" title="Notes on Ayurveda" />
+          <div className="biotic-grid-3">
             {blogPosts.map((post, i) => (
-              <VedikaBlogCard
+              <BioticBlogCard
                 key={i}
                 title={post.title}
                 category={post.category}
@@ -526,7 +526,7 @@ export function HomePage({
           <div className="text-center mt-12">
             <button
               onClick={() => onNavigate("blog")}
-              className="vedika-btn vedika-btn-outline"
+              className="biotic-btn biotic-btn-outline"
             >
               Read the Journal
             </button>
@@ -535,11 +535,11 @@ export function HomePage({
       </section>
 
       {/* ─── NEWSLETTER ─── */}
-      <VedikaNewsletter />
+      <BioticNewsletter />
 
       {/* ─── RECENTLY VIEWED ─── */}
-      <section className="vedika-section pt-0">
-        <div className="vedika-container">
+      <section className="biotic-section pt-0">
+        <div className="biotic-container">
           <RecentlyViewed />
         </div>
       </section>
