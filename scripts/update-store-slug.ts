@@ -7,10 +7,12 @@ async function main() {
     return;
   }
 
-  console.log(`Updating store "${store.name}" (${store.slug}) -> "Biotic Ayurveda" (biotic-naturals)...`);
+  console.log(
+    `Updating store "${store.name}" (${store.slug}) -> "Biotic Naturals" (biotic-naturals)...`,
+  );
   await db.store.update({
     where: { id: store.id },
-    data: { name: "Biotic Ayurveda", slug: "biotic-naturals" },
+    data: { name: "Biotic Naturals", slug: "biotic-naturals" },
   });
   console.log("✅ Store slug updated.");
 }

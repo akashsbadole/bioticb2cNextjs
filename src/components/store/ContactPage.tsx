@@ -48,7 +48,7 @@ const faqItems = [
 
 export function ContactPage({ onNavigate, data: _data }: ContactPageProps) {
   useSeo("contact", {
-    title: "Contact Us — Biotic Ayurveda",
+    title: "Contact Us — Biotic Naturals",
     description:
       "Get in touch with the Biotic team. Questions on dosha matching, orders, or bulk enquiries — we reply within one business day.",
   });

@@ -62,7 +62,7 @@ const config: Config = {
           "4": "var(--chart-4)",
           "5": "var(--chart-5)",
         },
-        // Biotic Ayurveda palette
+        // Biotic Naturals palette
         biotic: {
           bg: "#F7F1DE",
           "bg-alt": "#EFE6C8",

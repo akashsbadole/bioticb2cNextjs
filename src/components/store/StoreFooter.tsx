@@ -25,8 +25,9 @@ interface FooterMenuData {
 export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
   const companyEmail = settings?.site_email || settings?.contact_email || "";
   const companyPhone = settings?.site_phone || settings?.contact_phone || "";
-  const companyAddress = settings?.site_address || settings?.contact_address || "";
-  const siteName = settings?.site_name || "Biotic Ayurveda";
+  const companyAddress =
+    settings?.site_address || settings?.contact_address || "";
+  const siteName = settings?.site_name || "Biotic Naturals";
 
   const [footerMenus, setFooterMenus] = useState<FooterMenuData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,13 +41,19 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
         const locations = ["footer_1", "footer_2", "footer_3"];
         const results = await Promise.all(
           locations.map(async (loc) => {
-            const res = await fetch(`/api/menus?location=${loc}`, { cache: "no-store" });
+            const res = await fetch(`/api/menus?location=${loc}`, {
+              cache: "no-store",
+            });
             if (res.ok) return await res.json();
             return { menu: null, items: [] };
           }),
         );
         setFooterMenus(results.filter((r) => r.items && r.items.length > 0));
-      } catch { /* ignore */ } finally { setLoading(false); }
+      } catch {
+        /* ignore */
+      } finally {
+        setLoading(false);
+      }
     }
     fetchFooterMenus();
   }, []);
@@ -55,10 +62,12 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
     if (item.url) {
       if (item.url.startsWith("/")) {
         const segs = item.url.split("/").filter(Boolean);
-        if (segs[0] === "products" && segs[1]) onNavigate("product-page", segs[1]);
+        if (segs[0] === "products" && segs[1])
+          onNavigate("product-page", segs[1]);
         else if (segs[0] === "shop" && segs[1]) onNavigate("category", segs[1]);
         else if (segs[0] === "shop") onNavigate("shop");
-        else if (segs[0] === "blog" && segs[1]) onNavigate("blog-post", segs[1]);
+        else if (segs[0] === "blog" && segs[1])
+          onNavigate("blog-post", segs[1]);
         else if (segs[0] === "blog") onNavigate("blog");
         else if (segs[0] === "about") onNavigate("about");
         else if (segs[0] === "contact") onNavigate("contact");
@@ -83,17 +92,44 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
               {siteName}
             </div>
             <p className="text-[#98A398] text-sm leading-[1.7]">
-              {settings?.site_description || "Rooted in wellness. Small-batch, classical Ayurvedic formulations made with integrity and intention."}
+              {settings?.site_description ||
+                "Rooted in wellness. Small-batch, classical Ayurvedic formulations made with integrity and intention."}
             </p>
             <div className="flex gap-2.5 mt-[18px]">
               {facebookUrl !== "#" && (
-                <a href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-[#B7C0B4] transition-all duration-200 hover:bg-biotic-gold hover:text-biotic-green-dark">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-[15px] h-[15px]"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2z"/></svg>
+                <a
+                  href={facebookUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-[#B7C0B4] transition-all duration-200 hover:bg-biotic-gold hover:text-biotic-green-dark"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-[15px] h-[15px]"
+                  >
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2z" />
+                  </svg>
                 </a>
               )}
               {instagramUrl !== "#" && (
-                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-[#B7C0B4] transition-all duration-200 hover:bg-biotic-gold hover:text-biotic-green-dark">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-[15px] h-[15px]"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
+                <a
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-[#B7C0B4] transition-all duration-200 hover:bg-biotic-gold hover:text-biotic-green-dark"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-[15px] h-[15px]"
+                  >
+                    <rect x="2" y="2" width="20" height="20" rx="5" />
+                    <circle cx="12" cy="12" r="5" />
+                    <circle cx="17.5" cy="6.5" r="1.5" />
+                  </svg>
                 </a>
               )}
             </div>
@@ -117,7 +153,8 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
                 <ul className="list-none m-0 p-0">
                   {menuData.items.map((item) => (
                     <li key={item.id} className="mb-[11px]">
-                      <button onClick={() => navigateItem(item)}
+                      <button
+                        onClick={() => navigateItem(item)}
                         className="text-sm text-[#B7C0B4] transition-colors duration-200 bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold"
                       >
                         {item.label}
@@ -126,7 +163,8 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
                         <ul className="list-none m-2 mt-0 pl-3">
                           {item.children.map((child) => (
                             <li key={child.id} className="mb-2">
-                              <button onClick={() => navigateItem(child)}
+                              <button
+                                onClick={() => navigateItem(child)}
                                 className="text-xs text-[#98A398] transition-colors duration-200 bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold"
                               >
                                 {child.label}
@@ -142,44 +180,97 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
             ))
           ) : (
             <div className="footer-col">
-              <h4 className="text-white text-sm tracking-wide uppercase mb-[18px]">Quick Links</h4>
+              <h4 className="text-white text-sm tracking-wide uppercase mb-[18px]">
+                Quick Links
+              </h4>
               <ul className="list-none m-0 p-0">
-                <li className="mb-[11px]"><button onClick={() => onNavigate("home")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold">Home</button></li>
-                <li className="mb-[11px]"><button onClick={() => onNavigate("shop")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold">Shop</button></li>
+                <li className="mb-[11px]">
+                  <button
+                    onClick={() => onNavigate("home")}
+                    className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold"
+                  >
+                    Home
+                  </button>
+                </li>
+                <li className="mb-[11px]">
+                  <button
+                    onClick={() => onNavigate("shop")}
+                    className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold"
+                  >
+                    Shop
+                  </button>
+                </li>
               </ul>
             </div>
           )}
 
           {/* Support Column */}
           <div className="footer-col">
-            <h4 className="text-white text-sm tracking-wide uppercase mb-[18px]">Support</h4>
+            <h4 className="text-white text-sm tracking-wide uppercase mb-[18px]">
+              Support
+            </h4>
             <ul className="list-none m-0 p-0">
-              <li className="mb-[11px]"><button onClick={() => onNavigate("contact")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold">Contact Us</button></li>
-              <li className="mb-[11px]"><button onClick={() => onNavigate("faq")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold">FAQ</button></li>
-              <li className="mb-[11px]"><button onClick={() => onNavigate("tracking")} className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold">Track Order</button></li>
+              <li className="mb-[11px]">
+                <button
+                  onClick={() => onNavigate("contact")}
+                  className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold"
+                >
+                  Contact Us
+                </button>
+              </li>
+              <li className="mb-[11px]">
+                <button
+                  onClick={() => onNavigate("faq")}
+                  className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold"
+                >
+                  FAQ
+                </button>
+              </li>
+              <li className="mb-[11px]">
+                <button
+                  onClick={() => onNavigate("tracking")}
+                  className="text-sm text-[#B7C0B4] bg-transparent border-none cursor-pointer font-inherit text-left hover:text-biotic-gold"
+                >
+                  Track Order
+                </button>
+              </li>
             </ul>
           </div>
 
           {/* Contact Column */}
           <div className="footer-col">
-            <h4 className="text-white text-sm tracking-wide uppercase mb-[18px]">Get in Touch</h4>
+            <h4 className="text-white text-sm tracking-wide uppercase mb-[18px]">
+              Get in Touch
+            </h4>
             <ul className="list-none m-0 p-0">
               {companyEmail && (
                 <li className="mb-[11px] flex items-center gap-2">
                   <MailIcon className="w-[14px] h-[14px] text-biotic-gold shrink-0" />
-                  <a href={`mailto:${companyEmail}`} className="text-sm text-[#B7C0B4] transition-colors duration-200 no-underline hover:text-biotic-gold">{companyEmail}</a>
+                  <a
+                    href={`mailto:${companyEmail}`}
+                    className="text-sm text-[#B7C0B4] transition-colors duration-200 no-underline hover:text-biotic-gold"
+                  >
+                    {companyEmail}
+                  </a>
                 </li>
               )}
               {companyPhone && (
                 <li className="mb-[11px] flex items-center gap-2">
                   <PhoneIcon className="w-[14px] h-[14px] text-biotic-gold shrink-0" />
-                  <a href={`tel:${companyPhone}`} className="text-sm text-[#B7C0B4] transition-colors duration-200 no-underline hover:text-biotic-gold">{companyPhone}</a>
+                  <a
+                    href={`tel:${companyPhone}`}
+                    className="text-sm text-[#B7C0B4] transition-colors duration-200 no-underline hover:text-biotic-gold"
+                  >
+                    {companyPhone}
+                  </a>
                 </li>
               )}
               {companyAddress && (
                 <li className="mb-[11px] flex items-start gap-2">
                   <PinIcon className="w-[14px] h-[14px] text-biotic-gold shrink-0 mt-0.5" />
-                  <span className="text-sm text-[#98A398]">{companyAddress}</span>
+                  <span className="text-sm text-[#98A398]">
+                    {companyAddress}
+                  </span>
                 </li>
               )}
             </ul>
@@ -187,7 +278,9 @@ export function StoreFooter({ onNavigate, settings }: StoreFooterProps) {
         </div>
 
         <div className="flex justify-between items-center py-6 text-xs text-[#8A9587] flex-wrap gap-3">
-          <span>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</span>
+          <span>
+            &copy; {new Date().getFullYear()} {siteName}. All rights reserved.
+          </span>
           <span>Crafted with care for quality Ayurveda.</span>
         </div>
       </div>

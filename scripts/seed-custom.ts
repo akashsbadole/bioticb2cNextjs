@@ -17,7 +17,7 @@ async function main() {
     }
     store = await db.store.create({
       data: {
-        name: "Biotic Ayurveda",
+        name: "Biotic Naturals",
         slug: "biotic-naturals",
         domain: "localhost",
         description:
@@ -184,7 +184,7 @@ async function main() {
       title: "Terms and Conditions",
       slug: "terms",
       content:
-        "Welcome to Biotic Ayurveda. By accessing our shop, you agree to our terms and conditions.",
+        "Welcome to Biotic Naturals. By accessing our shop, you agree to our terms and conditions.",
     },
     {
       title: "Contact Us",

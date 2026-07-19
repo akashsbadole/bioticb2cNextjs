@@ -7,18 +7,45 @@ async function getStoreId(): Promise<string | null> {
   return store?.id || null;
 }
 
-async function upsertPage(storeId: string | null, slug: string, title: string, content: string, blocks: string, metaTitle: string, metaDescription: string, sortOrder: number) {
+async function upsertPage(
+  storeId: string | null,
+  slug: string,
+  title: string,
+  content: string,
+  blocks: string,
+  metaTitle: string,
+  metaDescription: string,
+  sortOrder: number,
+) {
   const existing = await db.contentPage.findFirst({ where: { slug, storeId } });
   if (existing) {
     console.log(`  Updating "${title}" (${slug})...`);
     await db.contentPage.update({
       where: { id: existing.id },
-      data: { title, content, blocks, metaTitle, metaDescription, isActive: true, sortOrder },
+      data: {
+        title,
+        content,
+        blocks,
+        metaTitle,
+        metaDescription,
+        isActive: true,
+        sortOrder,
+      },
     });
   } else {
     console.log(`  Creating "${title}" (${slug})...`);
     await db.contentPage.create({
-      data: { storeId, title, slug, content, blocks, metaTitle, metaDescription, isActive: true, sortOrder },
+      data: {
+        storeId,
+        title,
+        slug,
+        content,
+        blocks,
+        metaTitle,
+        metaDescription,
+        isActive: true,
+        sortOrder,
+      },
     });
   }
 }
@@ -38,7 +65,7 @@ async function main() {
     storeId,
     "homepage",
     "Homepage",
-    `<p>Welcome to Biotic Ayurveda — rooted in classical Ayurvedic texts, tested against modern lab standards. Explore our dosha-balanced formulations for skin, hair, and wellness.</p>`,
+    `<p>Welcome to Biotic Naturals — rooted in classical Ayurvedic texts, tested against modern lab standards. Explore our dosha-balanced formulations for skin, hair, and wellness.</p>`,
     JSON.stringify([
       {
         id: "homepage-hero",
@@ -46,30 +73,47 @@ async function main() {
         data: {
           hero: {
             title: "Rooted in Wellness",
-            subtitle: "Ayurvedic formulations for skin, hair and wellness. Small-batch, lab-tested, dosha-balanced.",
+            subtitle:
+              "Ayurvedic formulations for skin, hair and wellness. Small-batch, lab-tested, dosha-balanced.",
             buttonText: "Explore Formulations",
             buttonLink: "/shop",
           },
           features: {
             title: "The Biotic Standard",
             items: [
-              { title: "Lab-Tested", description: "Every batch third-party tested for potency, heavy metals, and microbial safety.", icon: "FlaskConical" },
-              { title: "Small-Batch", description: "Made in small quantities by hand, with the attention a vaidya gives a patient they know.", icon: "FlaskRound" },
-              { title: "Text-Based", description: "Every formula begins with a classical text — Charaka Samhita, Sushruta Samhita, or Ashtanga Hridayam.", icon: "BookOpen" },
+              {
+                title: "Lab-Tested",
+                description:
+                  "Every batch third-party tested for potency, heavy metals, and microbial safety.",
+                icon: "FlaskConical",
+              },
+              {
+                title: "Small-Batch",
+                description:
+                  "Made in small quantities by hand, with the attention a vaidya gives a patient they know.",
+                icon: "FlaskRound",
+              },
+              {
+                title: "Text-Based",
+                description:
+                  "Every formula begins with a classical text — Charaka Samhita, Sushruta Samhita, or Ashtanga Hridayam.",
+                icon: "BookOpen",
+              },
             ],
           },
           cta: {
             title: "Ready to begin your ritual?",
-            description: "Browse our full range of dosha-balanced formulations, each with complete ingredient traceability.",
+            description:
+              "Browse our full range of dosha-balanced formulations, each with complete ingredient traceability.",
             buttonText: "Shop Now",
             buttonLink: "/shop",
           },
         },
       },
     ]),
-    "Biotic Ayurveda — Rooted in Wellness",
+    "Biotic Naturals — Rooted in Wellness",
     "Ayurvedic formulations for skin, hair and wellness. Small-batch, lab-tested, dosha-balanced. Made in India.",
-    1
+    1,
   );
   console.log("  ✅ Homepage (homepage-content block)\n");
 
@@ -80,7 +124,7 @@ async function main() {
     storeId,
     "about-us",
     "About Us",
-    `<p>Every formula we make begins with a classical Ayurvedic text and ends with a lab report. Founded in 2012 in Jaipur, Rajasthan — Biotic Ayurveda bridges ancient wisdom and modern quality standards.</p>`,
+    `<p>Every formula we make begins with a classical Ayurvedic text and ends with a lab report. Founded in 2012 in Jaipur, Rajasthan — Biotic Naturals bridges ancient wisdom and modern quality standards.</p>`,
     JSON.stringify([
       {
         id: "about-hero-1",
@@ -88,7 +132,8 @@ async function main() {
         data: {
           hero: {
             title: "Rooted in the Vedas, refined for today.",
-            subtitle: "Every formula we make starts with a classical text and ends with a lab report.",
+            subtitle:
+              "Every formula we make starts with a classical text and ends with a lab report.",
             estYear: "Est. 2012 · Jaipur, Rajasthan",
             backgroundImage: "",
             backgroundColor: "#2F4A3C",
@@ -114,10 +159,27 @@ async function main() {
             ctaText: "Shop our formulations →",
             ctaPage: "shop",
             timeline: [
-              { year: "2012", title: "Founded in Jaipur", desc: "A small workshop with two Ayurvedic vaidyas and a belief that classical formulas deserved a modern audience." },
-              { year: "2015", title: "First lab partnership", desc: "Partnered with an NABL-accredited lab in Pune to test every batch for safety and potency." },
-              { year: "2018", title: "40,000th ritual shipped", desc: "Crossed a milestone that proved people were ready for long-term wellness routines." },
-              { year: "2026", title: "Biotic today", desc: "Still small-batch. Still rooted in the texts. Still made by people who care about the process.", current: true },
+              {
+                year: "2012",
+                title: "Founded in Jaipur",
+                desc: "A small workshop with two Ayurvedic vaidyas and a belief that classical formulas deserved a modern audience.",
+              },
+              {
+                year: "2015",
+                title: "First lab partnership",
+                desc: "Partnered with an NABL-accredited lab in Pune to test every batch for safety and potency.",
+              },
+              {
+                year: "2018",
+                title: "40,000th ritual shipped",
+                desc: "Crossed a milestone that proved people were ready for long-term wellness routines.",
+              },
+              {
+                year: "2026",
+                title: "Biotic today",
+                desc: "Still small-batch. Still rooted in the texts. Still made by people who care about the process.",
+                current: true,
+              },
             ],
           },
           directors: [
@@ -137,7 +199,7 @@ async function main() {
             },
           ],
           quote: {
-            text: "\"We don't reinvent Ayurveda. We honour it by doing the basics well — the right ingredients, the right process, and the honesty to lab-test every batch.\"",
+            text: '"We don\'t reinvent Ayurveda. We honour it by doing the basics well — the right ingredients, the right process, and the honesty to lab-test every batch."',
             author: "Dr. Ananya Sharma, Chief Formulator",
           },
           ctaCard: {
@@ -147,50 +209,99 @@ async function main() {
           },
           missionVisionValues: [
             {
-              icon: "Leaf", color: "text-biotic-green", bg: "bg-biotic-green-tint",
+              icon: "Leaf",
+              color: "text-biotic-green",
+              bg: "bg-biotic-green-tint",
               label: "Mission",
               title: "Make classical Ayurveda accessible",
               desc: "To formulate authentic Ayurvedic products that are lab-tested, traceable, and made for modern rituals.",
             },
             {
-              icon: "Eye", color: "text-biotic-gold", bg: "bg-biotic-gold-tint",
+              icon: "Eye",
+              color: "text-biotic-gold",
+              bg: "bg-biotic-gold-tint",
               label: "Vision",
               title: "Restore trust in Ayurvedic wellness",
               desc: "To set a new standard for transparency in Ayurvedic manufacturing — where every claim is backed by a test report.",
             },
             {
-              icon: "HeartHandshake", color: "text-biotic-red", bg: "bg-rose-50",
+              icon: "HeartHandshake",
+              color: "text-biotic-red",
+              bg: "bg-rose-50",
               label: "Values",
               title: "Text first · Lab always · People matter",
               desc: "We don't cut corners. If it isn't in the classical texts, it doesn't go in. If it isn't lab-tested, it doesn't ship.",
             },
           ],
           location: {
-            factoryAddress: "42, Hawa Sadak\nBani Park, Jaipur — 302 016\nRajasthan, India",
+            factoryAddress:
+              "42, Hawa Sadak\nBani Park, Jaipur — 302 016\nRajasthan, India",
             googleMapsEmbedUrl: "",
             logistics: [
-              { icon: "Train", label: "Nearest railway station", value: "Jaipur Junction — 4 km" },
-              { icon: "Plane", label: "Nearest airport", value: "Jaipur International — 14 km" },
-              { icon: "Route", label: "Nearest highway", value: "NH-48 — 2 km" },
-              { icon: "Factory", label: "Nearest major city", value: "Jaipur — 4 km" },
+              {
+                icon: "Train",
+                label: "Nearest railway station",
+                value: "Jaipur Junction — 4 km",
+              },
+              {
+                icon: "Plane",
+                label: "Nearest airport",
+                value: "Jaipur International — 14 km",
+              },
+              {
+                icon: "Route",
+                label: "Nearest highway",
+                value: "NH-48 — 2 km",
+              },
+              {
+                icon: "Factory",
+                label: "Nearest major city",
+                value: "Jaipur — 4 km",
+              },
             ],
-            dispatchTags: ["Pan-India dispatch", "Road + rail", "Small-batch tracked"],
-            dispatchDesc: "We dispatch to all major markets across India via road and rail freight. Consignments dispatched within agreed lead times.",
+            dispatchTags: [
+              "Pan-India dispatch",
+              "Road + rail",
+              "Small-batch tracked",
+            ],
+            dispatchDesc:
+              "We dispatch to all major markets across India via road and rail freight. Consignments dispatched within agreed lead times.",
           },
           cta: {
-            title: "Experience Biotic Ayurveda",
+            title: "Experience Biotic Naturals",
             cards: [
-              { icon: "Package", title: "Browse formulations", desc: "Explore our full range of skin, hair and wellness products.", cta: "Shop now →", page: "shop", useForm: false },
-              { icon: "Mail", title: "Bulk / wholesale enquiry", desc: "Looking for bulk supply or partnership? Send us your requirement.", cta: "Send enquiry →", page: "contact", useForm: true },
-              { icon: "MapPin", title: "Visit our workshop", desc: "By appointment — schedule a visit to see our process in person.", cta: "Book a visit →", page: "contact", useForm: true },
+              {
+                icon: "Package",
+                title: "Browse formulations",
+                desc: "Explore our full range of skin, hair and wellness products.",
+                cta: "Shop now →",
+                page: "shop",
+                useForm: false,
+              },
+              {
+                icon: "Mail",
+                title: "Bulk / wholesale enquiry",
+                desc: "Looking for bulk supply or partnership? Send us your requirement.",
+                cta: "Send enquiry →",
+                page: "contact",
+                useForm: true,
+              },
+              {
+                icon: "MapPin",
+                title: "Visit our workshop",
+                desc: "By appointment — schedule a visit to see our process in person.",
+                cta: "Book a visit →",
+                page: "contact",
+                useForm: true,
+              },
             ],
           },
         },
       },
     ]),
-    "About Us — Biotic Ayurveda",
+    "About Us — Biotic Naturals",
     "Rooted in classical Ayurvedic texts, tested against modern lab standards. Small-batch formulations made with integrity.",
-    2
+    2,
   );
   console.log("  ✅ About Us (about-page-content block)\n");
 
@@ -209,7 +320,8 @@ async function main() {
         data: {
           hero: {
             title: "Ayurvedic formulations for every dosha",
-            subtitle: "Shop by category, ingredient, or dosha — every product is lab-tested and made in small batches.",
+            subtitle:
+              "Shop by category, ingredient, or dosha — every product is lab-tested and made in small batches.",
           },
           categories: {
             title: "Shop by Category",
@@ -227,16 +339,17 @@ async function main() {
           },
           cta: {
             title: "Looking for bulk or wholesale?",
-            description: "Contact us for bulk orders, private labelling, or partnership enquiries.",
+            description:
+              "Contact us for bulk orders, private labelling, or partnership enquiries.",
             buttonText: "Send Enquiry",
             buttonLink: "/contact",
           },
         },
       },
     ]),
-    "Shop — Biotic Ayurveda",
+    "Shop — Biotic Naturals",
     "Browse our complete range of Ayurvedic formulations for skin, hair, and wellness. Dosha-balanced and lab-tested.",
-    3
+    3,
   );
   console.log("  ✅ Shop (products-page-content block)\n");
 
@@ -255,7 +368,8 @@ async function main() {
         data: {
           hero: {
             title: "We reply within one business day.",
-            subtitle: "Questions on dosha matching, an order, or a bulk/wholesale enquiry — write to us directly.",
+            subtitle:
+              "Questions on dosha matching, an order, or a bulk/wholesale enquiry — write to us directly.",
             topLabel: "Get in touch",
             backgroundColor: "#2F4A3C",
             pattern: "none",
@@ -289,18 +403,24 @@ async function main() {
                 type: "factory",
                 title: "Jaipur Workshop",
                 subtitle: "Primary",
-                address: "42, Hawa Sadak\nBani Park, Jaipur — 302 016\nRajasthan, India",
+                address:
+                  "42, Hawa Sadak\nBani Park, Jaipur — 302 016\nRajasthan, India",
                 accessibility: "Jaipur Junction 4km · Jaipur Airport 14km",
                 buttons: [
                   { text: "Get directions", icon: "MapPin", link: "" },
-                  { text: "Book visit", icon: "Factory", link: "#contact-form" },
+                  {
+                    text: "Book visit",
+                    icon: "Factory",
+                    link: "#contact-form",
+                  },
                 ],
               },
               {
                 type: "office",
                 title: "Registered Office",
                 subtitle: "",
-                address: "D-108, Sector 7\nMalviya Nagar, Jaipur — 302 017\nRajasthan, India",
+                address:
+                  "D-108, Sector 7\nMalviya Nagar, Jaipur — 302 017\nRajasthan, India",
                 accessibility: "Mon–Sat · 9am–6pm IST",
                 buttons: [{ text: "Get directions", icon: "MapPin", link: "" }],
               },
@@ -308,7 +428,8 @@ async function main() {
                 type: "visit",
                 title: "Planning a visit?",
                 subtitle: "",
-                description: "We welcome visits by appointment. Schedule in advance to meet our formulation team and see the workshop.",
+                description:
+                  "We welcome visits by appointment. Schedule in advance to meet our formulation team and see the workshop.",
                 highlights: [
                   "Meet our Ayurvedic formulators",
                   "See the small-batch production process",
@@ -322,9 +443,9 @@ async function main() {
         },
       },
     ]),
-    "Contact Us — Biotic Ayurveda",
+    "Contact Us — Biotic Naturals",
     "Get in touch with the Biotic team. Questions on dosha matching, orders, or bulk enquiries — we reply within one business day.",
-    4
+    4,
   );
   console.log("  ✅ Contact (contact-page-content block)\n");
 
@@ -341,8 +462,9 @@ async function main() {
         id: "blog-hero-1",
         type: "hero",
         data: {
-          title: "Journal — Biotic Ayurveda",
-          subtitle: "Long-form writing on doshas, ingredients, and the science behind formulas that are centuries old.",
+          title: "Journal — Biotic Naturals",
+          subtitle:
+            "Long-form writing on doshas, ingredients, and the science behind formulas that are centuries old.",
           buttonText: "Read Latest",
           buttonLink: "/blog",
           backgroundImage: "",
@@ -354,7 +476,8 @@ async function main() {
         id: "blog-text-1",
         type: "text",
         data: {
-          content: "<p>Explore the wisdom of classical Ayurveda through modern lenses. Our journal covers dosha theory, ingredient deep-dives, ritual guides, and conversations with vaidyas who have spent decades studying the Charaka Samhita, Sushruta Samhita, and Ashtanga Hridayam.</p><p>Whether you are new to Ayurveda or a seasoned practitioner, these writings are meant to inform — not simplify.</p>",
+          content:
+            "<p>Explore the wisdom of classical Ayurveda through modern lenses. Our journal covers dosha theory, ingredient deep-dives, ritual guides, and conversations with vaidyas who have spent decades studying the Charaka Samhita, Sushruta Samhita, and Ashtanga Hridayam.</p><p>Whether you are new to Ayurveda or a seasoned practitioner, these writings are meant to inform — not simplify.</p>",
         },
       },
       {
@@ -362,16 +485,17 @@ async function main() {
         type: "cta",
         data: {
           title: "Stay rooted in wellness",
-          description: "Subscribe to our newsletter for new journal entries, formulation releases, and seasonal wellness guides.",
+          description:
+            "Subscribe to our newsletter for new journal entries, formulation releases, and seasonal wellness guides.",
           buttonText: "Subscribe",
           buttonLink: "/contact",
           backgroundColor: "primary",
         },
       },
     ]),
-    "Journal — Biotic Ayurveda",
+    "Journal — Biotic Naturals",
     "Long-form writing on doshas, ingredients, and the science behind formulas that are centuries old.",
-    5
+    5,
   );
   console.log("  ✅ Journal (hero + text + cta blocks)\n");
 

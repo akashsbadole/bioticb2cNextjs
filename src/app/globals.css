@@ -53,40 +53,40 @@
   --color-biotic-line: var(--biotic-line);
 }
 
-/* Biotic Ayurveda — design tokens */
+/* Biotic Naturals — design tokens */
 :root {
-  --biotic-bg: #F7F1DE;
-  --biotic-bg-alt: #EFE6C8;
-  --biotic-paper: #FFFDF6;
-  --biotic-ink: #241D14;
-  --biotic-ink-soft: #5B5240;
-  --biotic-green: #2F4A3C;
-  --biotic-green-dark: #1C2C23;
-  --biotic-green-tint: #DCE6DA;
-  --biotic-gold: #C68A2E;
-  --biotic-gold-tint: #F1DFB4;
-  --biotic-red: #A6402F;
-  --biotic-sand: #D9C7A3;
-  --biotic-line: #E1D6B8;
+  --biotic-bg: #f7f1de;
+  --biotic-bg-alt: #efe6c8;
+  --biotic-paper: #fffdf6;
+  --biotic-ink: #241d14;
+  --biotic-ink-soft: #5b5240;
+  --biotic-green: #2f4a3c;
+  --biotic-green-dark: #1c2c23;
+  --biotic-green-tint: #dce6da;
+  --biotic-gold: #c68a2e;
+  --biotic-gold-tint: #f1dfb4;
+  --biotic-red: #a6402f;
+  --biotic-sand: #d9c7a3;
+  --biotic-line: #e1d6b8;
 }
 
 :root {
   --radius: 0.5rem;
-  --background: #FFFFFF;
+  --background: #ffffff;
   --foreground: #333333;
-  --card: #FFFFFF;
+  --card: #ffffff;
   --card-foreground: #333333;
-  --popover: #FFFFFF;
+  --popover: #ffffff;
   --popover-foreground: #333333;
   --primary: #3d6f08;
-  --primary-foreground: #FFFFFF;
+  --primary-foreground: #ffffff;
   --secondary: #8bc34a;
-  --secondary-foreground: #FFFFFF;
+  --secondary-foreground: #ffffff;
   --muted: #f8f6f3;
   --muted-foreground: #666666;
   --accent: #fa881e;
-  --accent-foreground: #FFFFFF;
-  --destructive: #FF6B6B;
+  --accent-foreground: #ffffff;
+  --destructive: #ff6b6b;
   --border: #dddddd;
   --input: #dddddd;
   --ring: #3d6f08;
@@ -95,10 +95,10 @@
   --chart-3: #001524;
   --chart-4: #f8f6f3;
   --chart-5: #333333;
-  --sidebar: #FFFFFF;
+  --sidebar: #ffffff;
   --sidebar-foreground: #333333;
   --sidebar-primary: #3d6f08;
-  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f8f6f3;
   --sidebar-accent-foreground: #333333;
   --sidebar-border: #dddddd;
@@ -114,7 +114,7 @@
   --brand-text: #333333;
   --brand-text-dark: #111111;
   --brand-text-light: #666666;
-  --brand-bg: #FFFFFF;
+  --brand-bg: #ffffff;
   --brand-bg-section: #f8f6f3;
   --brand-border: #dddddd;
   --brand-dark: #001524;
@@ -131,7 +131,12 @@
   }
 
   /* Heading typography - NutVatika (Astra theme) */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-poppins), sans-serif;
     color: var(--brand-text-dark);
     font-weight: 700;
@@ -167,7 +172,11 @@
     line-height: 1.25em;
   }
 
-  p, span, li, td, th {
+  p,
+  span,
+  li,
+  td,
+  th {
     font-family: var(--font-poppins), sans-serif;
     color: var(--brand-text);
   }
@@ -189,7 +198,7 @@
   /* Button styles - matching NutVatika (Astra theme) */
   .btn-primary {
     background-color: var(--brand-primary);
-    color: #FFFFFF;
+    color: #ffffff;
     border-radius: 30px;
     padding: 10px 20px;
     font-weight: 600;
@@ -211,7 +220,7 @@
 
   .btn-secondary {
     background-color: var(--brand-secondary);
-    color: #FFFFFF;
+    color: #ffffff;
     border-radius: 30px;
     padding: 10px 20px;
     font-weight: 600;
@@ -232,7 +241,7 @@
 
   .btn-accent {
     background-color: var(--brand-accent);
-    color: #FFFFFF;
+    color: #ffffff;
     border-radius: 30px;
     padding: 10px 20px;
     font-weight: 600;
@@ -270,7 +279,7 @@
 
   .btn-outline:hover {
     background-color: var(--brand-primary);
-    color: #FFFFFF;
+    color: #ffffff;
   }
 
   /* Card styles */
@@ -302,12 +311,12 @@
 
   .bg-dark {
     background-color: var(--brand-dark);
-    color: #FFFFFF;
+    color: #ffffff;
   }
 
   .bg-brand-gradient {
     background: linear-gradient(170deg, #001524 0%, #016129 50%, #0d5318 100%);
-    color: #FFFFFF;
+    color: #ffffff;
   }
 
   .text-brand-gradient {
@@ -319,7 +328,7 @@
 
   .bg-primary {
     background-color: var(--brand-primary);
-    color: #FFFFFF;
+    color: #ffffff;
   }
 }
 
@@ -342,15 +351,15 @@
   --background: var(--biotic-bg);
   --foreground: var(--biotic-ink);
   --primary: var(--biotic-green);
-  --primary-foreground: #FFFDF6;
+  --primary-foreground: #fffdf6;
   --secondary: var(--biotic-gold);
-  --secondary-foreground: #1C2C23;
+  --secondary-foreground: #1c2c23;
   --muted: var(--biotic-bg-alt);
   --muted-foreground: var(--biotic-ink-soft);
   --accent: var(--biotic-gold);
-  --accent-foreground: #1C2C23;
+  --accent-foreground: #1c2c23;
   --destructive: var(--biotic-red);
-  --destructive-foreground: #FFFFFF;
+  --destructive-foreground: #ffffff;
   --border: var(--biotic-line);
   --input: var(--biotic-line);
   --ring: var(--biotic-green);
@@ -365,7 +374,12 @@
 .biotic-body {
   background: var(--biotic-bg);
   color: var(--biotic-ink);
-  font-family: "Work Sans", var(--font-work-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Work Sans",
+    var(--font-work-sans),
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
 }
 
 .biotic-theme h1,
@@ -425,29 +439,57 @@
   font-weight: 600;
   letter-spacing: 0.01em;
   border: 1px solid transparent;
-  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
   white-space: nowrap;
   cursor: pointer;
 }
-.biotic-btn:active { transform: scale(0.97); }
-.biotic-btn-primary { background: var(--biotic-green); color: var(--biotic-paper); }
-.biotic-btn-primary:hover { background: var(--biotic-green-dark); }
-.biotic-btn-gold { background: var(--biotic-gold); color: var(--biotic-green-dark); }
-.biotic-btn-gold:hover { background: #B57C22; }
-.biotic-btn-outline { background: transparent; color: var(--biotic-green-dark); border-color: var(--biotic-green-dark); }
-.biotic-btn-outline:hover { background: var(--biotic-green-dark); color: var(--biotic-paper); }
-.biotic-btn-sm { padding: 10px 20px; font-size: 0.8rem; }
+.biotic-btn:active {
+  transform: scale(0.97);
+}
+.biotic-btn-primary {
+  background: var(--biotic-green);
+  color: var(--biotic-paper);
+}
+.biotic-btn-primary:hover {
+  background: var(--biotic-green-dark);
+}
+.biotic-btn-gold {
+  background: var(--biotic-gold);
+  color: var(--biotic-green-dark);
+}
+.biotic-btn-gold:hover {
+  background: #b57c22;
+}
+.biotic-btn-outline {
+  background: transparent;
+  color: var(--biotic-green-dark);
+  border-color: var(--biotic-green-dark);
+}
+.biotic-btn-outline:hover {
+  background: var(--biotic-green-dark);
+  color: var(--biotic-paper);
+}
+.biotic-btn-sm {
+  padding: 10px 20px;
+  font-size: 0.8rem;
+}
 
 /* Biotic card */
 .biotic-card {
   background: var(--biotic-paper);
   border: 1px solid var(--biotic-line);
   border-radius: 14px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 .biotic-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 30px -14px rgba(28,44,35,0.28);
+  box-shadow: 0 12px 30px -14px rgba(28, 44, 35, 0.28);
 }
 
 /* Biotic container */
@@ -464,8 +506,12 @@
 }
 
 /* Biotic section */
-.biotic-section { padding: 96px 0; }
-.biotic-section-tight { padding: 64px 0; }
+.biotic-section {
+  padding: 96px 0;
+}
+.biotic-section-tight {
+  padding: 64px 0;
+}
 
 /* Biotic section heading */
 .biotic-section-head {
@@ -497,10 +543,26 @@
 }
 
 /* Biotic grid helpers */
-.biotic-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-.biotic-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-.biotic-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
-.biotic-product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+.biotic-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.biotic-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+.biotic-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+}
+.biotic-product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 26px;
+}
 
 /* Biotic form inputs */
 .input-biotic {
@@ -510,7 +572,7 @@
   background: var(--biotic-paper);
   font: inherit;
   color: var(--biotic-ink);
-  font-size: .88rem;
+  font-size: 0.88rem;
   outline: none;
   width: 100%;
 }
@@ -549,43 +611,96 @@
 }
 
 /* Header responsive */
-.nav-links { display: flex; }
-.menu-toggle { display: none; }
+.nav-links {
+  display: flex;
+}
+.menu-toggle {
+  display: none;
+}
 
 @media (max-width: 1024px) {
-  .nav-links { display: none !important; }
-  .menu-toggle { display: block !important; }
+  .nav-links {
+    display: none !important;
+  }
+  .menu-toggle {
+    display: block !important;
+  }
 }
 
 /* Responsive */
 @media (max-width: 1080px) {
-  .biotic-grid-4 { grid-template-columns: repeat(2, 1fr); }
-  .biotic-product-grid { grid-template-columns: repeat(2, 1fr); }
-  .shop-layout { grid-template-columns: 1fr; }
-  .contact-layout { grid-template-columns: 1fr; }
-  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .biotic-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .biotic-product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .shop-layout {
+    grid-template-columns: 1fr;
+  }
+  .contact-layout {
+    grid-template-columns: 1fr;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 @media (max-width: 860px) {
-  .hero { grid-template-columns: 1fr !important; }
-  .hero .hero-art { order: -1; max-width: 340px; margin: 0 auto; }
-  .spotlight { grid-template-columns: 1fr !important; padding: 24px 16px !important; }
-  .biotic-grid-3 { grid-template-columns: 1fr; }
-  .biotic-grid-2 { grid-template-columns: 1fr; }
-  .ritual { grid-template-columns: 1fr !important; }
-  .blog-featured { grid-template-columns: 1fr !important; }
-  .newsletter { flex-direction: column !important; text-align: center; }
-  .newsletter input { width: 100% !important; }
-  .form-grid { grid-template-columns: 1fr !important; }
+  .hero {
+    grid-template-columns: 1fr !important;
+  }
+  .hero .hero-art {
+    order: -1;
+    max-width: 340px;
+    margin: 0 auto;
+  }
+  .spotlight {
+    grid-template-columns: 1fr !important;
+    padding: 24px 16px !important;
+  }
+  .biotic-grid-3 {
+    grid-template-columns: 1fr;
+  }
+  .biotic-grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .ritual {
+    grid-template-columns: 1fr !important;
+  }
+  .blog-featured {
+    grid-template-columns: 1fr !important;
+  }
+  .newsletter {
+    flex-direction: column !important;
+    text-align: center;
+  }
+  .newsletter input {
+    width: 100% !important;
+  }
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 @media (max-width: 680px) {
-  .biotic-grid-4 { grid-template-columns: 1fr; }
-  .biotic-product-grid { grid-template-columns: 1fr; }
-  .biotic-section { padding: 64px 0 !important; }
-  .trust-row { justify-content: center !important; text-align: center; }
+  .biotic-grid-4 {
+    grid-template-columns: 1fr;
+  }
+  .biotic-product-grid {
+    grid-template-columns: 1fr;
+  }
+  .biotic-section {
+    padding: 64px 0 !important;
+  }
+  .trust-row {
+    justify-content: center !important;
+    text-align: center;
+  }
 }
 
 /* Dropdown hover for desktop */
-.nav-links li:hover .dropdown-menu { display: block !important; }
+.nav-links li:hover .dropdown-menu {
+  display: block !important;
+}
 
 /* Nav link states */
 .nav-link {

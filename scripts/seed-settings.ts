@@ -1,7 +1,7 @@
 import { db } from "../src/lib/db";
 
 const DEFAULT_SETTINGS: { key: string; value: string }[] = [
-  { key: "site_name", value: "Biotic Ayurveda" },
+  { key: "site_name", value: "Biotic Naturals" },
   {
     key: "site_description",
     value:
@@ -32,7 +32,7 @@ const DEFAULT_SETTINGS: { key: string; value: string }[] = [
     value:
       "Thank you for your order. We'll send you a confirmation once it ships.",
   },
-  { key: "default_meta_title", value: "Biotic Ayurveda — Rooted in Wellness" },
+  { key: "default_meta_title", value: "Biotic Naturals — Rooted in Wellness" },
   {
     key: "default_meta_description",
     value:
@@ -41,7 +41,7 @@ const DEFAULT_SETTINGS: { key: string; value: string }[] = [
 ];
 
 async function main() {
-  console.log("Seeding default settings for Biotic Ayurveda...\n");
+  console.log("Seeding default settings for Biotic Naturals...\n");
 
   for (const s of DEFAULT_SETTINGS) {
     const existing = await db.siteSetting.findFirst({
