@@ -58,7 +58,8 @@ export function AccountPage() {
     enabled: !!auth.user,
     queryFn: async () => {
       const res = await fetch("/api/account");
-      return (await res.json()).user;
+      const data = await res.json();
+      return data.user ?? null;
     },
   });
 

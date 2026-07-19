@@ -116,7 +116,11 @@ export function AdminSettings() {
     handleSettingChange("shipping_weight_rates", JSON.stringify(newRates));
   };
 
-  const handleUpdateWeightRate = (index: number, key: "maxWeight" | "rate", value: number) => {
+  const handleUpdateWeightRate = (
+    index: number,
+    key: "maxWeight" | "rate",
+    value: number,
+  ) => {
     const newRates = [...weightRates];
     newRates[index] = { ...newRates[index], [key]: value };
     handleSettingChange("shipping_weight_rates", JSON.stringify(newRates));
@@ -543,15 +547,22 @@ export function AdminSettings() {
           </div>
           <div className="space-y-4 sm:col-span-3 border p-4 rounded-lg bg-muted/20">
             <div>
-              <Label className="text-base font-semibold">Weight Based Shipping Rates</Label>
+              <Label className="text-base font-semibold">
+                Weight Based Shipping Rates
+              </Label>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Define shipping charges based on total product weight in kilograms (kg). The matching tier with the smallest max weight greater than or equal to the total cart weight is used.
+                Define shipping charges based on total product weight in
+                kilograms (kg). The matching tier with the smallest max weight
+                greater than or equal to the total cart weight is used.
               </p>
             </div>
 
             <div className="space-y-2">
               {weightRates.length === 0 ? (
-                <p className="text-xs text-muted-foreground italic">No weight based rates defined yet. Flat shipping cost will be used as fallback.</p>
+                <p className="text-xs text-muted-foreground italic">
+                  No weight based rates defined yet. Flat shipping cost will be
+                  used as fallback.
+                </p>
               ) : (
                 <div className="space-y-2">
                   <div className="grid grid-cols-3 gap-4 text-xs font-semibold text-muted-foreground px-2">
@@ -560,13 +571,22 @@ export function AdminSettings() {
                     <span>Action</span>
                   </div>
                   {weightRates.map((rate: any, idx: number) => (
-                    <div key={idx} className="grid grid-cols-3 gap-4 items-center">
+                    <div
+                      key={idx}
+                      className="grid grid-cols-3 gap-4 items-center"
+                    >
                       <Input
                         type="number"
                         min="0"
                         step="0.1"
                         value={rate.maxWeight}
-                        onChange={(e) => handleUpdateWeightRate(idx, "maxWeight", parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          handleUpdateWeightRate(
+                            idx,
+                            "maxWeight",
+                            parseFloat(e.target.value) || 0,
+                          )
+                        }
                         placeholder="Max weight (e.g. 1)"
                       />
                       <Input
@@ -574,7 +594,13 @@ export function AdminSettings() {
                         min="0"
                         step="1"
                         value={rate.rate}
-                        onChange={(e) => handleUpdateWeightRate(idx, "rate", parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          handleUpdateWeightRate(
+                            idx,
+                            "rate",
+                            parseFloat(e.target.value) || 0,
+                          )
+                        }
                         placeholder="Rate (e.g. 50)"
                       />
                       <Button
@@ -590,7 +616,12 @@ export function AdminSettings() {
                   ))}
                 </div>
               )}
-              <Button type="button" variant="outline" size="sm" onClick={handleAddWeightRate}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddWeightRate}
+              >
                 Add Weight Rate Tier
               </Button>
             </div>
@@ -622,7 +653,15 @@ export function AdminSettings() {
           </CardTitle>
           <CardDescription>
             Google reCAPTCHA v2 protects your forms from spam. Get keys at{" "}
-            <a href="https://www.google.com/recaptcha/admin" target="_blank" rel="noopener noreferrer" className="underline">google.com/recaptcha/admin</a>.
+            <a
+              href="https://www.google.com/recaptcha/admin"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              google.com/recaptcha/admin
+            </a>
+            .
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -631,7 +670,9 @@ export function AdminSettings() {
             <Input
               id="recaptcha_site_key"
               value={settings.recaptcha_site_key}
-              onChange={(e) => handleSettingChange("recaptcha_site_key", e.target.value)}
+              onChange={(e) =>
+                handleSettingChange("recaptcha_site_key", e.target.value)
+              }
               placeholder="6Lc..._U"
             />
             <p className="text-xs text-muted-foreground">
@@ -644,7 +685,9 @@ export function AdminSettings() {
               id="recaptcha_secret_key"
               type="password"
               value={settings.recaptcha_secret_key}
-              onChange={(e) => handleSettingChange("recaptcha_secret_key", e.target.value)}
+              onChange={(e) =>
+                handleSettingChange("recaptcha_secret_key", e.target.value)
+              }
               placeholder="6Lc..._s"
             />
             <p className="text-xs text-muted-foreground">
@@ -671,7 +714,9 @@ export function AdminSettings() {
             <Input
               id="payu_merchant_key"
               value={settings.payu_merchant_key}
-              onChange={(e) => handleSettingChange("payu_merchant_key", e.target.value)}
+              onChange={(e) =>
+                handleSettingChange("payu_merchant_key", e.target.value)
+              }
               placeholder="Merchant Key"
             />
             <p className="text-xs text-muted-foreground">
@@ -684,7 +729,9 @@ export function AdminSettings() {
               id="payu_merchant_salt"
               type="password"
               value={settings.payu_merchant_salt}
-              onChange={(e) => handleSettingChange("payu_merchant_salt", e.target.value)}
+              onChange={(e) =>
+                handleSettingChange("payu_merchant_salt", e.target.value)
+              }
               placeholder="Merchant Salt"
             />
             <p className="text-xs text-muted-foreground">
@@ -698,11 +745,16 @@ export function AdminSettings() {
                 id="payu_test_mode"
                 checked={settings.payu_test_mode === "true"}
                 onCheckedChange={(checked) =>
-                  handleSettingChange("payu_test_mode", checked ? "true" : "false")
+                  handleSettingChange(
+                    "payu_test_mode",
+                    checked ? "true" : "false",
+                  )
                 }
               />
               <span className="text-sm text-muted-foreground">
-                {settings.payu_test_mode === "true" ? "Test Mode (Sandbox)" : "Production Mode"}
+                {settings.payu_test_mode === "true"
+                  ? "Test Mode (Sandbox)"
+                  : "Production Mode"}
               </span>
             </div>
           </div>
@@ -946,7 +998,7 @@ export function AdminSettings() {
       </Card>
 
       {/* Email / SMTP Settings */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Server className="h-4 w-4" />
@@ -1051,7 +1103,7 @@ export function AdminSettings() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Author Profiles */}
       <AuthorProfiles />

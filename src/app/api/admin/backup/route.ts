@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON file' }, { status: 400 });
     }
 
-    if (!backup.data || !['1.0', '1.1'].includes(backup.version)) {
+    if (!backup.data || !['1.0', '1.1', '1.2'].includes(backup.version)) {
       return NextResponse.json({ error: 'Invalid or unsupported backup format version' }, { status: 400 });
     }
 

@@ -41,36 +41,121 @@ import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import dynamic from "next/dynamic";
 
-function lazyNamed<T extends Record<string, unknown>>(importFn: () => Promise<T>, name: keyof T & string) {
-  return dynamic(() => importFn().then(m => ({ default: m[name] as React.ComponentType<any> })), { ssr: false });
+function lazyNamed<T extends Record<string, unknown>>(
+  importFn: () => Promise<T>,
+  name: keyof T & string,
+) {
+  return dynamic(
+    () =>
+      importFn().then((m) => ({
+        default: m[name] as React.ComponentType<any>,
+      })),
+    { ssr: false },
+  );
 }
 
-const AdminDashboardHome = lazyNamed(() => import("@/components/admin/AdminDashboardHome"), "AdminDashboardHome");
-const AdminAnalytics = lazyNamed(() => import("@/components/admin/AdminAnalytics"), "AdminAnalytics");
-const AdminProducts = lazyNamed(() => import("@/components/admin/AdminProducts"), "AdminProducts");
-const AdminCategories = lazyNamed(() => import("@/components/admin/AdminCategories"), "AdminCategories");
-const AdminBrands = lazyNamed(() => import("@/components/admin/AdminBrands"), "AdminBrands");
-const AdminOrders = lazyNamed(() => import("@/components/admin/AdminOrders"), "AdminOrders");
-const AdminCoupons = lazyNamed(() => import("@/components/admin/AdminCoupons"), "AdminCoupons");
-const AdminReviews = lazyNamed(() => import("@/components/admin/AdminReviews"), "AdminReviews");
-const AdminSettings = lazyNamed(() => import("@/components/admin/AdminSettings"), "AdminSettings");
-const AdminMedia = lazyNamed(() => import("@/components/admin/AdminMedia"), "AdminMedia");
-const AdminPages = lazyNamed(() => import("@/components/admin/AdminPages"), "AdminPages");
-const AdminSearchDialog = lazyNamed(() => import("@/components/admin/AdminSearchDialog"), "AdminSearchDialog");
-const AdminMenus = lazyNamed(() => import("@/components/admin/AdminMenus"), "AdminMenus");
-const AdminNewsletter = lazyNamed(() => import("@/components/admin/AdminNewsletter"), "AdminNewsletter");
-const AdminAbandonedCarts = lazyNamed(() => import("@/components/admin/AdminAbandonedCarts"), "AdminAbandonedCarts");
-const AdminPopups = lazyNamed(() => import("@/components/admin/AdminPopups"), "AdminPopups");
-const AdminBlog = lazyNamed(() => import("@/components/admin/AdminBlog"), "AdminBlog");
-const AdminFlashSales = lazyNamed(() => import("@/components/admin/AdminFlashSales"), "AdminFlashSales");
-const AdminSupport = lazyNamed(() => import("@/components/admin/AdminSupport"), "AdminSupport");
-const AdminPlugins = lazyNamed(() => import("@/components/admin/AdminPlugins"), "AdminPlugins");
-const AdminThemeCustomizer = lazyNamed(() => import("@/components/admin/AdminThemeCustomizer"), "AdminThemeCustomizer");
-const AdminCustomerPrices = lazyNamed(() => import("@/components/admin/AdminCustomerPrices"), "AdminCustomerPrices");
-const AdminBundles = lazyNamed(() => import("@/components/admin/AdminBundles"), "AdminBundles");
+const AdminDashboardHome = lazyNamed(
+  () => import("@/components/admin/AdminDashboardHome"),
+  "AdminDashboardHome",
+);
+const AdminAnalytics = lazyNamed(
+  () => import("@/components/admin/AdminAnalytics"),
+  "AdminAnalytics",
+);
+const AdminProducts = lazyNamed(
+  () => import("@/components/admin/AdminProducts"),
+  "AdminProducts",
+);
+const AdminCategories = lazyNamed(
+  () => import("@/components/admin/AdminCategories"),
+  "AdminCategories",
+);
+const AdminBrands = lazyNamed(
+  () => import("@/components/admin/AdminBrands"),
+  "AdminBrands",
+);
+const AdminOrders = lazyNamed(
+  () => import("@/components/admin/AdminOrders"),
+  "AdminOrders",
+);
+const AdminCoupons = lazyNamed(
+  () => import("@/components/admin/AdminCoupons"),
+  "AdminCoupons",
+);
+const AdminReviews = lazyNamed(
+  () => import("@/components/admin/AdminReviews"),
+  "AdminReviews",
+);
+const AdminSettings = lazyNamed(
+  () => import("@/components/admin/AdminSettings"),
+  "AdminSettings",
+);
+const AdminMedia = lazyNamed(
+  () => import("@/components/admin/AdminMedia"),
+  "AdminMedia",
+);
+const AdminPages = lazyNamed(
+  () => import("@/components/admin/AdminPages"),
+  "AdminPages",
+);
+const AdminSearchDialog = lazyNamed(
+  () => import("@/components/admin/AdminSearchDialog"),
+  "AdminSearchDialog",
+);
+const AdminMenus = lazyNamed(
+  () => import("@/components/admin/AdminMenus"),
+  "AdminMenus",
+);
+const AdminNewsletter = lazyNamed(
+  () => import("@/components/admin/AdminNewsletter"),
+  "AdminNewsletter",
+);
+const AdminAbandonedCarts = lazyNamed(
+  () => import("@/components/admin/AdminAbandonedCarts"),
+  "AdminAbandonedCarts",
+);
+const AdminPopups = lazyNamed(
+  () => import("@/components/admin/AdminPopups"),
+  "AdminPopups",
+);
+const AdminBlog = lazyNamed(
+  () => import("@/components/admin/AdminBlog"),
+  "AdminBlog",
+);
+const AdminFlashSales = lazyNamed(
+  () => import("@/components/admin/AdminFlashSales"),
+  "AdminFlashSales",
+);
+const AdminSupport = lazyNamed(
+  () => import("@/components/admin/AdminSupport"),
+  "AdminSupport",
+);
+const AdminPlugins = lazyNamed(
+  () => import("@/components/admin/AdminPlugins"),
+  "AdminPlugins",
+);
+const AdminThemeCustomizer = lazyNamed(
+  () => import("@/components/admin/AdminThemeCustomizer"),
+  "AdminThemeCustomizer",
+);
+const AdminCustomerPrices = lazyNamed(
+  () => import("@/components/admin/AdminCustomerPrices"),
+  "AdminCustomerPrices",
+);
+const AdminBundles = lazyNamed(
+  () => import("@/components/admin/AdminBundles"),
+  "AdminBundles",
+);
 import { NotificationBell } from "@/components/admin/NotificationBell";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Ticket, Star, Headphones, Clock, DollarSign, Gift } from "lucide-react";
+import {
+  Ticket,
+  Star,
+  Headphones,
+  Clock,
+  DollarSign,
+  Gift,
+} from "lucide-react";
 
 interface AdminDashboardProps {
   user: { id: string; email: string; name: string; role: string } | null;
@@ -84,7 +169,7 @@ const sidebarItems = [
   { id: "analytics", label: "Analytics", icon: TrendingUp },
   { id: "products", label: "Products", icon: Package },
   { id: "categories", label: "Categories", icon: FolderOpen },
-  { id: "brands", label: "Brands", icon: ShoppingBag },
+  // { id: "brands", label: "Brands", icon: ShoppingBag },
   { id: "blog", label: "Blog", icon: BookOpen },
   { id: "orders", label: "Orders", icon: ShoppingBag },
   { id: "abandoned-carts", label: "Abandoned Carts", icon: ShoppingCart },
@@ -99,8 +184,8 @@ const sidebarItems = [
   { id: "menus", label: "Menus", icon: Menu },
   { id: "customer-pricing", label: "Customer Pricing", icon: DollarSign },
   { id: "bundles", label: "Bundles", icon: Gift },
-  { id: "plugins", label: "Plugins", icon: Puzzle },
-  { id: "themes", label: "Themes", icon: Palette },
+  // { id: "plugins", label: "Plugins", icon: Puzzle },
+  // { id: "themes", label: "Themes", icon: Palette },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -256,7 +341,7 @@ export function AdminDashboard({
   const handleTabChange = (tab: string) => {
     setCurrentTab(tab);
     setMobileOpen(false);
-    onNavigate('admin', tab);
+    onNavigate("admin", tab);
   };
 
   const handleQuickNav = (tab: string) => {
