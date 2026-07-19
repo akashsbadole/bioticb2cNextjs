@@ -16,9 +16,12 @@ export async function GET(request: NextRequest) {
     const auth = await requireAuth(request);
     if (!auth.success) return auth.response;
 
+    const userId = await resolveUserId(auth);
+    if (!userId) return NextResponse.json({ error: 'User not found' }, { status: 401 });
+
     const storeId = getStoreId(request);
     const tickets = await db.supportTicket.findMany({
-      where: { userId: auth.payload.userId, ...(storeId ? { storeId } : {}) },
+      where: { userId, ...(storeId ? { storeId } : {}) },
       include: {
         Order: { select: { id: true, orderNumber: true, totalAmount: true } },
       },
@@ -36,6 +39,9 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await requireAuth(request);
     if (!auth.success) return auth.response;
+
+    const userId = await resolveUserId(auth);
+    if (!userId) return NextResponse.json({ error: 'User not found' }, { status: 401 });
 
     const storeId = getStoreId(request);
     const body = await request.json();
@@ -55,7 +61,7 @@ export async function POST(request: NextRequest) {
         message,
         orderId: orderId || null,
         priority,
-        userId: auth.payload.userId,
+        userId,
         storeId: storeId || null,
       },
       include: {
@@ -68,4 +74,30 @@ export async function POST(request: NextRequest) {
     console.error('Create support ticket error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
+}
+
+/**
+ * Resolve the real database user id for the authenticated caller.
+ * `requireAuth` trusts the `x-user-id` header (set by middleware from either a
+ * Bearer JWT or the NextAuth session). To guard against a stale/invalid id that
+ * would violate the `SupportTicket.userId` foreign key, we re-lookup the user
+ * by email (which `requireAuth` also provides) and fall back to the header id
+ * only when it matches an existing user.
+ */
+async function resolveUserId(
+  auth: { success: true; payload: { userId: string; email: string } },
+): Promise<string | null> {
+  const { userId, email } = auth.payload;
+  if (email) {
+    const user = await db.user.findFirst({
+      where: { email: email.trim().toLowerCase() },
+      select: { id: true },
+    });
+    if (user) return user.id;
+  }
+  if (userId) {
+    const user = await db.user.findUnique({ where: { id: userId }, select: { id: true } });
+    if (user) return user.id;
+  }
+  return null;
 }

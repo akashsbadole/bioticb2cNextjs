@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/lib/store";
+import { authHeaders } from "@/lib/fetch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -106,7 +107,7 @@ export function CheckoutPage() {
   const fetchAddresses = async () => {
     try {
       const res = await fetch("/api/account/addresses", {
-        headers: { Authorization: `Bearer ${auth.token}` },
+        headers: authHeaders(auth.token),
       });
       if (res.ok) {
         const data = await res.json();

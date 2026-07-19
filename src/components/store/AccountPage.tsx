@@ -34,6 +34,7 @@ import { formatPrice } from "@/lib/pricing";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { OrdersPage } from "./OrdersPage";
+import { authHeaders } from "@/lib/fetch";
 
 type AccountTab =
   | "dashboard"
@@ -860,7 +861,7 @@ function SupportTab() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${auth.token}`,
+          ...authHeaders(auth.token),
         },
         body: JSON.stringify({
           subject,

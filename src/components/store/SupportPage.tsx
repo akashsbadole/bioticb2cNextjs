@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useAppStore } from "@/lib/store";
+import { authHeaders } from "@/lib/fetch";
 
 const statusColors: Record<string, string> = {
   open: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
@@ -35,7 +36,7 @@ export function SupportPage() {
     enabled: !!auth.user,
     queryFn: async () => {
       const res = await fetch("/api/support", {
-        headers: { Authorization: `Bearer ${auth.token}` },
+        headers: authHeaders(auth.token),
       });
       if (!res.ok) throw new Error("Failed");
       return res.json();
@@ -53,7 +54,7 @@ export function SupportPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${auth.token}`,
+          ...authHeaders(auth.token),
         },
         body: JSON.stringify(data),
       });

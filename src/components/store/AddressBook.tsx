@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MapPin, Plus, Trash2, Home, Briefcase, CheckCircle2, Loader2 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
+import { authHeaders } from "@/lib/fetch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,7 +36,7 @@ export function AddressBook() {
     enabled: !!auth.token,
     queryFn: async () => {
         const res = await fetch("/api/account/addresses", {
-            headers: { Authorization: `Bearer ${auth.token}` },
+            headers: authHeaders(auth.token),
         });
         return (await res.json()).addresses || [];
     }
@@ -47,7 +48,7 @@ export function AddressBook() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${auth.token}`,
+                ...authHeaders(auth.token),
             },
             body: JSON.stringify(data),
         });
@@ -68,7 +69,7 @@ export function AddressBook() {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${auth.token}`,
+              ...authHeaders(auth.token),
             },
             body: JSON.stringify({ addresses: updated }),
           });
