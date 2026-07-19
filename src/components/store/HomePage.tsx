@@ -184,7 +184,7 @@ export function HomePage({
       .filter((cat: any) => cat.products.length > 0);
   }, [categories, allProducts]);
 
-  if (catLoading || prodLoading || allProdLoading) return <StoreLoading />;
+  if (catLoading || prodLoading) return <StoreLoading />;
 
   const handleAddToCart = (product: any) => {
     addToCart({

@@ -6,6 +6,7 @@ import { generatePayUHash, PAYU_CONFIG } from '@/lib/payments/payu';
 import { requireAuth } from '@/lib/admin-auth';
 import { sendOrderConfirmation } from '@/lib/email';
 import { createNotification } from '@/lib/notifications';
+import { logError } from '@/lib/error-logger';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { ORDER_STATUS, PAYMENT_STATUS } from '@/lib/constants';
 
@@ -38,7 +39,8 @@ export async function POST(request: NextRequest) {
     const rateLimitResponse = await checkRateLimit(request, ORDER_RATE_LIMIT);
     if (rateLimitResponse) return rateLimitResponse;
 
-    const auth = await requireAuth(request).catch(() => ({ success: false } as const));
+    const auth = await requireAuth(request);
+    if (!auth.success) return auth.response;
     const storeId = getStoreId(request);
 
     const body = await request.json();
@@ -69,6 +71,16 @@ export async function POST(request: NextRequest) {
     const isAllDigital = dbProducts.every(p => p.isDigital);
 
     // Calculate totals on server
+    const missingProductIds = productIds.filter(
+      (id: string) => !dbProducts.some(p => p.id === id)
+    );
+    if (missingProductIds.length > 0) {
+      return NextResponse.json(
+        { error: 'Some items are no longer available', missingProductIds },
+        { status: 400 }
+      );
+    }
+
     let calculatedSubtotal = 0;
     const orderItemsData = items.map((item: any) => {
       const dbProduct = dbProducts.find(p => p.id === item.productId);
@@ -197,7 +209,7 @@ export async function POST(request: NextRequest) {
       const newOrder = await tx.order.create({
         data: {
           storeId,
-          userId: auth.success ? auth.payload.userId : null,
+          userId: auth.payload.userId,
           orderNumber,
           totalAmount: calculatedTotal,
           subtotal: calculatedSubtotal,
@@ -335,9 +347,19 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ orderId: order.id });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to create order';
     console.error('Create order error:', error);
+    logError(error, {
+      category: 'payment',
+      context: 'POST /api/orders',
+    });
     return NextResponse.json(
-      { error: 'Failed to create order' },
+      {
+        error: process.env.NODE_ENV === 'production'
+          ? 'Failed to create order'
+          : `Failed to create order: ${message}`,
+        detail: message,
+      },
       { status: 500 }
     );
   }
@@ -363,7 +385,16 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ order });
   } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    console.error('Update order error:', error);
+    logError(error, { category: 'api', context: 'PUT /api/orders' });
+    return NextResponse.json(
+      {
+        error: process.env.NODE_ENV === 'production' ? 'Internal server error' : `Internal server error: ${message}`,
+        detail: message,
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -405,6 +436,15 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json({ orders });
   } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    console.error('List orders error:', error);
+    logError(error, { category: 'api', context: 'GET /api/orders' });
+    return NextResponse.json(
+      {
+        error: process.env.NODE_ENV === 'production' ? 'Internal server error' : `Internal server error: ${message}`,
+        detail: message,
+      },
+      { status: 500 }
+    );
   }
 }

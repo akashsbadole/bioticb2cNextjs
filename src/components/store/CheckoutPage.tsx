@@ -241,6 +241,19 @@ export function CheckoutPage() {
     );
   }
 
+  if (!auth.user) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <h1 className="text-2xl font-bold mb-4">Please log in to checkout</h1>
+        <p className="text-muted-foreground mb-6">You need an account to place an order.</p>
+        <div className="flex gap-3 justify-center">
+          <Button onClick={() => navigate("login")}>Log In</Button>
+          <Button variant="outline" onClick={() => navigate("register")}>Create Account</Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
       <button

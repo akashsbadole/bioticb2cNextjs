@@ -481,10 +481,14 @@ export function VedikaProductCard({ product, onNavigate, formatPrice, onAddToCar
   })() : null;
 
   return (
-    <div className="bg-vedika-paper rounded-xl border border-vedika-line overflow-hidden relative transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)]">
+    <div
+      onClick={() => onNavigate && onNavigate("product-page", product.slug)}
+      className="bg-vedika-paper rounded-xl border border-vedika-line overflow-hidden relative transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_30px_-14px_rgba(28,44,35,0.28)]"
+      style={{ cursor: onNavigate ? "pointer" : "default" }}
+    >
       <div className={`aspect-[1/1.05] flex items-center justify-center relative overflow-hidden ${image ? "bg-vedika-bg-alt" : "bg-gradient-to-br from-vedika-bg-alt to-vedika-green-tint"}`}>
         {image ? (
-          <Image src={image} alt={product.name} fill className="object-cover" sizes="(max-width: 680px) 100vw, 25vw" />
+          <Image src={image} alt={product.name} fill unoptimized className="object-cover" sizes="(max-width: 680px) 100vw, 25vw" />
         ) : (
           <LeafSimple className="w-[56%] h-[56%] text-vedika-green opacity-30" />
         )}
