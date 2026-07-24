@@ -189,3 +189,26 @@ export const mediaUpdateSchema = z.object({
 export const folderCreateSchema = z.object({
   folder: z.string().min(1, 'Folder name is required').max(200),
 });
+
+export const customFieldDefinitionSchema = z.object({
+  entityType: z.enum(['product', 'category']),
+  name: z.string().min(1, 'Name is required').max(50),
+  type: z.enum(['text', 'number', 'url', 'color', 'textarea', 'select']).default('text'),
+  options: z.string().optional(),
+  isRequired: z.boolean().default(false),
+  isVisible: z.boolean().default(true),
+  sortOrder: z.number().int().default(0),
+});
+
+export const customFieldValueSchema = z.object({
+  definitionId: z.string().min(1, 'Definition ID is required'),
+  entityId: z.string().min(1, 'Entity ID is required'),
+  entityType: z.enum(['product', 'category']),
+  value: z.string().default(''),
+});
+
+export const customFieldValuesBulkSchema = z.object({
+  entityType: z.enum(['product', 'category']),
+  entityId: z.string().min(1, 'Entity ID is required'),
+  values: z.array(customFieldValueSchema).default([]),
+});

@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
     const limit = limitParam > 0 ? Math.min(limitParam, 100) : undefined;
     const where: Record<string, unknown> = {};
 
-    // Always exclude soft-deleted unless explicitly requested
     if (!includeDeleted) {
       where.deletedAt = null;
     }
@@ -38,11 +37,46 @@ export async function GET(request: NextRequest) {
       include: all ? { _count: { select: { Product: true } } } : undefined,
     });
 
+    const categoryIds = categories.map((c: any) => c.id);
+    let customFieldMap = new Map<string, any[]>();
+    if (categoryIds.length > 0) {
+      const values = await db.customFieldValue.findMany({
+        where: {
+          entityId: { in: categoryIds },
+          entityType: 'category',
+          ...(storeId ? { storeId } : {}),
+        },
+        include: { Definition: true },
+      });
+      for (const v of values) {
+        const arr = customFieldMap.get(v.entityId) || [];
+        arr.push({
+          id: v.id,
+          definitionId: v.definitionId,
+          entityId: v.entityId,
+          entityType: v.entityType,
+          value: v.value,
+          definition: {
+            id: v.Definition.id,
+            name: v.Definition.name,
+            type: v.Definition.type,
+            isVisible: v.Definition.isVisible,
+            options: v.Definition.options,
+          },
+        });
+        customFieldMap.set(v.entityId, arr);
+      }
+    }
+
+    const enrichedCategories = categories.map((c: any) => ({
+      ...c,
+      customFieldValues: customFieldMap.get(c.id) || [],
+    }));
+
     const response = NextResponse.json(
-      slug ? { category: categories[0] || null } : { categories }
+      slug ? { category: enrichedCategories[0] || null } : { categories: enrichedCategories }
     );
 
-    // Cache public category listings for 10 minutes
     if (!includeDeleted) {
       response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
     }

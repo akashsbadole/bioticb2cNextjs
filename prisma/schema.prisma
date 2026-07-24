@@ -44,6 +44,8 @@ model Store {
   Wishlist      Wishlist[]
   Popup         Popup[]
   Banner        Banner[]
+  CustomFieldDefinition CustomFieldDefinition[]
+  CustomFieldValue      CustomFieldValue[]
 
   @@index([ownerUserId])
   @@index([isActive])
@@ -876,5 +878,45 @@ model BundleItem {
 
   @@unique([bundleId, productId])
   @@index([bundleId])
+}
+
+// ─── Custom Fields ────────────────────────────────────────────────
+
+model CustomFieldDefinition {
+  id          String   @id @default(cuid())
+  storeId     String?
+  entityType  String   // "product" | "category"
+  name        String   // e.g. "Material", "Origin", "Certification"
+  type        String   @default("text") // text | number | url | color | textarea | select
+  options     String?  @default("[]")   // JSON array for select type
+  isRequired  Boolean  @default(false)
+  isVisible   Boolean  @default(true)   // show on storefront
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  Store       Store?               @relation(fields: [storeId], references: [id])
+  values      CustomFieldValue[]
+
+  @@index([storeId, entityType])
+  @@index([entityType])
+}
+
+model CustomFieldValue {
+  id           String   @id @default(cuid())
+  definitionId String
+  entityId     String   // product.id or category.id
+  entityType   String   // "product" | "category"
+  storeId      String?
+  value        String   // stored as string; rendered based on definition.type
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  Definition   CustomFieldDefinition @relation(fields: [definitionId], references: [id], onDelete: Cascade)
+  Store        Store?               @relation(fields: [storeId], references: [id])
+
+  @@unique([definitionId, entityId, entityType])
+  @@index([entityId, entityType])
+  @@index([storeId])
 }
 

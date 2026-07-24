@@ -35,6 +35,7 @@ export default defineConfig({
     command: 'pnpm dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
+    timeout: 120000,
     env: {
       DATABASE_URL: 'file:./prisma/dev.db',
       AUTH_SECRET: 'change-me-to-a-random-64-char-string-for-security-hardening-12345678',

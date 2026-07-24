@@ -22,7 +22,38 @@ export async function GET(
     if (!category) {
       return NextResponse.json({ error: 'Category not found' }, { status: 404 });
     }
-    return NextResponse.json({ category, products: category.Product });
+
+    const customFieldValues = await db.customFieldValue.findMany({
+      where: {
+        entityId: category.id,
+        entityType: 'category',
+      },
+      include: { Definition: true },
+      orderBy: {
+        Definition: { sortOrder: 'asc' },
+      },
+    });
+
+    const formattedValues = customFieldValues.map((v) => ({
+      id: v.id,
+      definitionId: v.definitionId,
+      entityId: v.entityId,
+      entityType: v.entityType,
+      value: v.value,
+      definition: {
+        id: v.Definition.id,
+        name: v.Definition.name,
+        type: v.Definition.type,
+        isVisible: v.Definition.isVisible,
+        options: v.Definition.options,
+      },
+    }));
+
+    return NextResponse.json({
+      category,
+      products: category.Product,
+      customFieldValues: formattedValues,
+    });
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

@@ -15,6 +15,7 @@ import {
   PowerOff,
   FileText,
   Download,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -83,6 +84,7 @@ import {
   AdminCategoryFields,
   type CategoryFieldValues,
 } from "./AdminCategoryFields";
+import type { CustomFieldDefinition } from "./AdminCustomFields";
 
 interface Category {
   id: string;
@@ -196,6 +198,46 @@ export function AdminCategories() {
   // CSV import/export state
   const [importing, setImporting] = useState(false);
   const [exporting, setExporting] = useState(false);
+
+  // Custom fields state
+  const [customFieldDefs, setCustomFieldDefs] = useState<CustomFieldDefinition[]>([]);
+  const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
+  const [customFieldsLoading, setCustomFieldsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!formOpen || !editingCategory) {
+      setCustomFieldDefs([]);
+      setCustomFieldValues({});
+      return;
+    }
+    let cancelled = false;
+    setCustomFieldsLoading(true);
+    (async () => {
+      try {
+        const [defsRes, valuesRes] = await Promise.all([
+          adminFetch("/api/custom-fields?entityType=category"),
+          adminFetch(`/api/custom-fields/values?entityType=category&entityId=${editingCategory.id}`),
+        ]);
+        if (!defsRes.ok || !valuesRes.ok) return;
+        const defsJson = await defsRes.json();
+        const valuesJson = await valuesRes.json();
+        if (cancelled) return;
+        setCustomFieldDefs(defsJson.definitions || []);
+        const map: Record<string, string> = {};
+        for (const v of valuesJson.values || []) {
+          map[v.definitionId] = v.value || "";
+        }
+        setCustomFieldValues(map);
+      } catch {
+        // ignore
+      } finally {
+        if (!cancelled) setCustomFieldsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [formOpen, editingCategory?.id]);
 
   const { data: categories = [], isLoading: loading } = useQuery({
     queryKey: ["admin-categories"],
@@ -357,6 +399,29 @@ export function AdminCategories() {
     onError: (err: any) => toast.error(err.message),
   });
 
+  const saveCustomFieldsMutation = useMutation({
+    mutationFn: async ({ entityType, entityId, values }: { entityType: string; entityId: string; values: Record<string, string> }) => {
+      const payload = {
+        entityType,
+        entityId,
+        values: Object.entries(values).map(([definitionId, value]) => ({
+          definitionId,
+          entityId,
+          entityType,
+          value,
+        })),
+      };
+      const res = await adminFetch("/api/custom-fields/values/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error((await res.json()).error || "Failed to save custom fields");
+      return res.json();
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
   const handleSave = async () => {
     if (!form.name.trim()) {
       toast.error("Category name is required");
@@ -376,11 +441,27 @@ export function AdminCategories() {
       customSchema: form.customSchema.trim() || null,
       parentId: form.parentId || null,
       productIds: form.productIds,
-      // Category page fields
       ...categoryFields,
     };
 
-    saveMutation.mutate({ id: editingCategory?.id, data: payload });
+    saveMutation.mutate(
+      { id: editingCategory?.id, data: payload },
+      {
+        onSuccess: async () => {
+          if (editingCategory && Object.keys(customFieldValues).length > 0) {
+            try {
+              await saveCustomFieldsMutation.mutateAsync({
+                entityType: "category",
+                entityId: editingCategory.id,
+                values: customFieldValues,
+              });
+            } catch {
+              // already toasted
+            }
+          }
+        },
+      }
+    );
   };
 
   const handleSelectAll = () => {
@@ -725,9 +806,10 @@ export function AdminCategories() {
             onValueChange={setActiveSectionTab}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="sections">Sections</TabsTrigger>
+              <TabsTrigger value="custom-fields">Custom Fields</TabsTrigger>
             </TabsList>
             <TabsContent
               value="details"
@@ -1088,6 +1170,85 @@ export function AdminCategories() {
                 }}
                 saving={savingSections}
               />
+            </TabsContent>
+            <TabsContent
+              value="custom-fields"
+              className="py-4 max-h-[calc(90vh-210px)] overflow-y-auto"
+            >
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Custom Fields</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Manage additional structured fields for this category.
+                  </p>
+                </div>
+                {customFieldsLoading ? (
+                  <div className="flex items-center justify-center py-10">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  </div>
+                ) : customFieldDefs.length === 0 ? (
+                  <div className="text-center py-10 text-muted-foreground text-sm">
+                    No custom fields defined. Go to Custom Fields to add some.
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {customFieldDefs.map((def) => (
+                      <div key={def.id} className="grid gap-2">
+                        <Label htmlFor={`cat-cf-${def.id}`}>
+                          {def.name}
+                          {def.isRequired && <span className="text-rose-500 ml-1">*</span>}
+                        </Label>
+                        {def.type === "textarea" ? (
+                          <Textarea
+                            id={`cat-cf-${def.id}`}
+                            placeholder={def.name}
+                            value={customFieldValues[def.id] || ""}
+                            onChange={(e) =>
+                              setCustomFieldValues((prev) => ({ ...prev, [def.id]: e.target.value }))
+                            }
+                            rows={3}
+                          />
+                        ) : def.type === "select" ? (
+                          <Select
+                            value={customFieldValues[def.id] || ""}
+                            onValueChange={(v) =>
+                              setCustomFieldValues((prev) => ({ ...prev, [def.id]: v }))
+                            }
+                          >
+                            <SelectTrigger id={`cat-cf-${def.id}`}>
+                              <SelectValue placeholder={`Select ${def.name}`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {(() => {
+                                try {
+                                  const opts = JSON.parse(def.options || "[]");
+                                  return Array.isArray(opts)
+                                    ? opts.map((o: string) => (
+                                        <SelectItem key={o} value={o}>{o}</SelectItem>
+                                      ))
+                                    : null;
+                                } catch {
+                                  return null;
+                                }
+                              })()}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Input
+                            id={`cat-cf-${def.id}`}
+                            type={def.type === "url" ? "url" : def.type === "color" ? "color" : def.type === "number" ? "number" : "text"}
+                            placeholder={def.name}
+                            value={customFieldValues[def.id] || ""}
+                            onChange={(e) =>
+                              setCustomFieldValues((prev) => ({ ...prev, [def.id]: e.target.value }))
+                            }
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
           <DialogFooter>

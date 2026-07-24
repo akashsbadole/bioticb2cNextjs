@@ -146,6 +146,10 @@ const AdminBundles = lazyNamed(
   () => import("@/components/admin/AdminBundles"),
   "AdminBundles",
 );
+const AdminCustomFields = lazyNamed(
+  () => import("@/components/admin/AdminCustomFields"),
+  "AdminCustomFields",
+);
 import { NotificationBell } from "@/components/admin/NotificationBell";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
@@ -155,6 +159,7 @@ import {
   Clock,
   DollarSign,
   Gift,
+  Settings2,
 } from "lucide-react";
 
 interface AdminDashboardProps {
@@ -169,6 +174,7 @@ const sidebarItems = [
   { id: "analytics", label: "Analytics", icon: TrendingUp },
   { id: "products", label: "Products", icon: Package },
   { id: "categories", label: "Categories", icon: FolderOpen },
+  { id: "custom-fields", label: "Custom Fields", icon: Settings2 },
   // { id: "brands", label: "Brands", icon: ShoppingBag },
   { id: "blog", label: "Blog", icon: BookOpen },
   { id: "orders", label: "Orders", icon: ShoppingBag },
@@ -409,6 +415,8 @@ export function AdminDashboard({
         return <AdminProducts />;
       case "categories":
         return <AdminCategories />;
+      case "custom-fields":
+        return <AdminCustomFields />;
       case "brands":
         return <AdminBrands />;
       case "orders":

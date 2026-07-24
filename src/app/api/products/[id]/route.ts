@@ -65,7 +65,33 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ product });
+    const customFieldValues = await db.customFieldValue.findMany({
+      where: {
+        entityId: product.id,
+        entityType: 'product',
+      },
+      include: { Definition: true },
+      orderBy: {
+        Definition: { sortOrder: 'asc' },
+      },
+    });
+
+    const formattedValues = customFieldValues.map((v) => ({
+      id: v.id,
+      definitionId: v.definitionId,
+      entityId: v.entityId,
+      entityType: v.entityType,
+      value: v.value,
+      definition: {
+        id: v.Definition.id,
+        name: v.Definition.name,
+        type: v.Definition.type,
+        isVisible: v.Definition.isVisible,
+        options: v.Definition.options,
+      },
+    }));
+
+    return NextResponse.json({ product, customFieldValues: formattedValues });
   } catch (error) {
     logError(error, { category: 'api', context: 'GET /api/products/[id]' });
     return NextResponse.json(

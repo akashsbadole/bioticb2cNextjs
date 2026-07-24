@@ -10,6 +10,39 @@ import { ACTIVITY } from '@/lib/constants';
 
 const PRODUCTS_RATE_LIMIT = { maxRequests: 120, windowMs: 60 * 1000, prefix: 'products-search' };
 
+async function attachCustomFieldValues(products: any[], storeId?: string | null) {
+  if (!products.length) return products;
+  const productIds = products.map((p: any) => p.id);
+  const values = await db.customFieldValue.findMany({
+    where: {
+      entityId: { in: productIds },
+      entityType: 'product',
+      ...(storeId ? { storeId } : {}),
+    },
+    include: { Definition: true },
+  });
+  const grouped = new Map<string, any[]>();
+  for (const v of values) {
+    const arr = grouped.get(v.entityId) || [];
+    arr.push({
+      id: v.id,
+      definitionId: v.definitionId,
+      entityId: v.entityId,
+      entityType: v.entityType,
+      value: v.value,
+      definition: {
+        id: v.Definition.id,
+        name: v.Definition.name,
+        type: v.Definition.type,
+        isVisible: v.Definition.isVisible,
+        options: v.Definition.options,
+      },
+    });
+    grouped.set(v.entityId, arr);
+  }
+  return products.map((p: any) => ({ ...p, customFieldValues: grouped.get(p.id) || [] }));
+}
+
 export async function GET(request: NextRequest) {
   try {
     const rateLimitResponse = await checkRateLimit(request, PRODUCTS_RATE_LIMIT);
@@ -128,7 +161,6 @@ export async function GET(request: NextRequest) {
     let total = 0;
 
     if (cursor && !page) {
-      // Cursor-based pagination
       products = await db.product.findMany({
         where: { ...scopedWhere, id: { gt: cursor } },
         include: { Category: true, ProductVariant: true },
@@ -140,7 +172,6 @@ export async function GET(request: NextRequest) {
       }
       total = await db.product.count({ where: scopedWhere });
     } else {
-      // Page-based pagination (default, backward compatible)
       const pageNum = Math.max(1, parseInt(page || '1'));
       const skip = (pageNum - 1) * limit;
 
@@ -155,6 +186,8 @@ export async function GET(request: NextRequest) {
         db.product.count({ where: scopedWhere }),
       ]);
     }
+
+    products = await attachCustomFieldValues(products, storeId);
 
     const response = NextResponse.json({
       products,

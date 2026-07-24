@@ -443,6 +443,43 @@ export function ProductPage({ slug, onNavigate }: ProductPageProps) {
                         </div>
                     </div>
                 )}
+
+                {(product as any)?.customFieldValues?.length > 0 && (() => {
+                    const visibleFields = (product as any).customFieldValues.filter((cf: any) => cf.definition?.isVisible !== false);
+                    if (visibleFields.length === 0) return null;
+                    return (
+                        <div className="space-y-4">
+                            <h3 className="text-xl font-bold">Additional Information</h3>
+                            <div className="border rounded-2xl overflow-hidden">
+                                <table className="w-full text-sm">
+                                    <tbody>
+                                        {visibleFields.map((cf: any, idx: number) => (
+                                            <tr key={cf.id} className={idx % 2 === 0 ? 'bg-muted/30' : ''}>
+                                                <td className="px-4 py-3 font-bold text-muted-foreground w-1/3 border-r">
+                                                    {cf.definition?.name || cf.definitionId}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    {cf.definition?.type === 'url' && cf.value ? (
+                                                        <a href={cf.value} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">
+                                                            {cf.value}
+                                                        </a>
+                                                    ) : cf.definition?.type === 'color' && cf.value ? (
+                                                        <span className="inline-flex items-center gap-2">
+                                                            <span className="w-4 h-4 rounded border" style={{ background: cf.value }} />
+                                                            {cf.value}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="whitespace-pre-wrap break-words">{cf.value || '—'}</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    );
+                })()}
             </div>
           </div>
         </div>

@@ -24,6 +24,7 @@ import {
   Link2,
   Check,
   X,
+  Loader2,
 } from "lucide-react";
 import { AdminProductVariants } from "./AdminProductVariants";
 import { AdminProductAddons } from "./AdminProductAddons";
@@ -100,6 +101,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { adminFetch } from "@/lib/admin-fetch";
+import type { CustomFieldDefinition } from "./AdminCustomFields";
 
 interface Category {
   id: string;
@@ -300,6 +302,46 @@ export function AdminProducts() {
   // Edit dialog tab
   const [editTab, setEditTab] = useState("general");
 
+  // Custom fields state
+  const [customFieldDefs, setCustomFieldDefs] = useState<CustomFieldDefinition[]>([]);
+  const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
+  const [customFieldsLoading, setCustomFieldsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!formOpen || !editingProduct) {
+      setCustomFieldDefs([]);
+      setCustomFieldValues({});
+      return;
+    }
+    let cancelled = false;
+    setCustomFieldsLoading(true);
+    (async () => {
+      try {
+        const [defsRes, valuesRes] = await Promise.all([
+          adminFetch("/api/custom-fields?entityType=product"),
+          adminFetch(`/api/custom-fields/values?entityType=product&entityId=${editingProduct.id}`),
+        ]);
+        if (!defsRes.ok || !valuesRes.ok) return;
+        const defsJson = await defsRes.json();
+        const valuesJson = await valuesRes.json();
+        if (cancelled) return;
+        setCustomFieldDefs(defsJson.definitions || []);
+        const map: Record<string, string> = {};
+        for (const v of valuesJson.values || []) {
+          map[v.definitionId] = v.value || "";
+        }
+        setCustomFieldValues(map);
+      } catch {
+        // ignore
+      } finally {
+        if (!cancelled) setCustomFieldsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [formOpen, editingProduct?.id]);
+
   // Page builder state
   const [productBlocks, setProductBlocks] = useState<PageBlock[]>([]);
   const [builderOpen, setBuilderOpen] = useState(false);
@@ -374,6 +416,29 @@ export function AdminProducts() {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       setDeleteId(null);
     },
+  });
+
+  const saveCustomFieldsMutation = useMutation({
+    mutationFn: async ({ entityType, entityId, values }: { entityType: string; entityId: string; values: Record<string, string> }) => {
+      const payload = {
+        entityType,
+        entityId,
+        values: Object.entries(values).map(([definitionId, value]) => ({
+          definitionId,
+          entityId,
+          entityType,
+          value,
+        })),
+      };
+      const res = await adminFetch("/api/custom-fields/values/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error((await res.json()).error || "Failed to save custom fields");
+      return res.json();
+    },
+    onError: (err: any) => toast.error(err.message),
   });
 
   const restoreMutation = useMutation({
@@ -553,7 +618,24 @@ export function AdminProducts() {
       relatedProductIds: JSON.stringify(selectedRelatedIds),
     };
 
-    saveMutation.mutate({ id: editingProduct?.id, data: payload });
+    saveMutation.mutate(
+      { id: editingProduct?.id, data: payload },
+      {
+        onSuccess: async () => {
+          if (editingProduct && Object.keys(customFieldValues).length > 0) {
+            try {
+              await saveCustomFieldsMutation.mutateAsync({
+                entityType: "product",
+                entityId: editingProduct.id,
+                values: customFieldValues,
+              });
+            } catch {
+              // already toasted in mutation onError
+            }
+          }
+        },
+      }
+    );
   };
 
   const handleSelectAll = () => {
@@ -1263,11 +1345,12 @@ export function AdminProducts() {
           </DialogHeader>
           {editingProduct && (
             <Tabs value={editTab} onValueChange={setEditTab}>
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="general">General</TabsTrigger>
                 <TabsTrigger value="variants">Variants</TabsTrigger>
-                <TabsTrigger value="related">Related</TabsTrigger>
                 <TabsTrigger value="addons">Add-ons</TabsTrigger>
+                <TabsTrigger value="related">Related</TabsTrigger>
+                <TabsTrigger value="custom-fields">Custom Fields</TabsTrigger>
               </TabsList>
             </Tabs>
           )}
@@ -1963,6 +2046,84 @@ export function AdminProducts() {
                         </Badge>
                       ))}
                     </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Custom Fields Tab */}
+            {editingProduct && editTab === "custom-fields" && (
+              <div className="py-4 space-y-4">
+                <div className="space-y-2">
+                  <Label>Custom Fields</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Manage additional structured fields for this product.
+                  </p>
+                </div>
+                {customFieldsLoading ? (
+                  <div className="flex items-center justify-center py-10">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  </div>
+                ) : customFieldDefs.length === 0 ? (
+                  <div className="text-center py-10 text-muted-foreground text-sm">
+                    No custom fields defined. Go to Custom Fields to add some.
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {customFieldDefs.map((def) => (
+                      <div key={def.id} className="grid gap-2">
+                        <Label htmlFor={`cf-${def.id}`}>
+                          {def.name}
+                          {def.isRequired && <span className="text-rose-500 ml-1">*</span>}
+                        </Label>
+                        {def.type === "textarea" ? (
+                          <Textarea
+                            id={`cf-${def.id}`}
+                            placeholder={def.name}
+                            value={customFieldValues[def.id] || ""}
+                            onChange={(e) =>
+                              setCustomFieldValues((prev) => ({ ...prev, [def.id]: e.target.value }))
+                            }
+                            rows={3}
+                          />
+                        ) : def.type === "select" ? (
+                          <Select
+                            value={customFieldValues[def.id] || ""}
+                            onValueChange={(v) =>
+                              setCustomFieldValues((prev) => ({ ...prev, [def.id]: v }))
+                            }
+                          >
+                            <SelectTrigger id={`cf-${def.id}`}>
+                              <SelectValue placeholder={`Select ${def.name}`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {(() => {
+                                try {
+                                  const opts = JSON.parse(def.options || "[]");
+                                  return Array.isArray(opts)
+                                    ? opts.map((o: string) => (
+                                        <SelectItem key={o} value={o}>{o}</SelectItem>
+                                      ))
+                                    : null;
+                                } catch {
+                                  return null;
+                                }
+                              })()}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Input
+                            id={`cf-${def.id}`}
+                            type={def.type === "url" ? "url" : def.type === "color" ? "color" : def.type === "number" ? "number" : "text"}
+                            placeholder={def.name}
+                            value={customFieldValues[def.id] || ""}
+                            onChange={(e) =>
+                              setCustomFieldValues((prev) => ({ ...prev, [def.id]: e.target.value }))
+                            }
+                          />
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
