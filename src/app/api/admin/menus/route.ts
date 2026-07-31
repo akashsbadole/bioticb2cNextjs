@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 import { z } from 'zod';
 
 const menuSchema = z.object({
@@ -141,6 +142,7 @@ export async function POST(request: NextRequest) {
     });
 
     revalidatePath('/', 'layout');
+    invalidateCache(CACHE_TAGS.menus);
     return NextResponse.json({ menu: menuWithItems }, { status: 201 });
   } catch (error) {
     console.error('Create menu error:', error);

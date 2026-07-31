@@ -414,7 +414,7 @@ export const useAppStore = create<AppState>()(
       setSettings: (settings) => set({ settings }),
       fetchSettings: async () => {
         try {
-          const res = await fetch("/api/settings/public", { cache: "no-store" });
+          const res = await fetch("/api/settings/public");
           if (res.ok) {
             const data = await res.json();
             set({ settings: data.settings || {} });

@@ -10,6 +10,7 @@ import { useActiveFlashSales, getFlashSalePrice } from "@/lib/flash-sales";
 import { useCustomerPrices } from "@/lib/customer-pricing";
 import { toast } from "sonner";
 import { StoreLoading } from "./StoreLoading";
+import type { StorefrontInitialData } from "@/lib/storefront-data";
 import {
   BioticProductCard,
   BioticFilterSidebar,
@@ -21,9 +22,10 @@ import {
 interface CategoryPageProps {
   slug: string;
   onNavigate: (page: string, data?: unknown) => void;
+  initialData?: StorefrontInitialData["category"];
 }
 
-export function CategoryPage({ slug, onNavigate }: CategoryPageProps) {
+export function CategoryPage({ slug, onNavigate, initialData }: CategoryPageProps) {
   const { navigate, addToCart, wishlistIds, toggleWishlistId, auth, settings } = useAppStore();
   const { productMap: flashProductMap } = useActiveFlashSales();
   const { getPrice: getCustomerPrice, prices: customerPrices } = useCustomerPrices();
@@ -34,6 +36,8 @@ export function CategoryPage({ slug, onNavigate }: CategoryPageProps) {
   const { data, isLoading: loading } = useQuery({
     queryKey: ["category-page", slug, sortBy],
     staleTime: 5 * 60 * 1000,
+    initialData:
+      initialData && sortBy === "featured" ? initialData : undefined,
     queryFn: async () => {
       const catRes = await fetch(`/api/categories?slug=${slug}`);
       const catData = await catRes.json();

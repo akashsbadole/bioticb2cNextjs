@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
+import { storefrontCacheHeaders } from '@/lib/cache';
 
 // Settings keys that should never be exposed to the public
 const SENSITIVE_KEYS = [
@@ -41,7 +42,9 @@ export async function GET(request: NextRequest) {
     }
 
     const response = NextResponse.json({ settings: settingsMap });
-    response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+    Object.entries(storefrontCacheHeaders(300)).forEach(([key, value]) =>
+      response.headers.set(key, value),
+    );
     return response;
   } catch (error) {
     console.error('Get public settings error:', error);

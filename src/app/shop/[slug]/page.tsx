@@ -1,10 +1,20 @@
 import type { Metadata } from "next";
-import { CategoryClientPage } from "./client";
+import { StoreShell } from "@/components/store/StoreShell";
+import {
+  getCategoryInitialData,
+  getCategorySlugs,
+} from "@/lib/storefront-data";
 
-export const revalidate = 60;
+export const revalidate = 300;
+export const dynamicParams = true;
 
 interface Props {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateStaticParams() {
+  const slugs = await getCategorySlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -17,5 +27,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { slug } = await params;
-  return <CategoryClientPage slug={slug} />;
+  const data = await getCategoryInitialData(slug);
+
+  return (
+    <StoreShell
+      initialPage={{ type: "category", slug }}
+      initialData={data ? { category: data } : undefined}
+    />
+  );
 }

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { ShopClientPage } from "./client";
+import { StoreShell } from "@/components/store/StoreShell";
+import { getShopInitialData } from "@/lib/storefront-data";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Shop | Biotic Naturals",
@@ -9,6 +10,13 @@ export const metadata: Metadata = {
     "Browse our products. Premium quality FMCG products with fast delivery.",
 };
 
-export default function Page() {
-  return <ShopClientPage />;
+export default async function Page() {
+  const data = await getShopInitialData();
+
+  return (
+    <StoreShell
+      initialPage="shop"
+      initialData={data ? { shop: data } : undefined}
+    />
+  );
 }

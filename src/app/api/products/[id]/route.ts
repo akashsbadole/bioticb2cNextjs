@@ -4,7 +4,7 @@ import { requireAdminAuth } from '@/lib/admin-auth';
 import { logError } from '@/lib/error-logger';
 import { sendLowStockAlert, sendBackInStockNotification } from '@/lib/email';
 import { ensurePluginsLoaded, isPluginEnabled, hooks } from '@/lib/plugins';
-import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
+import { storefrontCache, CACHE_TAGS, invalidateCache, storefrontCacheHeaders } from '@/lib/cache';
 
 async function resolveProduct(idOrSlug: string, includeDeleted = false) {
   const where = {
@@ -109,7 +109,11 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(data);
+    const response = NextResponse.json(data);
+    Object.entries(storefrontCacheHeaders(300)).forEach(([key, value]) =>
+      response.headers.set(key, value),
+    );
+    return response;
   } catch (error) {
     logError(error, { category: 'api', context: 'GET /api/products/[id]' });
     return NextResponse.json(

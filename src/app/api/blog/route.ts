@@ -6,7 +6,7 @@ import { getStoreId } from '@/lib/store-db';
 import { normalizeBlocksForStorage } from '@/lib/page-blocks';
 import { normalizeImageUrl } from '@/lib/utils';
 import { requireAdminAuth } from '@/lib/admin-auth';
-import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
+import { storefrontCache, CACHE_TAGS, invalidateCache, storefrontCacheHeaders } from '@/lib/cache';
 import { ACTIVITY } from '@/lib/constants';
 import { sanitizeHtml, sanitizeBlocks } from '@/lib/sanitize';
 
@@ -122,8 +122,9 @@ export async function GET(request: NextRequest) {
     const { blogPosts, pagination } = await fetchBlogPosts();
 
     const response = NextResponse.json({ blogPosts, pagination });
-    response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
-    response.headers.set('Vary', 'host');
+    Object.entries(storefrontCacheHeaders(600)).forEach(([key, value]) =>
+      response.headers.set(key, value),
+    );
     return response;
   } catch (error) {
     console.error('Get blog posts error:', error);

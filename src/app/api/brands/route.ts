@@ -4,7 +4,7 @@ import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { validateBody } from '@/lib/validate';
 import { brandSchema } from '@/lib/validations';
-import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
+import { storefrontCache, CACHE_TAGS, invalidateCache, storefrontCacheHeaders } from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,8 +23,9 @@ export async function GET(request: NextRequest) {
 
     const brands = await loadBrands();
     const response = NextResponse.json({ brands });
-    response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
-    response.headers.set('Vary', 'host');
+    Object.entries(storefrontCacheHeaders(600)).forEach(([key, value]) =>
+      response.headers.set(key, value),
+    );
     return response;
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

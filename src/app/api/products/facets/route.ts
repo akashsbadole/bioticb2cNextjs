@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
+import { storefrontCacheHeaders } from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
   try {
@@ -87,7 +88,7 @@ export async function GET(request: NextRequest) {
         .sort((a, b) => b.count - a.count),
     }));
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       categories: categories.map(c => ({ id: c.id, name: c.name, slug: c.slug, count: (c as any)._count.Product })),
       priceRange: {
         min: priceStats._min.price || 0,
@@ -98,6 +99,10 @@ export async function GET(request: NextRequest) {
       availability: { inStock: inStockCount, outOfStock: outOfStockCount },
       attributes,
     });
+    Object.entries(storefrontCacheHeaders(120)).forEach(([key, value]) =>
+      response.headers.set(key, value),
+    );
+    return response;
   } catch (error) {
     console.error('Facets error:', error);
     return NextResponse.json({ categories: [], priceRange: { min: 0, max: 0, avg: 0 }, brands: [], availability: { inStock: 0, outOfStock: 0 }, attributes: [] });

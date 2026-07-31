@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { BioticBlogCard, ClockIcon } from "./biotic-components";
+import type { StorefrontInitialData } from "@/lib/storefront-data";
 
 interface BlogPageProps {
   onNavigate: (page: string, data?: unknown) => void;
+  initialData?: StorefrontInitialData["blog"];
 }
 
 const fallbackPosts = [
@@ -19,16 +21,17 @@ const fallbackPosts = [
 
 const allTags = ["All", "Dosha Guide", "Ingredients", "Rituals", "Behind the Brand"];
 
-export function BlogPage({ onNavigate }: BlogPageProps) {
+export function BlogPage({ onNavigate, initialData }: BlogPageProps) {
   const [selectedTag, setSelectedTag] = useState("All");
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ["blog-posts"],
     staleTime: 10 * 60 * 1000,
+    initialData: initialData?.posts,
     queryFn: async () => {
-      const res = await fetch("/api/blog-posts");
+      const res = await fetch("/api/blog?limit=20&published=true");
       const data = await res.json();
-      return data.posts || data || [];
+      return data.blogPosts || data.posts || data || [];
     },
   });
 

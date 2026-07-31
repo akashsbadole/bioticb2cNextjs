@@ -6,7 +6,7 @@ import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { logError } from '@/lib/error-logger';
 import { checkRateLimit } from '@/lib/rate-limit';
-import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
+import { storefrontCache, CACHE_TAGS, invalidateCache, storefrontCacheHeaders } from '@/lib/cache';
 import { ACTIVITY } from '@/lib/constants';
 
 const PRODUCTS_RATE_LIMIT = { maxRequests: 120, windowMs: 60 * 1000, prefix: 'products-search' };
@@ -240,9 +240,11 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.json({ products, pagination });
 
-    // Cache public product listings for 5 minutes (revalidate in background)
+    // Cache public product listings at the CDN edge (revalidate in background)
     if (!all && trashed !== 'true') {
-      response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+      Object.entries(storefrontCacheHeaders(300)).forEach(([key, value]) =>
+        response.headers.set(key, value),
+      );
     }
 
     return response;

@@ -16,6 +16,7 @@ export const CACHE_TAGS = {
   settings: "settings",
   flashSales: "flash-sales",
   coupons: "coupons",
+  menus: "menus",
   product: (id: string) => `product:${id}`,
 } as const;
 
@@ -48,4 +49,22 @@ export function invalidateCache(...tags: string[]): void {
   for (const tag of tags) {
     revalidateTag(tag, { expire: 0 });
   }
+}
+
+/**
+ * Shared-cache response headers for public storefront GETs.
+ *
+ * `s-maxage` + `stale-while-revalidate` make Netlify's CDN (and any
+ * shared cache in front of the origin) serve cached JSON at the edge,
+ * so repeat visitors never touch the serverless function or database.
+ * `max-age=0` on the plain Cache-Control keeps browsers revalidating so
+ * they always see fresh data, while `Netlify-CDN-Cache-Control` pins the
+ * edge TTL explicitly (Netlify's preferred header).
+ */
+export function storefrontCacheHeaders(ttl: number): Record<string, string> {
+  return {
+    "Cache-Control": "public, max-age=0, s-maxage=" + ttl + ", stale-while-revalidate=" + ttl * 2,
+    "Netlify-CDN-Cache-Control": "public, max-age=" + ttl + ", stale-while-revalidate=" + ttl * 2,
+    "Vary": "host, x-store-id",
+  };
 }

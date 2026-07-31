@@ -16,6 +16,7 @@ import { StoreLoading } from "./StoreLoading";
 import { SocialShare } from "./SocialShare";
 import { generateArticleSchema } from "@/lib/seo/schema-generator";
 import { useSeo } from "@/lib/use-seo";
+import type { StorefrontInitialData } from "@/lib/storefront-data";
 
 interface BlogPostData {
   id: string;
@@ -38,6 +39,7 @@ interface BlogPostData {
 interface BlogPostViewProps {
   postId: string;
   onNavigate: (page: string, data?: unknown) => void;
+  initialData?: StorefrontInitialData["blogPost"];
 }
 
 function calculateReadTime(content: string): number {
@@ -93,7 +95,7 @@ function extractHeadings(
   return headings;
 }
 
-export function BlogPostView({ postId, onNavigate }: BlogPostViewProps) {
+export function BlogPostView({ postId, onNavigate, initialData }: BlogPostViewProps) {
   const [post, setPost] = useState<BlogPostData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -119,10 +121,14 @@ export function BlogPostView({ postId, onNavigate }: BlogPostViewProps) {
       }
     };
 
-    if (postId) {
+    if (initialData?.blogPost) {
+      // Build-time embedded data — no runtime fetch, no DB hit.
+      setPost(initialData.blogPost as BlogPostData);
+      setLoading(false);
+    } else if (postId) {
       fetchPost();
     }
-  }, [postId]);
+  }, [postId, initialData?.blogPost]);
 
   useEffect(() => {
     if (!post) return;

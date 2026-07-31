@@ -6,7 +6,7 @@ import { contentPageSchema } from '@/lib/validations';
 import { normalizeImageUrl } from '@/lib/utils';
 import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
-import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
+import { storefrontCache, CACHE_TAGS, invalidateCache, storefrontCacheHeaders } from '@/lib/cache';
 import { normalizeBlocksForStorage } from '@/lib/page-blocks';
 import { PLATFORM_PAGE_SLUGS } from '@/lib/platform-pages';
 import { sanitizeHtml, sanitizeBlocks } from '@/lib/sanitize';
@@ -55,8 +55,9 @@ export async function GET(request: NextRequest) {
     const contentPages = await fetchContentPages();
 
     const response = NextResponse.json({ contentPages });
-    response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
-    response.headers.set('Vary', 'host');
+    Object.entries(storefrontCacheHeaders(600)).forEach(([key, value]) =>
+      response.headers.set(key, value),
+    );
     return response;
   } catch (error) {
     console.error('Get content pages error:', error);

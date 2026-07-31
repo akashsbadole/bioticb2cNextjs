@@ -6,6 +6,7 @@ import { useAppStore } from "@/lib/store";
 import { useSeo } from "@/lib/use-seo";
 import { formatPrice } from "@/lib/pricing";
 import { getFirstImage } from "@/lib/utils";
+import type { StorefrontInitialData } from "@/lib/storefront-data";
 import { StoreLoading } from "./StoreLoading";
 import { RecentlyViewed } from "./RecentlyViewed";
 import {
@@ -27,6 +28,7 @@ interface HomePageProps {
   onNavigate: (page: string, data?: unknown) => void;
   settings?: Record<string, string> | null;
   data?: Record<string, unknown>;
+  initialData?: StorefrontInitialData["home"];
 }
 
 const testimonials = [
@@ -96,6 +98,7 @@ export function HomePage({
   onNavigate,
   settings,
   data: externalData,
+  initialData,
 }: HomePageProps) {
   const {
     settings: storeSettings,
@@ -143,6 +146,7 @@ export function HomePage({
   const { data: categories = [], isLoading: catLoading } = useQuery({
     queryKey: ["categories"],
     staleTime: 5 * 60 * 1000,
+    initialData: initialData?.categories,
     queryFn: async () => {
       const res = await fetch("/api/categories");
       if (res.ok) {
@@ -156,6 +160,7 @@ export function HomePage({
   const { data: products = [], isLoading: prodLoading } = useQuery({
     queryKey: ["featured-products"],
     staleTime: 5 * 60 * 1000,
+    initialData: initialData?.featuredProducts,
     queryFn: async () => {
       const res = await fetch(
         "/api/products?featured=true&limit=8&inStock=true",
@@ -167,6 +172,7 @@ export function HomePage({
   const { data: allProducts = [], isLoading: allProdLoading } = useQuery({
     queryKey: ["all-storefront-products"],
     staleTime: 5 * 60 * 1000,
+    initialData: initialData?.allProducts,
     queryFn: async () => {
       const res = await fetch("/api/products?limit=100&inStock=true");
       return res.ok ? (await res.json()).products || [] : [];

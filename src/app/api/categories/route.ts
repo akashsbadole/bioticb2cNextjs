@@ -5,7 +5,7 @@ import { categorySchema } from '@/lib/validations';
 import { getStoreId } from '@/lib/store-db';
 import { normalizeImageUrl } from '@/lib/utils';
 import { requireAdminAuth } from '@/lib/admin-auth';
-import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
+import { storefrontCache, CACHE_TAGS, invalidateCache, storefrontCacheHeaders } from '@/lib/cache';
 import { ACTIVITY } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {
@@ -91,7 +91,9 @@ export async function GET(request: NextRequest) {
     );
 
     if (!includeDeleted) {
-      response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
+      Object.entries(storefrontCacheHeaders(600)).forEach(([key, value]) =>
+        response.headers.set(key, value),
+      );
     }
 
     return response;

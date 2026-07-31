@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { BlogClientPage } from "./client";
+import { StoreShell } from "@/components/store/StoreShell";
+import { getBlogInitialData } from "@/lib/storefront-data";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Blog | Biotic Naturals",
@@ -9,6 +10,13 @@ export const metadata: Metadata = {
     "Read the latest articles, news, and updates from Biotic Naturals.",
 };
 
-export default function Page() {
-  return <BlogClientPage />;
+export default async function Page() {
+  const data = await getBlogInitialData();
+
+  return (
+    <StoreShell
+      initialPage="blog"
+      initialData={data ? { blog: data } : undefined}
+    />
+  );
 }

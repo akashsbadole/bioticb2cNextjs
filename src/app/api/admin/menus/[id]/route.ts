@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 import { z } from 'zod';
 
 const menuItemSchema = z.object({
@@ -145,6 +146,7 @@ export async function PUT(
     });
 
     revalidatePath('/', 'layout');
+    invalidateCache(CACHE_TAGS.menus);
     return NextResponse.json({ menu: updatedMenu });
   } catch (error) {
     console.error('Update menu error:', error);
@@ -177,6 +179,7 @@ export async function DELETE(
     await db.menu.delete({ where: { id } });
 
     revalidatePath('/', 'layout');
+    invalidateCache(CACHE_TAGS.menus);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Delete menu error:', error);

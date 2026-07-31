@@ -8,9 +8,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { StoreLayout } from "./StoreLayout";
 import { PageSkeleton } from "./PageSkeleton";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import type { StorefrontInitialData } from "@/lib/storefront-data";
 
 interface StoreShellProps {
   initialPage?: string | { type: string; slug?: string };
+  initialData?: StorefrontInitialData;
   children?: ReactNode;
 }
 
@@ -175,7 +177,7 @@ const TrackingPage = dynamic(
   { loading: () => <PageSkeleton /> },
 );
 
-export function StoreShell({ initialPage, children }: StoreShellProps) {
+export function StoreShell({ initialPage, initialData, children }: StoreShellProps) {
   const storePage = useAppStore((s) => s.currentPage);
   const navigate = useAppStore((s) => s.navigate);
   const setAuthUser = useAppStore((s) => s.setAuthUser);
@@ -239,11 +241,11 @@ export function StoreShell({ initialPage, children }: StoreShellProps) {
   const renderPage = useCallback(() => {
     switch (page.type) {
       case "home":
-        return <HomePage onNavigate={navigate} />;
+        return <HomePage onNavigate={navigate} initialData={initialData?.home} />;
       case "shop":
-        return <ShopPage onNavigate={navigate} />;
+        return <ShopPage onNavigate={navigate} initialData={initialData?.shop} />;
       case "category":
-        return <CategoryPage slug={page.slug!} onNavigate={navigate} />;
+        return <CategoryPage slug={page.slug!} onNavigate={navigate} initialData={initialData?.category} />;
       case "content-page":
         return <CmsPage slug={page.slug!} onNavigate={navigate} />;
       case "product-page":
@@ -251,10 +253,9 @@ export function StoreShell({ initialPage, children }: StoreShellProps) {
       case "products":
         return <ProductsOverviewPage onNavigate={navigate} />;
       case "blog":
-        return <BlogPage onNavigate={navigate} />;
+        return <BlogPage onNavigate={navigate} initialData={initialData?.blog} />;
       case "blog-post":
-        return <BlogPostView postId={page.slug!} onNavigate={navigate} />;
-      case "about":
+        return <BlogPostView postId={page.slug!} onNavigate={navigate} initialData={initialData?.blogPost} />;      case "about":
         return <AboutPage onNavigate={navigate} />;
       case "manufacturing":
         return <ManufacturingPage onNavigate={navigate} />;
@@ -318,7 +319,7 @@ export function StoreShell({ initialPage, children }: StoreShellProps) {
           </div>
         );
     }
-  }, [page, navigate]);
+  }, [page, navigate, initialData]);
 
   if (children) return <>{children}</>;
 

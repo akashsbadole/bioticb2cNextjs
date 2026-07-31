@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
-import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
+import { storefrontCache, CACHE_TAGS, invalidateCache, storefrontCacheHeaders } from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
   try {
@@ -43,7 +43,11 @@ export async function GET(request: NextRequest) {
 
     const flashSales = await loadFlashSales();
 
-    return NextResponse.json({ flashSales });
+    const response = NextResponse.json({ flashSales });
+    Object.entries(storefrontCacheHeaders(60)).forEach(([key, value]) =>
+      response.headers.set(key, value),
+    );
+    return response;
   } catch (error) {
     console.error('Get flash sales error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

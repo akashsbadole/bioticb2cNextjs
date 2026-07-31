@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { storefrontCacheHeaders } from '@/lib/cache';
 
 const SEARCH_RATE_LIMIT = { maxRequests: 60, windowMs: 60 * 1000, prefix: 'public-search' };
 
@@ -59,7 +60,11 @@ export async function GET(request: NextRequest) {
 
     const products = await db.product.findMany({ where, take: limit, orderBy });
 
-    return NextResponse.json({ products, total: products.length });
+    const response = NextResponse.json({ products, total: products.length });
+    Object.entries(storefrontCacheHeaders(60)).forEach(([key, value]) =>
+      response.headers.set(key, value),
+    );
+    return response;
   } catch (error) {
     console.error('Search error:', error);
     return NextResponse.json({ products: [], total: 0 });

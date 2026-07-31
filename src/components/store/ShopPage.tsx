@@ -18,8 +18,15 @@ import {
 import { QuickViewModal } from "./QuickViewModal";
 import { BioticFilterSidebar, BioticFilterGroup } from "./biotic-components";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { StorefrontInitialData } from "@/lib/storefront-data";
 
-export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
+export function ShopPage({
+  onNavigate: _onNavigate,
+  initialData,
+}: {
+  onNavigate?: any;
+  initialData?: StorefrontInitialData["shop"];
+}) {
   const {
     auth,
     settings,
@@ -61,6 +68,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
     staleTime: 5 * 60 * 1000,
+    initialData: initialData?.categories,
     queryFn: async () => {
       const res = await fetch("/api/categories");
       return (await res.json()).categories || [];
@@ -70,6 +78,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
   const { data: brands = [] } = useQuery({
     queryKey: ["brands"],
     staleTime: 5 * 60 * 1000,
+    initialData: initialData?.brands,
     queryFn: async () => {
       const res = await fetch("/api/brands");
       return (await res.json()).brands || [];
@@ -90,9 +99,20 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
     });
   };
 
+  const isDefaultFilters =
+    searchQuery === "" &&
+    filters.categoryId === "all" &&
+    filters.brandId === "all" &&
+    filters.minPrice === "" &&
+    filters.maxPrice === "" &&
+    filters.sortBy === "featured" &&
+    filters.stockStatus === "in_stock" &&
+    Object.keys(filters.attributes).length === 0;
+
   const { data: products = [], isLoading: loading } = useQuery({
     queryKey: ["products", searchQuery, filters],
     staleTime: 5 * 60 * 1000,
+    initialData: isDefaultFilters ? initialData?.products : undefined,
     queryFn: async () => {
       const params = new URLSearchParams();
       if (searchQuery) params.set("search", searchQuery);
