@@ -40,11 +40,23 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
     maxPrice: "",
     sortBy: "featured",
     stockStatus: "in_stock",
+    attributes: {} as Record<string, string>,
   });
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
   const [visibleCount, setVisibleCount] = useState(12);
 
   const currency = settings?.currency || "INR";
+
+  const { data: facets } = useQuery({
+    queryKey: ["facets", searchQuery],
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const res = await fetch(
+        `/api/products/facets${searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ""}`,
+      );
+      return res.ok ? await res.json() : null;
+    },
+  });
 
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
@@ -64,6 +76,20 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
     },
   });
 
+  const facetCategoryCount = (id: string) =>
+    facets?.categories?.find((c: any) => c.id === id)?.count ?? 0;
+  const facetBrandCount = (id: string) =>
+    facets?.brands?.find((b: any) => b.id === id)?.count ?? 0;
+
+  const setAttributeFilter = (key: string, value: string) => {
+    setFilters((prev) => {
+      const attributes = { ...prev.attributes };
+      if (attributes[key] === value) delete attributes[key];
+      else attributes[key] = value;
+      return { ...prev, attributes };
+    });
+  };
+
   const { data: products = [], isLoading: loading } = useQuery({
     queryKey: ["products", searchQuery, filters],
     staleTime: 5 * 60 * 1000,
@@ -79,6 +105,13 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
       if (filters.stockStatus === "in_stock") params.set("inStock", "true");
       else if (filters.stockStatus === "out_of_stock")
         params.set("stockStatus", "out_of_stock");
+      const attrEntries = Object.entries(filters.attributes);
+      if (attrEntries.length > 0) {
+        params.set(
+          "attributes",
+          JSON.stringify(Object.fromEntries(attrEntries)),
+        );
+      }
 
       const res = await fetch(`/api/products?${params.toString()}`);
       return (await res.json()).products || [];
@@ -149,24 +182,67 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
               className="accent-biotic-green w-[15px] h-[15px]"
             />
             {cat.name}
+            {facetCategoryCount(cat.id) > 0 && (
+              <span className="text-xs text-biotic-sand ml-auto">
+                {facetCategoryCount(cat.id)}
+              </span>
+            )}
           </button>
         ))}
       </BioticFilterGroup>
 
       <BioticFilterGroup title="Brands">
-        <select
-          value={filters.brandId}
-          onChange={(e) => setFilters({ ...filters, brandId: e.target.value })}
-          className="input-biotic"
-        >
-          <option value="all">All Brands</option>
-          {brands.map((b: any) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
+        {brands.map((b: any) => (
+          <button
+            key={b.id}
+            onClick={() => setFilters({ ...filters, brandId: b.id })}
+            className={`flex items-center gap-2.5 text-sm text-biotic-ink-soft mb-3 cursor-pointer bg-transparent border-none font-inherit ${filters.brandId === b.id ? "font-bold" : ""}`}
+          >
+            <input
+              type="checkbox"
+              checked={filters.brandId === b.id}
+              onChange={() => {}}
+              className="accent-biotic-green w-[15px] h-[15px]"
+            />
+            {b.name}
+            {facetBrandCount(b.id) > 0 && (
+              <span className="text-xs text-biotic-sand ml-auto">
+                {facetBrandCount(b.id)}
+              </span>
+            )}
+          </button>
+        ))}
+        {brands.length === 0 && (
+          <p className="text-sm text-biotic-ink-soft">No brands available</p>
+        )}
       </BioticFilterGroup>
+
+      {(facets?.attributes || []).length > 0 && (
+        <div>
+          {facets.attributes.map((attr: any) => (
+            <BioticFilterGroup key={attr.key} title={attr.key}>
+              {attr.values.map((v: any) => (
+                <button
+                  key={`${attr.key}-${v.value}`}
+                  onClick={() => setAttributeFilter(attr.key, v.value)}
+                  className={`flex items-center gap-2.5 text-sm text-biotic-ink-soft mb-3 cursor-pointer bg-transparent border-none font-inherit ${filters.attributes[attr.key] === v.value ? "font-bold" : ""}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={filters.attributes[attr.key] === v.value}
+                    onChange={() => {}}
+                    className="accent-biotic-green w-[15px] h-[15px]"
+                  />
+                  {v.value}
+                  <span className="text-xs text-biotic-sand ml-auto">
+                    {v.count}
+                  </span>
+                </button>
+              ))}
+            </BioticFilterGroup>
+          ))}
+        </div>
+      )}
 
       <BioticFilterGroup title="Availability">
         <select
@@ -214,6 +290,7 @@ export function ShopPage({ onNavigate: _onNavigate }: { onNavigate?: any }) {
             maxPrice: "",
             sortBy: "featured",
             stockStatus: "in_stock",
+            attributes: {},
           });
           setSearchQuery("");
         }}

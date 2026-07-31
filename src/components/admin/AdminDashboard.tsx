@@ -22,6 +22,10 @@ import {
   Megaphone,
   Puzzle,
   Palette,
+  Users,
+  ArrowRightLeft,
+  ClipboardList,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -150,6 +154,22 @@ const AdminCustomFields = lazyNamed(
   () => import("@/components/admin/AdminCustomFields"),
   "AdminCustomFields",
 );
+const AdminUsers = lazyNamed(
+  () => import("@/components/admin/AdminUsers"),
+  "AdminUsers",
+);
+const AdminRedirects = lazyNamed(
+  () => import("@/components/admin/AdminRedirects"),
+  "AdminRedirects",
+);
+const AdminActivityLog = lazyNamed(
+  () => import("@/components/admin/AdminActivityLog"),
+  "AdminActivityLog",
+);
+const AdminDataExport = lazyNamed(
+  () => import("@/components/admin/AdminDataExport"),
+  "AdminDataExport",
+);
 import { NotificationBell } from "@/components/admin/NotificationBell";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
@@ -175,7 +195,11 @@ const sidebarItems = [
   { id: "products", label: "Products", icon: Package },
   { id: "categories", label: "Categories", icon: FolderOpen },
   { id: "custom-fields", label: "Custom Fields", icon: Settings2 },
-  // { id: "brands", label: "Brands", icon: ShoppingBag },
+  { id: "brands", label: "Brands", icon: ShoppingBag },
+  { id: "users", label: "Users", icon: Users },
+  { id: "redirects", label: "Redirects", icon: ArrowRightLeft },
+  { id: "activity-logs", label: "Activity Logs", icon: ClipboardList },
+  { id: "data-export", label: "Data Export", icon: Download },
   { id: "blog", label: "Blog", icon: BookOpen },
   { id: "orders", label: "Orders", icon: ShoppingBag },
   { id: "abandoned-carts", label: "Abandoned Carts", icon: ShoppingCart },
@@ -190,8 +214,8 @@ const sidebarItems = [
   { id: "menus", label: "Menus", icon: Menu },
   { id: "customer-pricing", label: "Customer Pricing", icon: DollarSign },
   { id: "bundles", label: "Bundles", icon: Gift },
-  // { id: "plugins", label: "Plugins", icon: Puzzle },
-  // { id: "themes", label: "Themes", icon: Palette },
+  { id: "plugins", label: "Plugins", icon: Puzzle },
+  { id: "themes", label: "Themes", icon: Palette },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -419,6 +443,14 @@ export function AdminDashboard({
         return <AdminCustomFields />;
       case "brands":
         return <AdminBrands />;
+      case "users":
+        return <AdminUsers />;
+      case "redirects":
+        return <AdminRedirects />;
+      case "activity-logs":
+        return <AdminActivityLog />;
+      case "data-export":
+        return <AdminDataExport />;
       case "orders":
         return <AdminOrders />;
       case "abandoned-carts":

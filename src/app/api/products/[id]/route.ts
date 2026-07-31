@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { logError } from '@/lib/error-logger';
 import { sendLowStockAlert, sendBackInStockNotification } from '@/lib/email';
+import { ensurePluginsLoaded, isPluginEnabled, hooks } from '@/lib/plugins';
+import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
 
 async function resolveProduct(idOrSlug: string, includeDeleted = false) {
   const where = {
@@ -40,6 +42,8 @@ export async function PATCH(
         data: { deletedAt: null },
         include: { Category: true },
       });
+      invalidateCache(CACHE_TAGS.products);
+      invalidateCache(CACHE_TAGS.product(existing.id));
       return NextResponse.json({ product });
     }
 
@@ -56,42 +60,56 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const product = await resolveProduct(id);
 
-    if (!product) {
+    // ISR-style data cache for the public detail endpoint. Invalidated on
+    // admin writes via invalidateCache(CACHE_TAGS.product(id)).
+    const fetchProduct = storefrontCache(
+      [`product:${id}`],
+      async () => {
+        const product = await resolveProduct(id);
+        if (!product) return null;
+
+        const customFieldValues = await db.customFieldValue.findMany({
+          where: {
+            entityId: product.id,
+            entityType: 'product',
+          },
+          include: { Definition: true },
+          orderBy: {
+            Definition: { sortOrder: 'asc' },
+          },
+        });
+
+        const formattedValues = customFieldValues.map((v) => ({
+          id: v.id,
+          definitionId: v.definitionId,
+          entityId: v.entityId,
+          entityType: v.entityType,
+          value: v.value,
+          definition: {
+            id: v.Definition.id,
+            name: v.Definition.name,
+            type: v.Definition.type,
+            isVisible: v.Definition.isVisible,
+            options: v.Definition.options,
+          },
+        }));
+
+        return { product, customFieldValues: formattedValues };
+      },
+      [CACHE_TAGS.products, CACHE_TAGS.product(id)],
+      300,
+    );
+
+    const data = await fetchProduct();
+    if (!data) {
       return NextResponse.json(
         { error: 'Product not found' },
         { status: 404 }
       );
     }
 
-    const customFieldValues = await db.customFieldValue.findMany({
-      where: {
-        entityId: product.id,
-        entityType: 'product',
-      },
-      include: { Definition: true },
-      orderBy: {
-        Definition: { sortOrder: 'asc' },
-      },
-    });
-
-    const formattedValues = customFieldValues.map((v) => ({
-      id: v.id,
-      definitionId: v.definitionId,
-      entityId: v.entityId,
-      entityType: v.entityType,
-      value: v.value,
-      definition: {
-        id: v.Definition.id,
-        name: v.Definition.name,
-        type: v.Definition.type,
-        isVisible: v.Definition.isVisible,
-        options: v.Definition.options,
-      },
-    }));
-
-    return NextResponse.json({ product, customFieldValues: formattedValues });
+    return NextResponse.json(data);
   } catch (error) {
     logError(error, { category: 'api', context: 'GET /api/products/[id]' });
     return NextResponse.json(
@@ -198,45 +216,58 @@ export async function PUT(
     }
 
     // Dispatch back-in-stock notification emails when stock transitions
-    // from out-of-stock (<=0) to a positive value.
+    // from out-of-stock (<=0) to a positive value. When the
+    // `stock-notifications` plugin is enabled, the plugin hook handles the
+    // dispatch; otherwise the built-in logic below runs (default behavior).
     if (
       body.stock !== undefined &&
       product.stock > 0 &&
       existing.stock <= 0
     ) {
-      (async () => {
-        try {
-          const subscribers = await db.stockNotification.findMany({
-            where: { productId: product.id, notified: false },
-          });
-          if (subscribers.length === 0) return;
+      await ensurePluginsLoaded();
+      if (isPluginEnabled("stock-notifications")) {
+        hooks.doAction("product:stock-updated", {
+          productId: product.id,
+          stock: product.stock,
+        });
+      } else {
+        (async () => {
+          try {
+            const subscribers = await db.stockNotification.findMany({
+              where: { productId: product.id, notified: false },
+            });
+            if (subscribers.length === 0) return;
 
-          const notifiedIds: string[] = [];
-          await Promise.allSettled(
-            subscribers.map(async (sub) => {
-              const sent = await sendBackInStockNotification({
-                email: sub.email,
-                productName: product.name,
-                productSlug: product.slug,
+            const notifiedIds: string[] = [];
+            await Promise.allSettled(
+              subscribers.map(async (sub) => {
+                const sent = await sendBackInStockNotification({
+                  email: sub.email,
+                  productName: product.name,
+                  productSlug: product.slug,
+                });
+                if (sent) notifiedIds.push(sub.id);
+              })
+            );
+
+            if (notifiedIds.length > 0) {
+              await db.stockNotification.updateMany({
+                where: { id: { in: notifiedIds } },
+                data: { notified: true, notifiedAt: new Date() },
               });
-              if (sent) notifiedIds.push(sub.id);
-            })
-          );
-
-          if (notifiedIds.length > 0) {
-            await db.stockNotification.updateMany({
-              where: { id: { in: notifiedIds } },
-              data: { notified: true, notifiedAt: new Date() },
+            }
+          } catch (err) {
+            logError(err, {
+              category: 'email',
+              context: `stock-notification dispatch (${product.id})`,
             });
           }
-        } catch (err) {
-          logError(err, {
-            category: 'email',
-            context: `stock-notification dispatch (${product.id})`,
-          });
-        }
-      })();
+        })();
+      }
     }
+
+    invalidateCache(CACHE_TAGS.products);
+    invalidateCache(CACHE_TAGS.product(product.id));
 
     return NextResponse.json({ product });
   } catch (error) {
@@ -269,6 +300,8 @@ export async function DELETE(
 
     if (permanent) {
       await db.product.delete({ where: { id: existing.id } });
+      invalidateCache(CACHE_TAGS.products);
+      invalidateCache(CACHE_TAGS.product(existing.id));
       return NextResponse.json({ message: 'Product permanently deleted' });
     }
 
@@ -281,6 +314,9 @@ export async function DELETE(
       where: { id: existing.id },
       data: { deletedAt: new Date() },
     });
+
+    invalidateCache(CACHE_TAGS.products);
+    invalidateCache(CACHE_TAGS.product(existing.id));
 
     return NextResponse.json({ message: 'Product moved to trash' });
   } catch (error) {

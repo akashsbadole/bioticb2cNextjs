@@ -4,6 +4,7 @@ import { normalizeBlocksForStorage } from '@/lib/page-blocks';
 import { getStoreId } from '@/lib/store-db';
 import { normalizeImageUrl } from '@/lib/utils';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 import { sanitizeHtml, sanitizeBlocks } from '@/lib/sanitize';
 
 async function resolveBlogPost(idOrSlug: string, storeId: string | null) {
@@ -132,6 +133,8 @@ export async function PUT(
       },
     });
 
+    invalidateCache(CACHE_TAGS.blog);
+
     return NextResponse.json({ blogPost });
   } catch (error) {
     console.error('Update blog post error:', error);
@@ -171,6 +174,8 @@ export async function DELETE(
         data: { deletedAt: new Date(), isPublished: false },
       });
     }
+
+    invalidateCache(CACHE_TAGS.blog);
 
     return NextResponse.json({
       message: permanent
@@ -213,6 +218,7 @@ export async function PATCH(
         where: { id: existing.id },
         data: { deletedAt: null },
       });
+      invalidateCache(CACHE_TAGS.blog);
       return NextResponse.json({ message: 'Blog post restored' });
     }
 

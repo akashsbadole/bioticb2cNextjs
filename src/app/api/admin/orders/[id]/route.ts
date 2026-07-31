@@ -4,6 +4,7 @@ import { requireAdminAuth } from '@/lib/admin-auth';
 import { getStoreId } from '@/lib/store-db';
 import { sendTrackingUpdate } from '@/lib/email';
 import { sendWhatsApp } from '@/lib/sms';
+import { ensurePluginsLoaded, hooks } from '@/lib/plugins';
 
 export async function PUT(
   request: NextRequest,
@@ -47,6 +48,16 @@ export async function PUT(
         ).catch(() => {});
       }
     }
+
+    // Plugin hook point: extensions can react to order status/payment changes.
+    await ensurePluginsLoaded();
+    hooks.doAction("order:status-updated", {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      status: order.status,
+      paymentStatus: order.paymentStatus,
+      trackingNumber: order.trackingNumber,
+    });
 
     return NextResponse.json({ order });
   } catch (error) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,6 +23,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    invalidateCache(CACHE_TAGS.blog);
 
     if (action === 'delete') {
       const result = await db.blogPost.updateMany({

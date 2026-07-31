@@ -1,6 +1,6 @@
 # WCommerce Catalogue
 
-A **multi-tenant B2B/B2C e-commerce platform** built with Next.js 16 (App Router). Enables businesses to create and manage online stores with full CMS capabilities, B2B quotation workflows, page builder, media library, and multi-store management.
+A **B2C/B2B e-commerce catalogue platform** built with Next.js 16 (App Router). Enables businesses to run an online store with full CMS capabilities, page builder, media library, tiered/volume pricing, and enquiry management. Single-store (no multi-tenancy).
 
 ---
 
@@ -20,7 +20,7 @@ A **multi-tenant B2B/B2C e-commerce platform** built with Next.js 16 (App Router
 | **Animation**    | Framer Motion                                                                                                                                  |
 | **Tables**       | TanStack React Table                                                                                                                           |
 | **Media**        | Sharp (image processing)                                                                                                                       |
-| **Payment**      | PayU (configured in env) + Razorpay (library present)                                                                                          |
+| **Payment**      | PayU (hash-verified callbacks) + Cash on Delivery                                                                                              |
 | **Email**        | Nodemailer                                                                                                                                     |
 | **SMS (OTP)**    | Twilio (optional)                                                                                                                              |
 | **Testing**      | Playwright + Vitest                                                                                                                            |
@@ -49,18 +49,15 @@ A **multi-tenant B2B/B2C e-commerce platform** built with Next.js 16 (App Router
 - Dashboard with stats, charts, enquiry trends
 - Product management (CRUD, bulk, import/export, trash, variants, tiered pricing)
 - Category management (tree view, rich page builder fields, import/export)
-- Page Builder — 26+ drag-and-drop block types (hero, text, gallery, features, testimonials, FAQ, pricing, timeline, process, etc.)
+- Page Builder — 44 block types (hero, text, gallery, features, testimonials, FAQ, pricing, timeline, process, etc.)
 - Blog management with WYSIWYG editor
 - Banner management
 - Media library (folders, upload, search)
 - Menu builder (primary, footer, mobile)
 - Redirect management (301/302, import/export)
 - Enquiry management with status workflow
-- Quote generation with line items
-- B2B company verification & tier management
 - User management (roles, import/export)
 - Settings (general, SMTP, B2B, shipping, tax, payment, SEO, theme, catalog mode)
-- Multi-store management
 - Activity logs (audit trail)
 - Backup & restore (full DB JSON)
 - Import (CSV, WooCommerce, Shopify)
@@ -69,24 +66,14 @@ A **multi-tenant B2B/B2C e-commerce platform** built with Next.js 16 (App Router
 ### B2B / Wholesale
 
 - Product enquiries with status tracking
-- Formal quotation system (line items, validity, accept/decline)
-- Company registration & verification
 - Tier-based pricing (standard/silver/gold/platinum — 0%/5%/10%/15%)
 - Volume pricing tiers per product
-- Buyer portal with orders, quotes, company info
 - Minimum order quantities & wholesale pricing
-
-### Multi-Tenant
-
-- Subdomain-based stores (`{slug}.platform.com`)
-- Custom domain support
-- Per-store settings, products, categories, content
-- Store switching for super admins
-- Store plan tiers (free/basic/pro/enterprise)
+- Customer-specific prices per product (CSV import)
 
 ### CMS / Page Builder
 
-- **26+ block types**: Hero, Text, Image Gallery, Features Grid, CTA, Testimonials, Spacer, Divider, Products Grid, Lead Capture, FAQ, Slider, Product Carousel, About Section, Trust Bar, Audience Cards, Capabilities, Product Categories, Factory Reel, Certifications, Leadership, Partner Logos, Blog Grid, Pricing Table, Sticky CTA, Hero Split, Timeline, Metrics Bar, Process Flow, Packaging Grid, Quick Connect, CRM Flow
+- **44 block types**: Hero, Text, Image Gallery, Features Grid, CTA, Testimonials, Spacer, Divider, Products Grid, Lead Capture, FAQ, Slider, Product Carousel, About Section, Trust Bar, Audience Cards, Capabilities, Product Categories, Factory Reel, Certifications, Leadership, Partner Logos, Blog Grid, Pricing Table, Sticky CTA, Hero Split, Timeline, Metrics Bar, Process Flow, Packaging Grid, Quick Connect, CRM Flow
 - Drag-and-drop block reordering
 - Category landing pages with dedicated fields (hero, content-split, cards, CTA, process, infographic)
 - Content pages with block-based editing
@@ -198,17 +185,18 @@ src/
 │   ├── [[...slug]]/        # Catch-all storefront route
 │   ├── product/[slug]/     # Product/category detail route
 │   ├── admin/              # Admin dashboard (login + dashboard)
-│   ├── api/                # All API routes
+│   ├── api/                # All API routes (138 route files)
 │   │   ├── admin/          # Admin-only CRUD (protected by requireAdminAuth)
-│   │   ├── products/       # Product CRUD
+│   │   ├── products/       # Product CRUD + facets
 │   │   ├── categories/     # Category CRUD
 │   │   ├── blog/           # Blog CRUD
 │   │   ├── enquiries/      # Enquiry management
-│   │   ├── quotes/         # Quotation system
 │   │   ├── auth/           # NextAuth handlers (signIn/signOut/callback)
 │   │   ├── media/          # Media library
-│   │   └── ...             # 97+ route files
-│   └── portal/             # B2B buyer portal
+│   │   └── ...
+│   ├── orders/             # SPA deep-link route (account orders)
+│   ├── bundles/            # SPA deep-link route (product bundles)
+│   └── register/           # Customer registration
 ├── components/
 │   ├── store/              # Storefront components
 │   ├── admin/              # Admin components
@@ -235,7 +223,7 @@ src/
 
 ### Database
 
-27 models including: Store, User, Product, Category, ProductVariant, ProductTier, BlogPost, ContentPage, Banner, Media, Enquiry, Quote, Company, Menu, MenuItem, Redirect, Notification, ActivityLog, NewsletterSubscriber, SiteSetting, Cart, CartItem, Order, OrderItem, Coupon, PasswordResetToken, EmailVerificationToken.
+44 models including: Store, User, Session, Product, Category, ProductVariant, Brand, ProductAddon, BlogPost, ContentPage, Banner, Media, Enquiry, Menu, MenuItem, Redirect, Notification, ActivityLog, NewsletterSubscriber, SiteSetting, Cart, CartItem, Order, OrderItem, Coupon, Wishlist, FlashSale, Plugin, Theme, Review, ShippingRate, Popup, SupportTicket, StockNotification, PasswordResetToken, EmailVerificationToken, OtpToken, Bundle, BundleItem, CustomFieldDefinition, CustomFieldValue, CustomerPrice, RateLimitEntry.
 
 ---
 
@@ -246,7 +234,7 @@ src/
 | **admin**                | Full access to all features (enforced in middleware + `requireAdminAuth`)           |
 | **editor**               | Content management (products, categories, blog, pages) — enforced alongside admin   |
 | **clerk**                | Referenced in UI; order/enquiry access is governed by `requireAuth` on those routes |
-| **buyer** / **customer** | B2B buyer portal access and standard storefront account                             |
+| **buyer** / **customer** | Standard storefront account (orders, addresses, wishlist, support tickets, reviews) |
 
 ---
 
@@ -281,16 +269,15 @@ Default admin: `admin@store.com` / `admin123`
 | `DEPLOY.md`      | Production deployment guide               |
 | `CODE-REVIEW.md` | Code review findings & fixes              |
 
-### credential:
+### Default Credentials
 
-dmin credentials created:
-Field Value
-Email admin@example.com
-Password admin123
-Role admin
-================================
+| Field    | Value             |
+| -------- | ----------------- |
+| Email    | admin@example.com |
+| Password | admin123          |
+| Role     | admin             |
 
-You can now test customer login:
+Customer login:
 
-- OTP tab — enter customer@store.com, check terminal for [OTP DEV] Code XXXX...
-- Password tab — customer@store.com / customer123
+- OTP tab — enter `customer@store.com`, check terminal for `[OTP DEV] Code XXXX...`
+- Password tab — `customer@store.com` / `customer123`

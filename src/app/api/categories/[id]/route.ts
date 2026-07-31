@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { normalizeImageUrl } from '@/lib/utils';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 
 export async function GET(
   _request: NextRequest,
@@ -177,6 +178,8 @@ export async function PUT(
       },
     });
 
+    invalidateCache(CACHE_TAGS.categories);
+
     return NextResponse.json({ category: updated, products: updated?.Product || [] });
   } catch (error) {
     console.error('Update category error:', error);
@@ -220,6 +223,7 @@ export async function DELETE(
         );
       }
       await db.category.delete({ where: { id } });
+      invalidateCache(CACHE_TAGS.categories);
       return NextResponse.json({ message: 'Category permanently deleted' });
     }
 
@@ -228,6 +232,8 @@ export async function DELETE(
       where: { id },
       data: { deletedAt: new Date(), isActive: false },
     });
+
+    invalidateCache(CACHE_TAGS.categories);
 
     return NextResponse.json({
       message: 'Category deleted successfully',

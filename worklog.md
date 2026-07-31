@@ -667,3 +667,32 @@ Stage Summary:
 - Admin login: Working (admin@store.com / admin123)
 - Products API: 6 products with categories
 - Homepage: Full HTML rendered with header, products, footer, newsletter
+
+---
+Task ID: AUDIT-IMPL-P1-P4
+Agent: Main Agent
+Task: Full audit implementation — critical bugs, stale tests, missing features, cleanup, docs
+
+Work Log:
+- P1 CRITICAL: Session model added to prisma/schema.postgres.prisma (revocation of API tokens via jose); stock validation before order creation (400 with productId/requested/available); guarded transactional stock decrements (updateMany where stock >= qty) in /api/orders and PayU callback; /api/cron/abandoned-carts + /api/cron/cleanup-sessions scheduled in vercel.json; PDF invoice route no longer uses eval (new Function(require)) — dynamic import of pdfkit with stream-finish await.
+- P2: /orders and /bundles deep-link routes (StoreShell routeFromPath + src/app/orders|bundles pages); 14 CMS block types that rendered nothing now render in PageBlockRenderer (slider, about, blog-grid, pricing-table, hero-split, timeline, metrics-bar, process-flow, packaging-grid, certification-cards, address-cards, product-carousel, mfg-page-content alias, catalogue-page-content alias); admin sidebar tabs enabled: Brands, Users, Redirects, Activity Logs, Data Export, Plugins, Themes; Playwright specs updated to real credentials (Password123! family) and rewritten B2C flows (b2b-verification.spec.ts).
+- P3: Faceted search — brandId filter (was silently ignored) + attributes JSON contains filter in /api/products; attribute facet aggregation in /api/products/facets; ShopPage facets UI (attribute groups, counts, reset). Plugin system now real: loadPlugins registers builtin hooks, 60s TTL cache, isPluginEnabled/getLoadedPlugin; hooks wired to product:stock-updated (restock), order:created, order:status-updated.
+- P4: Deleted dead code (api-response.ts, api-response.test.ts, AdminClient.tsx, StorePageShell.tsx, ghost banner/plugin [id] dirs); moved work.md to docs/; next.config.ts images restricted to Cloudinary/Unsplash/Google and CSP gains frame-ancestors 'self'; README/DEVELOPER updated (single-store, 44 models, accurate roles/stack); worklog + CHANGELOG updated; Playwright CI job added.
+- Note: README.md was found zeroed (binary corruption) during doc edits — reconstructed from session context; UTF-8 now.
+- VERIFICATION: npx prisma generate, npx tsc --noEmit, npm run lint, npm run build — status recorded below.
+
+Stage Summary:
+- 4 phases of audit fixes implemented; verification status below.
+
+---
+Task ID: NETLIFY-ISR-CACHE
+Agent: Main Agent
+Task: Netlify deployment prep + ISR-style caching (unstable_cache + revalidateTag)
+
+Work Log:
+- Netlify: netlify.toml created (build: prisma generate && next build, publish .next, NODE_VERSION 20); .nvmrc (20); crons moved from vercel.json to .github/workflows/cron.yml (abandoned-carts 2h, cleanup-sessions daily, Bearer CRON_SECRET, workflow_dispatch); vercel.json left for Vercel fallback.
+- Decision (user): Turso (existing libsql) + GitHub Actions for scheduled jobs; no Postgres migration needed.
+- ISR: storefront pages are client shells, so ISR implemented at data layer - src/lib/cache.ts: CACHE_TAGS + storefrontCache (unstable_cache wrapper) + invalidateCache (revalidateTag with { expire: 0 } profile - single-arg form is deprecated in Next 16).
+- Cached GETs: /api/products (filter-keyed, 300s), /api/products/[id] (300s), /api/categories (600s), /api/blog (600s), /api/content-pages (600s).
+- Invalidation: products POST/PUT/PATCH/DELETE + bulk; categories POST/PUT/DELETE + bulk; blog POST/PUT/DELETE/PATCH + bulk; content-pages POST/PUT/DELETE; order create + PayU success callback (stock changes invalidate product tags).
+- VERIFICATION: tsc clean, eslint clean, next build clean (120 static pages), vitest 6 files/37 tests pass.

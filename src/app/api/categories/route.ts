@@ -5,6 +5,7 @@ import { categorySchema } from '@/lib/validations';
 import { getStoreId } from '@/lib/store-db';
 import { normalizeImageUrl } from '@/lib/utils';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
 import { ACTIVITY } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {
@@ -30,48 +31,60 @@ export async function GET(request: NextRequest) {
       where.slug = slug;
     }
 
-    const categories = await db.category.findMany({
-      where: { ...where, ...(storeId ? { storeId } : {}) },
-      orderBy: { sortOrder: 'asc' },
-      take: limit,
-      include: all ? { _count: { select: { Product: true } } } : undefined,
-    });
-
-    const categoryIds = categories.map((c: any) => c.id);
-    let customFieldMap = new Map<string, any[]>();
-    if (categoryIds.length > 0) {
-      const values = await db.customFieldValue.findMany({
-        where: {
-          entityId: { in: categoryIds },
-          entityType: 'category',
-          ...(storeId ? { storeId } : {}),
-        },
-        include: { Definition: true },
-      });
-      for (const v of values) {
-        const arr = customFieldMap.get(v.entityId) || [];
-        arr.push({
-          id: v.id,
-          definitionId: v.definitionId,
-          entityId: v.entityId,
-          entityType: v.entityType,
-          value: v.value,
-          definition: {
-            id: v.Definition.id,
-            name: v.Definition.name,
-            type: v.Definition.type,
-            isVisible: v.Definition.isVisible,
-            options: v.Definition.options,
-          },
+    // ISR-style data cache for public category reads (admin calls pass
+    // includeDeleted/all, which stay in the key). Invalidated on admin
+    // writes via invalidateCache(CACHE_TAGS.categories).
+    const fetchCategories = storefrontCache(
+      [storeId || '', all || '', includeDeleted || '', slug || '', String(limit)],
+      async () => {
+        const categories = await db.category.findMany({
+          where: { ...where, ...(storeId ? { storeId } : {}) },
+          orderBy: { sortOrder: 'asc' },
+          take: limit,
+          include: all ? { _count: { select: { Product: true } } } : undefined,
         });
-        customFieldMap.set(v.entityId, arr);
-      }
-    }
 
-    const enrichedCategories = categories.map((c: any) => ({
-      ...c,
-      customFieldValues: customFieldMap.get(c.id) || [],
-    }));
+        const categoryIds = categories.map((c: any) => c.id);
+        let customFieldMap = new Map<string, any[]>();
+        if (categoryIds.length > 0) {
+          const values = await db.customFieldValue.findMany({
+            where: {
+              entityId: { in: categoryIds },
+              entityType: 'category',
+              ...(storeId ? { storeId } : {}),
+            },
+            include: { Definition: true },
+          });
+          for (const v of values) {
+            const arr = customFieldMap.get(v.entityId) || [];
+            arr.push({
+              id: v.id,
+              definitionId: v.definitionId,
+              entityId: v.entityId,
+              entityType: v.entityType,
+              value: v.value,
+              definition: {
+                id: v.Definition.id,
+                name: v.Definition.name,
+                type: v.Definition.type,
+                isVisible: v.Definition.isVisible,
+                options: v.Definition.options,
+              },
+            });
+            customFieldMap.set(v.entityId, arr);
+          }
+        }
+
+        return categories.map((c: any) => ({
+          ...c,
+          customFieldValues: customFieldMap.get(c.id) || [],
+        }));
+      },
+      [CACHE_TAGS.categories],
+      600,
+    );
+
+    const enrichedCategories = await fetchCategories();
 
     const response = NextResponse.json(
       slug ? { category: enrichedCategories[0] || null } : { categories: enrichedCategories }
@@ -189,6 +202,8 @@ export async function POST(request: NextRequest) {
       ipAddress,
       details: { name: category.name },
     }).catch(() => {});
+
+    invalidateCache(CACHE_TAGS.categories);
 
     return NextResponse.json({ category }, { status: 201 });
   } catch (error) {

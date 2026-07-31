@@ -622,6 +622,24 @@ model User {
   Store                   Store?               @relation("CurrentUserStore", fields: [currentStoreId], references: [id])
   OwnedStores             Store[]              @relation("StoreOwner")
   CustomerPrice           CustomerPrice[]
+  Sessions                Session[]
+}
+
+// Active login sessions (audit 6.2). One row per issued device/token so admins
+// can list and remotely terminate sessions. Soft-deletable via revokedAt.
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenId     String   @unique // opaque id embedded in the JWT (jti) for revocation
+  ipAddress   String?
+  userAgent   String?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  revokedAt   DateTime?
+
+  @@index([userId])
+  @@index([tokenId])
 }
 
 model ActivityLog {

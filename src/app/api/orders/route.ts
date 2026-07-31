@@ -9,6 +9,8 @@ import { createNotification } from '@/lib/notifications';
 import { logError } from '@/lib/error-logger';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { ORDER_STATUS, PAYMENT_STATUS } from '@/lib/constants';
+import { ensurePluginsLoaded, hooks } from '@/lib/plugins';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 
 const ORDER_RATE_LIMIT = { maxRequests: 10, windowMs: 60 * 60 * 1000, prefix: 'order-create' };
 
@@ -18,6 +20,7 @@ const orderSchema = z.object({
     variantId: z.string().optional(),
     quantity: z.number().int().min(1).max(999),
   })).min(1),
+
   customer: z.object({
     name: z.string().min(1).max(100),
     email: z.string().email(),
@@ -33,6 +36,19 @@ const orderSchema = z.object({
   couponCode: z.string().optional(),
   shippingMethod: z.string().optional(),
 });
+
+type OrderItemInput = z.infer<typeof orderSchema>['items'][number];
+
+interface OrderItemData {
+  productId: string;
+  variantId?: string | null;
+  name: string;
+  sku: string | null;
+  hsnCode: string | null;
+  quantity: number;
+  price: number;
+  total: number;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,12 +76,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch product data from DB to prevent price tampering
-    const productIds = items.map((i: any) => i.productId);
-    const variantIds = items.map((i: any) => i.variantId).filter(Boolean);
+    const productIds = items.map((i: OrderItemInput) => i.productId);
+    const variantIds = items.map((i: OrderItemInput) => i.variantId).filter((id): id is string => Boolean(id));
 
     const [dbProducts, dbVariants] = await Promise.all([
       db.product.findMany({ where: { id: { in: productIds } } }),
-      db.productVariant.findMany({ where: { id: { in: variantIds as string[] } } })
+      db.productVariant.findMany({ where: { id: { in: variantIds } } })
     ]);
 
     const isAllDigital = dbProducts.every(p => p.isDigital);
@@ -81,8 +97,47 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Stock validation: reject items exceeding available stock before any
+    // price/order computation (prevents negative stock and overselling).
+    for (const item of items) {
+      const dbProduct = dbProducts.find(p => p.id === item.productId);
+      if (!dbProduct) continue;
+      if (dbProduct.isDigital) continue;
+      if (item.variantId) {
+        const variant = dbVariants.find(v => v.id === item.variantId);
+        if (!variant) {
+          return NextResponse.json(
+            { error: `Variant ${item.variantId} is no longer available` },
+            { status: 400 }
+          );
+        }
+        if (item.quantity > variant.stock) {
+          return NextResponse.json(
+            {
+              error: `Insufficient stock for "${dbProduct.name}"`,
+              productId: item.productId,
+              variantId: item.variantId,
+              requested: item.quantity,
+              available: variant.stock,
+            },
+            { status: 400 }
+          );
+        }
+      } else if (item.quantity > dbProduct.stock) {
+        return NextResponse.json(
+          {
+            error: `Insufficient stock for "${dbProduct.name}"`,
+            productId: item.productId,
+            requested: item.quantity,
+            available: dbProduct.stock,
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     let calculatedSubtotal = 0;
-    const orderItemsData = items.map((item: any) => {
+    const orderItemsData: OrderItemData[] = items.map((item: OrderItemInput) => {
       const dbProduct = dbProducts.find(p => p.id === item.productId);
       if (!dbProduct) throw new Error(`Product ${item.productId} not found`);
 
@@ -139,9 +194,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Per‑product tax computation (uses product.taxRate if set, else global gstRate)
+    // Perâ€‘product tax computation (uses product.taxRate if set, else global gstRate)
     let taxAmount = 0;
-    for (const od of orderItemsData as any[]) {
+    for (const od of orderItemsData) {
       const dbProduct = dbProducts.find(p => p.id === od.productId);
       const effectiveRate = dbProduct?.taxRate ?? gstRate;
       const proportion = calculatedSubtotal > 0 ? od.total / calculatedSubtotal : 0;
@@ -242,7 +297,7 @@ export async function POST(request: NextRequest) {
 
       // 2. Create order items
       await Promise.all(
-        orderItemsData.map((itemData: any) =>
+        orderItemsData.map((itemData: OrderItemData) =>
           tx.orderItem.create({
             data: {
               orderId: newOrder.id,
@@ -257,17 +312,25 @@ export async function POST(request: NextRequest) {
       //    payment confirmation, so we skip it here to avoid early decrement
       //    on orders that may never be paid.
       if (paymentMethod === 'cod') {
-        for (const itemData of orderItemsData as any[]) {
+        for (const itemData of orderItemsData) {
+          const dbProduct = dbProducts.find(p => p.id === itemData.productId);
+          if (dbProduct?.isDigital) continue;
           if (itemData.variantId) {
-            await tx.productVariant.update({
-              where: { id: itemData.variantId },
+            const reserved = await tx.productVariant.updateMany({
+              where: { id: itemData.variantId, stock: { gte: itemData.quantity } },
               data: { stock: { decrement: itemData.quantity } },
             });
+            if (reserved.count === 0) {
+              throw new Error(`Insufficient stock for "${itemData.name}" (variant)`);
+            }
           } else {
-            await tx.product.update({
-              where: { id: itemData.productId },
+            const reserved = await tx.product.updateMany({
+              where: { id: itemData.productId, stock: { gte: itemData.quantity } },
               data: { stock: { decrement: itemData.quantity } },
             });
+            if (reserved.count === 0) {
+              throw new Error(`Insufficient stock for "${itemData.name}"`);
+            }
           }
         }
       }
@@ -343,6 +406,24 @@ export async function POST(request: NextRequest) {
       });
     } catch {
       // ignore notification failures
+    }
+
+    // Plugin hook point: extensions can react to newly created orders
+    // (e.g. ERP sync, analytics, custom email flows).
+    await ensurePluginsLoaded();
+    hooks.doAction("order:created", {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      customerEmail: customer.email,
+      totalAmount: order.totalAmount,
+      paymentMethod,
+      items: orderItemsData,
+    });
+
+    // Stock changed â€” invalidate storefront product caches.
+    invalidateCache(CACHE_TAGS.products);
+    for (const item of orderItemsData) {
+      if (item.productId) invalidateCache(CACHE_TAGS.product(item.productId));
     }
 
     return NextResponse.json({ orderId: order.id });

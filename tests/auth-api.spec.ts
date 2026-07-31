@@ -16,7 +16,7 @@ test.describe('Auth API', () => {
     expect(data.error).toBeTruthy();
   });
 
-  test('POST /api/auth/register creates B2B buyer', async ({ apiBase }) => {
+  test('POST /api/auth/register creates buyer account', async ({ apiBase }) => {
     const email = `buyer_${Date.now()}@example.com`;
     const res = await fetch(`${apiBase}/api/auth/register`, {
       method: 'POST',
@@ -24,7 +24,7 @@ test.describe('Auth API', () => {
       body: JSON.stringify({
         name: 'API Buyer',
         email,
-        password: 'password123',
+        password: 'Password123!',
         companyName: 'API Buyer Corp',
         taxId: 'TAX-999',
         address: '45 API Street',
@@ -38,7 +38,7 @@ test.describe('Auth API', () => {
     const res = await fetch(`${apiBase}/api/auth/register`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ name: 'Bad', email: `bad${Date.now()}@example.com`, password: 'test1234' }),
+      body: JSON.stringify({ name: 'Bad', email: `bad${Date.now()}@example.com`, password: 'Test1234!' }),
     });
     const data = await res.json();
     expect(res.status).toBeGreaterThanOrEqual(400);
@@ -82,7 +82,7 @@ test.describe('Auth API', () => {
         'content-type': 'application/json',
         authorization: `Bearer ${adminToken}`,
       },
-      body: JSON.stringify({ currentPassword: 'admin123', newPassword: 'admin123456!' }),
+      body: JSON.stringify({ currentPassword: 'admin123', newPassword: 'Admin123456!' }),
     });
     const data = await res.json();
     expect(res.status).toBe(200);

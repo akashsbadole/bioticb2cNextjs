@@ -6,6 +6,7 @@ import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { logError } from '@/lib/error-logger';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
 import { ACTIVITY } from '@/lib/constants';
 
 const PRODUCTS_RATE_LIMIT = { maxRequests: 120, windowMs: 60 * 1000, prefix: 'products-search' };
@@ -88,6 +89,21 @@ export async function GET(request: NextRequest) {
       where.categoryId = categoryId;
     }
 
+    const brandId = searchParams.get('brandId');
+    if (brandId) {
+      where.brandId = brandId;
+    }
+
+    const attributeFilter = searchParams.get('attributes');
+    if (attributeFilter) {
+      // Filter by product attributes JSON (e.g. attributes={"Size":"M"} or a raw value match)
+      const attrQuery = attributeFilter.replace(/[\\%_]/g, '\\$&');
+      where.OR = [
+        ...(Array.isArray(where.OR) ? (where.OR as object[]) : []),
+        { attributes: { contains: attrQuery } },
+      ];
+    }
+
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
     const inStock = searchParams.get('inStock');
@@ -155,48 +171,74 @@ export async function GET(request: NextRequest) {
 
     const scopedWhere = { ...where, ...(storeId ? { storeId } : {}) };
 
-    // Cursor-based or page-based pagination
-    let products: any[];
-    let nextCursor = null;
-    let total = 0;
+    // ISR-style data cache: keyed on the full filter set, purged on admin
+    // writes via invalidateCache(CACHE_TAGS.products).
+    const cacheKey = [
+      storeId || '',
+      search || '',
+      categoryId || '',
+      featured || '',
+      ids || '',
+      slug || '',
+      trashed || '',
+      cursor || '',
+      String(limit),
+      page || '',
+      sort || '',
+      all || '',
+      brandId || '',
+      attributeFilter || '',
+      minPrice || '',
+      maxPrice || '',
+      inStock || '',
+      stockStatus || '',
+    ];
 
-    if (cursor && !page) {
-      products = await db.product.findMany({
-        where: { ...scopedWhere, id: { gt: cursor } },
-        include: { Category: true, ProductVariant: true },
-        orderBy,
-        take: limit + 1,
-      });
-      if (products.length > limit) {
-        nextCursor = products.pop()?.id || null;
-      }
-      total = await db.product.count({ where: scopedWhere });
-    } else {
-      const pageNum = Math.max(1, parseInt(page || '1'));
-      const skip = (pageNum - 1) * limit;
+    const fetchProducts = storefrontCache(
+      cacheKey,
+      async () => {
+        // Cursor-based or page-based pagination
+        let products: any[];
+        let nextCursor: string | null = null;
+        let total = 0;
 
-      [products, total] = await Promise.all([
-        db.product.findMany({
-          where: scopedWhere,
-          include: { Category: true, ProductVariant: true },
-          orderBy,
-          skip,
-          take: limit,
-        }),
-        db.product.count({ where: scopedWhere }),
-      ]);
-    }
+        if (cursor && !page) {
+          products = await db.product.findMany({
+            where: { ...scopedWhere, id: { gt: cursor } },
+            include: { Category: true, ProductVariant: true },
+            orderBy,
+            take: limit + 1,
+          });
+          if (products.length > limit) {
+            nextCursor = products.pop()?.id || null;
+          }
+          total = await db.product.count({ where: scopedWhere });
+        } else {
+          const pageNum = Math.max(1, parseInt(page || '1'));
+          const skip = (pageNum - 1) * limit;
 
-    products = await attachCustomFieldValues(products, storeId);
+          [products, total] = await Promise.all([
+            db.product.findMany({
+              where: scopedWhere,
+              include: { Category: true, ProductVariant: true },
+              orderBy,
+              skip,
+              take: limit,
+            }),
+            db.product.count({ where: scopedWhere }),
+          ]);
+        }
 
-    const response = NextResponse.json({
-      products,
-      pagination: {
-        total,
-        limit,
-        nextCursor,
+        const enriched = await attachCustomFieldValues(products, storeId);
+        return { products: enriched, pagination: { total, limit, nextCursor } };
       },
-    });
+      [CACHE_TAGS.products],
+      300,
+    );
+
+    const { products, pagination } = await fetchProducts();
+
+    const response = NextResponse.json({ products, pagination });
 
     // Cache public product listings for 5 minutes (revalidate in background)
     if (!all && trashed !== 'true') {
@@ -297,6 +339,8 @@ export async function POST(request: NextRequest) {
       ipAddress,
       details: { name: product.name, price: product.price },
     }).catch(() => {});
+
+    invalidateCache(CACHE_TAGS.products);
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (error) {

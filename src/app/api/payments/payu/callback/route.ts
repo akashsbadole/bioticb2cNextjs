@@ -5,6 +5,7 @@ import { sendOrderConfirmation } from '@/lib/email';
 import { sendWhatsApp } from '@/lib/sms';
 import { createNotification } from '@/lib/notifications';
 import { PAYMENT_STATUS } from '@/lib/constants';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     if (status === 'success') {
       // Guard against duplicate callbacks (PayU retries on network timeouts).
-      // Only process if the order is still in unpaid state — if it's already
+      // Only process if the order is still in unpaid state â€” if it's already
       // paid, skip straight to the success redirect without re-decrementing stock.
       const existingOrder = await db.order.findUnique({
         where: { id: orderId },
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (existingOrder.paymentStatus === PAYMENT_STATUS.PAID) {
-        // Already processed — idempotent redirect to success page
+        // Already processed â€” idempotent redirect to success page
         console.warn(`PayU callback: duplicate callback for already-paid order ${orderId}, skipping`);
         return NextResponse.redirect(new URL(`/order-success/${orderId}`, request.url));
       }
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
         });
 
         if (!locked || locked.paymentStatus === PAYMENT_STATUS.PAID) {
-          // Another request already committed — return null to signal skip
+          // Another request already committed â€” return null to signal skip
           return null;
         }
 
@@ -71,24 +72,36 @@ export async function POST(request: NextRequest) {
 
         for (const item of updated.items) {
           if (item.variantId) {
-            await tx.productVariant.update({
-              where: { id: item.variantId },
+            const reserved = await tx.productVariant.updateMany({
+              where: { id: item.variantId, stock: { gte: item.quantity } },
               data: { stock: { decrement: item.quantity } },
             });
+            if (reserved.count === 0) {
+              throw new Error(`Insufficient stock for "${item.name}" (variant)`);
+            }
           } else {
-            await tx.product.update({
-              where: { id: item.productId },
+            const reserved = await tx.product.updateMany({
+              where: { id: item.productId, stock: { gte: item.quantity } },
               data: { stock: { decrement: item.quantity } },
             });
+            if (reserved.count === 0) {
+              throw new Error(`Insufficient stock for "${item.name}"`);
+            }
           }
         }
 
         return updated;
       });
 
-      // Null means the transaction detected a concurrent payment — still redirect to success
+      // Null means the transaction detected a concurrent payment â€” still redirect to success
       if (!order) {
         return NextResponse.redirect(new URL(`/order-success/${orderId}`, request.url));
+      }
+
+      // Stock changed â€” invalidate storefront product caches.
+      invalidateCache(CACHE_TAGS.products);
+      for (const item of order.items) {
+        if (item.productId) invalidateCache(CACHE_TAGS.product(item.productId));
       }
 
       try {
@@ -111,7 +124,7 @@ export async function POST(request: NextRequest) {
       if (order.customerPhone) {
         sendWhatsApp(
           order.customerPhone,
-          `Thank you for your order ${order.orderNumber || order.id.slice(0, 8)}! Your payment of ₹${order.totalAmount.toFixed(2)} has been received. We will notify you once it ships.`,
+          `Thank you for your order ${order.orderNumber || order.id.slice(0, 8)}! Your payment of â‚¹${order.totalAmount.toFixed(2)} has been received. We will notify you once it ships.`,
         ).catch(() => { });
       }
 

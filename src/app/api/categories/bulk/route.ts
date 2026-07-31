@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,6 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     const count = ids.length;
+    invalidateCache(CACHE_TAGS.categories);
     return NextResponse.json({ success: true, count });
   } catch (error) {
     console.error('Bulk category operation error:', error);

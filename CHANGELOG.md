@@ -8,11 +8,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Standardized API response helpers (`src/lib/api-response.ts`): `ok`, `created`, `badRequest`, `unauthorized`, `forbidden`, `notFound`, `conflict`, `tooManyRequests`, `serverError`.
+- `Session` model (production schema) for API token revocation tracking.
 - Newsletter confirmation email (`sendNewsletterConfirmation`) wired into the subscribe route.
 - Low stock alert email template (`sendLowStockAlert`) for admin notifications.
-- Quote notification email template (`sendQuoteNotification`) for the B2B RFQ workflow.
 - `CONTRIBUTING.md` with code style, commit conventions, PR process, testing, and branch naming.
+- Stock validation at order creation (400 with `productId`/`requested`/`available`) and guarded transactional stock decrements (orders + PayU callback).
+- Scheduled cron jobs for `/api/cron/abandoned-carts` (every 2h) and `/api/cron/cleanup-sessions` (daily) — originally defined in `vercel.json`, now driven by GitHub Actions (see `.github/workflows/cron.yml`).
+- Deep-link routes `/orders` and `/bundles` (SPA pages with dedicated URLs).
+- Rendering for 14 previously-silent CMS page-builder block types (slider, about, blog-grid, pricing-table, hero-split, timeline, metrics-bar, process-flow, packaging-grid, certification-cards, address-cards, product-carousel, mfg/catalogue page aliases).
+- Admin sidebar tabs: Brands, Users, Redirects, Activity Logs, Data Export, Plugins, Themes.
+- Faceted search: `brandId` and `attributes` filters on `/api/products`; attribute facet aggregation on `/api/products/facets`; facet counts UI in ShopPage.
+- Functional plugin hook system: builtin `stock-notifications` (restock alert on `product:stock-updated`), `flash-sales` (price/badge filters), plus `order:created` and `order:status-updated` hooks; 60s plugin cache.
+- PDF invoice generation via dynamic `pdfkit` import (no `eval`).
+- Netlify deployment config: `netlify.toml` (pnpm build via corepack, `publish: .next`), `.nvmrc` (Node 20).
+- GitHub Actions cron job (`.github/workflows/cron.yml`) replacing Vercel crons: `/api/cron/abandoned-carts` (2h) and `/api/cron/cleanup-sessions` (daily) with Bearer `CRON_SECRET` auth.
+- ISR-style data caching for the storefront: `src/lib/cache.ts` (`CACHE_TAGS`, `storefrontCache` wrapping `unstable_cache`, `invalidateCache` with `{ expire: 0 }` profile).
+- Cached storefront reads: `/api/products` (filter-keyed, 300s), `/api/products/[id]` (300s), `/api/categories` (600s), `/api/blog` (600s), `/api/content-pages` (600s).
+- On-demand cache invalidation on writes: products/categories/blog CRUD + bulk ops, content-pages CRUD, order creation and PayU success callback (stock changes).
+
+### Fixed
+- README.md recovered from binary (null-byte) corruption; docs de-staled (single-store, 44 models, actual stack).
+- Playwright specs updated to real credential policy (`Password123!` family, B2C register/login flows).
+
+### Security
+- `next.config.ts`: image domains restricted to Cloudinary/Unsplash/Google; CSP adds `frame-ancestors 'self'`.
+
+### Removed
+- Dead code: `src/lib/api-response.ts` (+ test), `src/app/admin/AdminClient.tsx`, `src/components/store/StorePageShell.tsx`, ghost `banner/[id]` and `plugin/[id]` route dirs.
 
 ## [1.1.0] - 2026-01-15
 

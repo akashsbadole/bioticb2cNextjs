@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { normalizeImageUrl } from '@/lib/utils';
 import { getStoreId } from '@/lib/store-db';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 import { normalizeBlocksForStorage } from '@/lib/page-blocks';
 import { sanitizeHtml, sanitizeBlocks } from '@/lib/sanitize';
 
@@ -107,6 +108,7 @@ export async function PUT(
     });
 
     revalidatePath('/', 'layout');
+    invalidateCache(CACHE_TAGS.pages);
     return NextResponse.json({ contentPage });
   } catch (error) {
     console.error('Update content page error:', error);
@@ -138,6 +140,7 @@ export async function DELETE(
     await db.contentPage.delete({ where: { id } });
 
     revalidatePath('/', 'layout');
+    invalidateCache(CACHE_TAGS.pages);
     return NextResponse.json({
       message: 'Content page deleted successfully',
     });

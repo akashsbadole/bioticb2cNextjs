@@ -6,6 +6,7 @@ import { getStoreId } from '@/lib/store-db';
 import { normalizeBlocksForStorage } from '@/lib/page-blocks';
 import { normalizeImageUrl } from '@/lib/utils';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
 import { ACTIVITY } from '@/lib/constants';
 import { sanitizeHtml, sanitizeBlocks } from '@/lib/sanitize';
 
@@ -58,47 +59,69 @@ export async function GET(request: NextRequest) {
       ? { publishedAt: 'desc' as const }
       : { createdAt: 'desc' as const };
 
-    const [blogPosts, total] = await Promise.all([
-      db.blogPost.findMany({
-        where: scopedWhere,
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          excerpt: true,
-          content: true,
-          coverImage: true,
-          authorId: true,
-          metaTitle: true,
-          metaDescription: true,
-          ogImage: true,
-          tags: true,
-          isPublished: true,
-          publishedAt: true,
-          createdAt: true,
-          updatedAt: true,
-          User: { select: { id: true, name: true, email: true, avatar: true, bio: true } },
-        },
-        orderBy,
-        ...(cursor ? { cursor: { id: cursor }, skip: 1 } : { skip: (page - 1) * limit }),
-        take: limit,
-      }),
-      db.blogPost.count({ where: scopedWhere }),
-    ]);
+    // ISR-style data cache for public blog reads. Invalidated on admin
+    // writes via invalidateCache(CACHE_TAGS.blog).
+    const fetchBlogPosts = storefrontCache(
+      [
+        storeId || '',
+        all || '',
+        published || '',
+        search || '',
+        tag || '',
+        slug || '',
+        String(page),
+        String(limit),
+        cursor || '',
+      ],
+      async () => {
+        const [blogPosts, total] = await Promise.all([
+          db.blogPost.findMany({
+            where: scopedWhere,
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              excerpt: true,
+              content: true,
+              coverImage: true,
+              authorId: true,
+              metaTitle: true,
+              metaDescription: true,
+              ogImage: true,
+              tags: true,
+              isPublished: true,
+              publishedAt: true,
+              createdAt: true,
+              updatedAt: true,
+              User: { select: { id: true, name: true, email: true, avatar: true, bio: true } },
+            },
+            orderBy,
+            ...(cursor ? { cursor: { id: cursor }, skip: 1 } : { skip: (page - 1) * limit }),
+            take: limit,
+          }),
+          db.blogPost.count({ where: scopedWhere }),
+        ]);
 
-    const lastPost = blogPosts[blogPosts.length - 1];
-    const nextCursor = blogPosts.length === limit && lastPost ? lastPost.id : null;
-
-    const response = NextResponse.json({
-      blogPosts,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-        ...(nextCursor ? { nextCursor } : {}),
+        const lastPost = blogPosts[blogPosts.length - 1];
+        const nextCursor = blogPosts.length === limit && lastPost ? lastPost.id : null;
+        return {
+          blogPosts,
+          pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+            ...(nextCursor ? { nextCursor } : {}),
+          },
+        };
       },
-    });
+      [CACHE_TAGS.blog],
+      600,
+    );
+
+    const { blogPosts, pagination } = await fetchBlogPosts();
+
+    const response = NextResponse.json({ blogPosts, pagination });
     response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
     response.headers.set('Vary', 'host');
     return response;
@@ -184,6 +207,8 @@ export async function POST(request: NextRequest) {
       ipAddress,
       details: { title: blogPost.title, isPublished: blogPost.isPublished },
     }).catch(() => {});
+
+    invalidateCache(CACHE_TAGS.blog);
 
     return NextResponse.json({ blogPost }, { status: 201 });
   } catch (error) {

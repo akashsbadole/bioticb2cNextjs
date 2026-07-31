@@ -1,4 +1,14 @@
 {
   "framework": "nextjs",
-  "buildCommand": "prisma generate && next build"
+  "buildCommand": "prisma generate && next build",
+  "crons": [
+    {
+      "path": "/api/cron/abandoned-carts",
+      "schedule": "0 */2 * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-sessions",
+      "schedule": "0 3 * * *"
+    }
+  ]
 }

@@ -54,6 +54,39 @@ export async function GET(request: NextRequest) {
       orderBy: { name: 'asc' },
     });
 
+    // Aggregate attribute facets from the product `attributes` JSON string
+    // (flat object like {"Material":"Cotton","Size":"M"}).
+    const attributeMap = new Map<string, Map<string, number>>();
+    const attributeProducts = await db.product.findMany({
+      where: baseWhere,
+      select: { attributes: true },
+      take: 5000,
+    });
+    for (const p of attributeProducts) {
+      if (!p.attributes) continue;
+      let parsed: Record<string, unknown>;
+      try {
+        parsed = JSON.parse(p.attributes);
+      } catch {
+        continue;
+      }
+      for (const [key, rawValue] of Object.entries(parsed)) {
+        const values = Array.isArray(rawValue) ? rawValue.map(String) : [String(rawValue)];
+        for (const value of values) {
+          if (!value) continue;
+          const byValue = attributeMap.get(key) || new Map<string, number>();
+          byValue.set(value, (byValue.get(value) || 0) + 1);
+          attributeMap.set(key, byValue);
+        }
+      }
+    }
+    const attributes = Array.from(attributeMap.entries()).map(([key, byValue]) => ({
+      key,
+      values: Array.from(byValue.entries())
+        .map(([value, count]) => ({ value, count }))
+        .sort((a, b) => b.count - a.count),
+    }));
+
     return NextResponse.json({
       categories: categories.map(c => ({ id: c.id, name: c.name, slug: c.slug, count: (c as any)._count.Product })),
       priceRange: {
@@ -63,9 +96,10 @@ export async function GET(request: NextRequest) {
       },
       brands: brands.map(b => ({ id: b.id, name: b.name, slug: b.slug, count: (b as any)._count.Product })),
       availability: { inStock: inStockCount, outOfStock: outOfStockCount },
+      attributes,
     });
   } catch (error) {
     console.error('Facets error:', error);
-    return NextResponse.json({ categories: [], priceRange: { min: 0, max: 0, avg: 0 }, brands: [], availability: { inStock: 0, outOfStock: 0 } });
+    return NextResponse.json({ categories: [], priceRange: { min: 0, max: 0, avg: 0 }, brands: [], availability: { inStock: 0, outOfStock: 0 }, attributes: [] });
   }
 }

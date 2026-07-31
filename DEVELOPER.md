@@ -2,7 +2,7 @@
 
 ## Overview
 
-WCommerce Catalogue is a multi-tenant B2B/B2C e-commerce platform built with Next.js 16 (App Router), PostgreSQL, Prisma ORM, and Zustand for client state. Each store is isolated by tenant via `storeId` and accessed through subdomains or custom domains.
+WCommerce Catalogue is a single-store B2C/B2B-capable e-commerce catalogue platform built with Next.js 16 (App Router), PostgreSQL/SQLite, Prisma ORM, and Zustand for client state. The store is resolved via `storeId` (single default store); subdomain/tenant isolation is out of scope.
 
 ## Tech Stack
 
@@ -10,45 +10,44 @@ WCommerce Catalogue is a multi-tenant B2B/B2C e-commerce platform built with Nex
 |---|---|
 | Framework | Next.js 16 (App Router, standalone output) |
 | Language | TypeScript 5 |
-| Database | PostgreSQL (Neon serverless) |
-| ORM | Prisma 6.19 |
-| Auth | Custom JWT (jose) + bcryptjs |
-| UI | Radix UI + shadcn/ui (48 components) |
+| Database | SQLite (dev, default `schema.prisma`) / PostgreSQL (prod, `schema.postgres.prisma`) |
+| ORM | Prisma 6 |
+| Auth | NextAuth v5 (Credentials + OTP) + jose JWT for API tokens |
+| UI | Radix UI + shadcn/ui |
 | CSS | Tailwind CSS 4 |
 | State | Zustand 5 (persisted) |
 | Server State | TanStack React Query 5 |
 | Forms | React Hook Form 7 + Zod 4 |
-| Payment | Razorpay SDK 2 |
+| Payment | PayU (hash-verified callbacks) + COD |
 | Email | Nodemailer 7 |
 | Animation | Framer Motion 12 |
-| Testing | Playwright 1.60 |
+| Testing | Playwright 1.60 + Vitest |
 
 ## Project Structure
 
 ```
 wcommerce-catelog~/
 ├── prisma/
-│   ├── schema.prisma          # 27 Prisma models
+│   ├── schema.prisma          # 44 Prisma models (SQLite)
+│   ├── schema.postgres.prisma # 44 models (PostgreSQL production)
 │   └── migrations/            # SQL migrations
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx         # Root layout (fonts, ThemeProvider, Toaster)
-│   │   ├── page.tsx           # SPA entry (client-side routing via Zustand)
+│   │   ├── [[...slug]]/       # SPA entry (client-side routing via Zustand)
 │   │   ├── admin/             # Admin dashboard
-│   │   ├── portal/            # B2B Buyer Portal
-│   │   ├── register/          # B2B registration
-│   │   ├── api/               # 97 API route files (35 groups)
+│   │   ├── register/          # B2C registration
+│   │   ├── api/               # 138 API route files
 │   │   └── error.tsx, not-found.tsx, loading.tsx
 │   ├── components/
-│   │   ├── admin/             # 31 admin components
-│   │   ├── store/             # 28 store-front components
-│   │   └── ui/                # 48 shadcn/ui primitives
+│   │   ├── admin/             # 47 admin components
+│   │   ├── store/             # 70 store-front components
+│   │   └── ui/                # shadcn/ui primitives
 │   ├── hooks/
-│   ├── lib/                   # 22 library files
+│   ├── lib/                   # 47 library files
 │   └── middleware.ts          # Auth, RBAC, store resolution, redirects
 ├── tests/                     # Playwright tests
 ├── scripts/                   # Utility scripts
-└── Dockerfile, Caddyfile, vercel.json
+└── Dockerfile, vercel.json
 ```
 
 ## Getting Started
@@ -99,40 +98,41 @@ npm run dev
 
 ## Architecture
 
-### Multi-Tenancy
+### Store Resolution (single store)
 
-Stores are resolved in middleware via:
-1. Subdomain: `{slug}.wcommerce.com`
-2. Custom domain: `shop.example.com`
-3. Header: `x-store-id`
-4. Query param: `?store=slug`
+The app is single-store. Middleware resolves the default store id via:
+1. `DEFAULT_STORE_ID` env fast-path (recommended)
+2. Internal fetch to `/api/store/default` (cached 1 hour, fallback)
+3. Header `x-store-id` / query `?store=slug` (testing)
 
-In-memory cache with 5-minute TTL. Store-scoped queries use `scopedWhere()` from `src/lib/store-db.ts`.
+Store-scoped queries use `scopedWhere()` from `src/lib/store-db.ts`.
 
 ### Authentication
 
-- JWT tokens signed with HS256 (jose library)
-- httpOnly cookies (`admin_token`) + Bearer header
-- Rate limiting: 5 login attempts per 15 minutes
-- Header spoofing prevention (strips `x-user-id`, `x-user-role`, `x-user-email`)
+- NextAuth v5 (Credentials email/password + email/SMS OTP, JWT session strategy) for the UI
+- `jose` HS256 JWT for API Bearer tokens (`/api/auth/login`, `/api/auth/register`) with `Session`-table revocation tracking
+- httpOnly session cookies; Bearer header identity injected via middleware (`x-user-id`, `x-user-role`, `x-user-email`, `x-user-jti`)
+- Header spoofing prevention (middleware strips spoofed `x-user-*` headers)
+- Rate limiting: in-memory edge limiter (middleware) + Prisma-backed per-route limiter (login 5/15min, contact 10/hr, orders 10/15min, products 120/min, etc.)
 
 ### Roles (RBAC)
 
-| Role | Read | Write |
-|---|---|---|
-| admin | Everything | Everything |
-| clerk | Products, categories, enquiries, blog, pages, settings, media, orders, quotes, companies | Enquiries, notifications, quotes |
-| buyer | Quotes, enquiries, companies | Quotes (accept), enquiries |
+| Role | Scope |
+|---|---|
+| admin | Everything |
+| editor | Dashboard, content, orders, media, settings (read/write on most non-security entities) |
+| customer | Own orders, addresses, wishlist, support tickets, reviews, newsletter |
 
-### Database Schema (27 Models)
+### Database Schema (44 Models)
 
-**Platform**: Store, SiteSetting
-**User/Auth**: User, PasswordResetToken, EmailVerificationToken, NewsletterSubscriber, Company, ActivityLog, Notification
-**Catalog**: Product, Category, ProductVariant, ProductTier
-**Commerce**: Order, OrderItem, Cart, CartItem, Wishlist, WishlistItem, Coupon
-**Content**: BlogPost, ContentPage, Banner, Media
-**B2B**: Enquiry, Quote
-**Other**: Redirect
+**Platform**: Store, SiteSetting, Theme, Plugin
+**User/Auth**: User, Session, PasswordResetToken, EmailVerificationToken, OtpToken, NewsletterSubscriber, ActivityLog, Notification
+**Catalog**: Product, Category, ProductVariant, Brand, ProductAddon, Bundle, BundleItem, CustomFieldDefinition, CustomFieldValue, CustomerPrice
+**Commerce**: Order, OrderItem, Cart, CartItem, Wishlist, Coupon, ShippingRate, Review, SupportTicket
+**Content**: BlogPost, ContentPage, Popup, Banner, Media, Redirect, Menu, MenuItem
+**B2B/Leads**: Enquiry
+**Marketing**: FlashSale, FlashSaleProduct, StockNotification
+**Ops**: RateLimitEntry
 
 ## API Reference
 

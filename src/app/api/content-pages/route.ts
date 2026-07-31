@@ -6,6 +6,7 @@ import { contentPageSchema } from '@/lib/validations';
 import { normalizeImageUrl } from '@/lib/utils';
 import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
 import { normalizeBlocksForStorage } from '@/lib/page-blocks';
 import { PLATFORM_PAGE_SLUGS } from '@/lib/platform-pages';
 import { sanitizeHtml, sanitizeBlocks } from '@/lib/sanitize';
@@ -34,13 +35,24 @@ export async function GET(request: NextRequest) {
 
     const skipStoreFilter = PLATFORM_PAGE_SLUGS.has(slug || '');
 
-    const contentPages = await db.contentPage.findMany({
-      where: {
-        ...where,
-        ...(storeId && !skipStoreFilter ? { storeId } : {}),
+    // ISR-style data cache for public content page reads. Invalidated on
+    // admin writes via invalidateCache(CACHE_TAGS.pages).
+    const fetchContentPages = storefrontCache(
+      [storeId || '', all || '', search || '', slug || '', String(skipStoreFilter)],
+      async () => {
+        return db.contentPage.findMany({
+          where: {
+            ...where,
+            ...(storeId && !skipStoreFilter ? { storeId } : {}),
+          },
+          orderBy: { sortOrder: 'asc' },
+        });
       },
-      orderBy: { sortOrder: 'asc' },
-    });
+      [CACHE_TAGS.pages],
+      600,
+    );
+
+    const contentPages = await fetchContentPages();
 
     const response = NextResponse.json({ contentPages });
     response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
@@ -107,6 +119,7 @@ export async function POST(request: NextRequest) {
     });
 
     revalidatePath('/', 'layout');
+    invalidateCache(CACHE_TAGS.pages);
     return NextResponse.json({ contentPage }, { status: 201 });
   } catch (error) {
     console.error('Create content page error:', error);

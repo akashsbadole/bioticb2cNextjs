@@ -45,6 +45,10 @@ const routeFromPath = (
     navigate("register");
   } else if (segments[0] === "wishlist") {
     navigate("wishlist");
+  } else if (segments[0] === "orders") {
+    navigate("orders");
+  } else if (segments[0] === "bundles") {
+    navigate("bundles");
   } else if (segments[0] === "faq") {
     navigate("faq");
   } else if (segments[0] === "compare") {

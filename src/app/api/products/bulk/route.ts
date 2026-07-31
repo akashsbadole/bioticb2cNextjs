@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 
 const MAX_BULK_SIZE = 100;
 
@@ -41,6 +42,8 @@ export async function POST(request: NextRequest) {
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
+    invalidateCache(CACHE_TAGS.products);
+    ids.forEach((id) => invalidateCache(CACHE_TAGS.product(id)));
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Bulk operation error:', error);

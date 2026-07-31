@@ -52,6 +52,7 @@ import {
 import { getFirstImage } from "@/lib/utils";
 import { formatPrice } from "@/lib/pricing";
 import { VideoModal } from "./VideoModal";
+import { ProductSlider } from "./ProductSlider";
 
 // Curated icon map for dynamic resolution (instead of importing entire library)
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -2483,8 +2484,7 @@ function SliderBlock({
   data: Record<string, unknown>;
   onNavigate?: (page: string, data?: unknown) => void;
 }) {
-  const items =
-    (data.items as Array<{
+  const items =    (data.items as Array<{
       image: string;
       title: string;
       subtitle: string;
@@ -2563,6 +2563,33 @@ function SliderBlock({
         </>
       )}
     </div>
+  );
+}
+
+function ProductCarouselBlock({
+  data,
+  onNavigate,
+}: {
+  data: Record<string, unknown>;
+  onNavigate?: (page: string, data?: unknown) => void;
+}) {
+  const title = (data.title as string) || "Our Products";
+  const maxProducts = (data.maxProducts as number) || 10;
+  const categoryId = (data.categoryId as string) || "";
+  const currency = (data.currency as string) || "INR";
+
+  const params = new URLSearchParams();
+  params.set("inStock", "true");
+  params.set("limit", String(maxProducts));
+  if (categoryId) params.set("categoryId", categoryId);
+
+  return (
+    <ProductSlider
+      title={title}
+      queryParams={params.toString()}
+      currency={currency}
+      onNavigate={onNavigate || (() => {})}
+    />
   );
 }
 
@@ -3045,6 +3072,32 @@ export function PageBlockRenderer({
         return <StickyCtaBlock data={data} onNavigate={onNavigate} />;
       case "faq":
         return <FaqBlock data={data} />;
+      case "slider":
+        return <SliderBlock data={data} onNavigate={onNavigate} />;
+      case "about":
+        return <AboutBlock data={data} onNavigate={onNavigate} />;
+      case "blog-grid":
+        return <BlogGridBlock data={data} onNavigate={onNavigate} />;
+      case "pricing-table":
+        return <PricingTableBlock data={data} onNavigate={onNavigate} />;
+      case "hero-split":
+        return <HeroSplitBlock data={data} onNavigate={onNavigate} />;
+      case "timeline":
+        return <TimelineBlock data={data} />;
+      case "metrics-bar":
+        return <MetricsBarBlock data={data} />;
+      case "process-flow":
+        return <ProcessFlowBlock data={data} />;
+      case "packaging-grid":
+        return <PackagingGridBlock data={data} onNavigate={onNavigate} />;
+      case "certification-cards":
+        return <CertificationCardsBlock data={data} />;
+      case "address-cards":
+        return <AddressCardsBlock data={data} onNavigate={onNavigate} />;
+      case "product-carousel":
+        return (
+          <ProductCarouselBlock data={data} onNavigate={onNavigate || (() => {})} />
+        );
 
       // Page content blocks (fully customizable)
       case "homepage-content":
@@ -3052,6 +3105,7 @@ export function PageBlockRenderer({
       case "about-page-content":
         return <AboutPage data={data} onNavigate={onNavigate || (() => {})} />;
       case "manufacturing-content":
+      case "mfg-page-content":
         return (
           <ManufacturingPage
             data={data}
@@ -3063,6 +3117,7 @@ export function PageBlockRenderer({
           <ContactPage data={data} onNavigate={onNavigate || (() => {})} />
         );
       case "products-page-content":
+      case "catalogue-page-content":
         return (
           <ProductsPage data={data} onNavigate={onNavigate || (() => {})} />
         );

@@ -31,7 +31,7 @@ test.describe('Auth flows', () => {
       body: JSON.stringify({
         name: 'Queue Buyer',
         email,
-        password: 'password123',
+        password: 'Password123!',
         companyName: 'Queue Corp',
         taxId: 'TAX-QUEUE',
         address: '1 Queue St',

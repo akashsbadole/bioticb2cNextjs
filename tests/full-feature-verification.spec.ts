@@ -66,11 +66,10 @@ test.describe('Full Feature Verification', () => {
     await page.goto('/register');
     await page.getByLabel('Full Name').fill('B2C Tester');
     await page.getByLabel('Email').fill(customerEmail);
-    await page.locator('#reg-password').fill('password123');
-    await page.locator('#reg-confirm').fill('password123');
+    await page.getByLabel('Password').fill('Password123!');
     await page.getByRole('button', { name: /Create Account/i }).click();
 
-    await expect(page.getByText(/verify your email/i).first()).toBeVisible({ timeout: 15000 });
+    await expect(page).toHaveURL(/.*\/account/, { timeout: 15000 });
 
     // 2. Admin approves customer
     const usersRes = await request.get('/api/users', {
@@ -84,13 +83,14 @@ test.describe('Full Feature Verification', () => {
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
 
-    // 3. Login as customer
+    // 3. Login as customer (clear the auto-session from registration first)
+    await page.context().clearCookies();
     await page.goto('/login');
-    await page.locator('input[type="email"]').fill(customerEmail);
-    await page.locator('input[type="password"]').fill('password123');
+    await page.locator('input[id="email"]').fill(customerEmail);
+    await page.locator('input[id="password"]').fill('Password123!');
     await page.getByRole('button', { name: /Sign In/i }).click();
 
-    await page.wait_for_timeout(2000);
+    await page.waitForTimeout(2000);
 
     // 4. Browse shop
     await page.goto('/shop');

@@ -1,15 +1,14 @@
 /**
  * Admin fetch utilities for authenticated API calls.
  *
- * Note: Since we are using Clerk, the Clerk middleware automatically
- * handles session verification. Downstream API routes should
- * trust the `x-user-id` and `x-user-role` headers injected by
- * the middleware.
+ * Note: Auth is handled by NextAuth (session cookie) in middleware, which
+ * injects the `x-user-id` and `x-user-role` headers. Downstream API routes
+ * trust those headers via `requireAuth`/`requireAdminAuth`.
  */
 
 export async function adminFetch(url: string, options: RequestInit = {}): Promise<Response> {
-  // In Clerk version, we don't need to manually attach Bearer tokens for same-origin requests
-  // as Clerk handles session cookies automatically.
+  // Same-origin requests are authenticated via the NextAuth session cookie,
+  // so no manual Bearer token attachment is needed here.
 
   return fetch(url, {
     cache: 'no-store',

@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAuth } from '@/lib/admin-auth';
 
-const getPdfModule = new Function('mod', 'return require(mod)') as (mod: string) => any;
+const loadPdfKit = async () => {
+  const mod = await import('pdfkit');
+  return mod.default || mod;
+};
 
 export async function GET(
   _request: NextRequest,
@@ -47,15 +50,18 @@ export async function GET(
 
     let PDFDocument: any;
     try {
-      PDFDocument = getPdfModule('pdfkit');
+      PDFDocument = await loadPdfKit();
     } catch {
       return NextResponse.json({ error: 'PDF generation unavailable' }, { status: 503 });
     }
     const doc = new PDFDocument({ margin: 50 });
 
     const chunks: Buffer[] = [];
-    doc.on('data', (chunk) => chunks.push(chunk));
-    doc.on('end', () => {});
+    const finished = new Promise<void>((resolve, reject) => {
+      doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+      doc.on('end', () => resolve());
+      doc.on('error', reject);
+    });
 
     const leftMargin = 50;
     const pageWidth = 525;
@@ -143,6 +149,7 @@ export async function GET(
     doc.text('Thank you for your purchase!', leftMargin, 740, { align: 'center', width: pageWidth });
 
     doc.end();
+    await finished;
 
     return new NextResponse(Buffer.concat(chunks), {
       status: 200,
