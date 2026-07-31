@@ -4,18 +4,28 @@ import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { validateBody } from '@/lib/validate';
 import { brandSchema } from '@/lib/validations';
+import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
   try {
     const storeId = getStoreId(request);
-  const brands = await db.brand.findMany({
-    where: storeId ? { storeId } : {},
-    orderBy: { name: 'asc' },
-  });
-  const response = NextResponse.json({ brands });
-  response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
-  response.headers.set('Vary', 'host');
-  return response;
+
+    const loadBrands = storefrontCache(
+      [`brands:${storeId ?? 'default'}`],
+      async () =>
+        db.brand.findMany({
+          where: storeId ? { storeId } : {},
+          orderBy: { name: 'asc' },
+        }),
+      [CACHE_TAGS.brands],
+      600,
+    );
+
+    const brands = await loadBrands();
+    const response = NextResponse.json({ brands });
+    response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
+    response.headers.set('Vary', 'host');
+    return response;
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -41,6 +51,8 @@ export async function POST(request: NextRequest) {
         image,
       }
     });
+
+    invalidateCache(CACHE_TAGS.brands, CACHE_TAGS.products);
 
     return NextResponse.json({ brand });
   } catch (error) {

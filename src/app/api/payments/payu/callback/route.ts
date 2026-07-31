@@ -18,7 +18,11 @@ export async function POST(request: NextRequest) {
     const saltSetting = await db.siteSetting.findFirst({
       where: { key: 'payu_merchant_salt' }
     });
-    const payuSalt = (saltSetting && saltSetting.value) || process.env.PAYU_MERCHANT_SALT || 'test_salt';
+    const payuSalt = (saltSetting && saltSetting.value) || process.env.PAYU_MERCHANT_SALT || '';
+    if (!payuSalt) {
+      console.error('PayU callback: PAYU_MERCHANT_SALT is not configured (SiteSetting payu_merchant_salt or env)');
+      return NextResponse.redirect(new URL('/checkout?error=callback_error', request.url));
+    }
     const isValid = verifyPayUHash(data, payuSalt);
 
     if (!isValid) {

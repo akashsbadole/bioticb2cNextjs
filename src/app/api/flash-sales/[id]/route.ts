@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -47,6 +48,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       },
     });
 
+    // Flash sale discounts are applied to cached product output — invalidate both.
+    invalidateCache(CACHE_TAGS.flashSales, CACHE_TAGS.products);
+
     return NextResponse.json({ flashSale });
   } catch (error) {
     console.error('Update flash sale error:', error);
@@ -67,6 +71,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
 
     await db.flashSale.delete({ where: { id } });
+
+    invalidateCache(CACHE_TAGS.flashSales, CACHE_TAGS.products);
 
     return NextResponse.json({ success: true });
   } catch (error) {

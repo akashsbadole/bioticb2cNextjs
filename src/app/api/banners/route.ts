@@ -1,18 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
+import { storefrontCache, CACHE_TAGS } from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
   try {
     const storeId = getStoreId(request);
 
-    const banners = await db.banner.findMany({
-      where: {
-        isActive: true,
-        ...(storeId ? { storeId } : {}),
-      },
-      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-    });
+    const loadBanners = storefrontCache(
+      [`banners:${storeId ?? 'default'}`],
+      async () =>
+        db.banner.findMany({
+          where: {
+            isActive: true,
+            ...(storeId ? { storeId } : {}),
+          },
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+        }),
+      [CACHE_TAGS.banners],
+      300,
+    );
+
+    const banners = await loadBanners();
 
     return NextResponse.json({ banners });
   } catch (error) {

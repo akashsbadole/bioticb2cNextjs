@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { getStoreId } from '@/lib/store-db';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
   try {
@@ -69,6 +70,8 @@ export async function POST(request: NextRequest) {
         sortOrder: Number(sortOrder) || 0,
       },
     });
+
+    invalidateCache(CACHE_TAGS.popups);
 
     return NextResponse.json({ popup });
   } catch (error) {

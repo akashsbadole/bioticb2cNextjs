@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { storefrontCache, CACHE_TAGS, invalidateCache } from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,29 +10,38 @@ export async function GET(request: NextRequest) {
     const active = searchParams.get('active');
     const storeId = getStoreId(request);
 
-    const where: Record<string, unknown> = {};
-    if (storeId) where.storeId = storeId;
+    const loadFlashSales = storefrontCache(
+      [`flash-sales:${storeId ?? 'default'}:${active ?? 'all'}`],
+      async () => {
+        const where: Record<string, unknown> = {};
+        if (storeId) where.storeId = storeId;
 
-    if (active === 'true') {
-      const now = new Date();
-      where.startDate = { lte: now };
-      where.endDate = { gte: now };
-      where.isActive = true;
-    }
+        if (active === 'true') {
+          const now = new Date();
+          where.startDate = { lte: now };
+          where.endDate = { gte: now };
+          where.isActive = true;
+        }
 
-    const flashSales = await db.flashSale.findMany({
-      where,
-      include: {
-        products: {
+        return db.flashSale.findMany({
+          where,
           include: {
-            Product: {
-              select: { id: true, name: true, slug: true, price: true, images: true, stock: true },
+            products: {
+              include: {
+                Product: {
+                  select: { id: true, name: true, slug: true, price: true, images: true, stock: true },
+                },
+              },
             },
           },
-        },
+          orderBy: { createdAt: 'desc' },
+        });
       },
-      orderBy: { createdAt: 'desc' },
-    });
+      [CACHE_TAGS.flashSales],
+      60,
+    );
+
+    const flashSales = await loadFlashSales();
 
     return NextResponse.json({ flashSales });
   } catch (error) {
@@ -76,6 +86,9 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Flash sale discounts are applied to cached product output — invalidate both.
+    invalidateCache(CACHE_TAGS.flashSales, CACHE_TAGS.products);
 
     return NextResponse.json({ flashSale }, { status: 201 });
   } catch (error) {

@@ -23,8 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Netlify deployment config: `netlify.toml` (pnpm build via corepack, `publish: .next`), `.nvmrc` (Node 20).
 - GitHub Actions cron job (`.github/workflows/cron.yml`) replacing Vercel crons: `/api/cron/abandoned-carts` (2h) and `/api/cron/cleanup-sessions` (daily) with Bearer `CRON_SECRET` auth.
 - ISR-style data caching for the storefront: `src/lib/cache.ts` (`CACHE_TAGS`, `storefrontCache` wrapping `unstable_cache`, `invalidateCache` with `{ expire: 0 }` profile).
-- Cached storefront reads: `/api/products` (filter-keyed, 300s), `/api/products/[id]` (300s), `/api/categories` (600s), `/api/blog` (600s), `/api/content-pages` (600s).
-- On-demand cache invalidation on writes: products/categories/blog CRUD + bulk ops, content-pages CRUD, order creation and PayU success callback (stock changes).
+- Cached storefront reads: `/api/products` (filter-keyed, 300s), `/api/products/[id]` (300s), `/api/categories` (600s), `/api/blog` (600s), `/api/content-pages` (600s), `/api/banners` (300s), `/api/popups` (300s), `/api/brands` (600s), `/api/flash-sales` (60s).
+- On-demand cache invalidation on writes: products/categories/blog CRUD + bulk ops, content-pages CRUD, banners/popups CRUD (admin routes), brands CRUD, flash-sales CRUD (also purges product price caches), order creation and PayU success callback (stock changes).
 
 ### Fixed
 - README.md recovered from binary (null-byte) corruption; docs de-staled (single-store, 44 models, actual stack).
@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 - `next.config.ts`: image domains restricted to Cloudinary/Unsplash/Google; CSP adds `frame-ancestors 'self'`.
+- PayU callback fails closed when `PAYU_MERCHANT_SALT` is not configured (removed `'test_salt'` fallback).
 
 ### Removed
 - Dead code: `src/lib/api-response.ts` (+ test), `src/app/admin/AdminClient.tsx`, `src/components/store/StorePageShell.tsx`, ghost `banner/[id]` and `plugin/[id]` route dirs.

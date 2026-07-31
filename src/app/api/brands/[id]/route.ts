@@ -4,6 +4,7 @@ import { getStoreId } from '@/lib/store-db';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { validateBody } from '@/lib/validate';
 import { brandSchema } from '@/lib/validations';
+import { CACHE_TAGS, invalidateCache } from '@/lib/cache';
 
 export async function PUT(
   request: NextRequest,
@@ -30,6 +31,9 @@ export async function PUT(
       },
     });
 
+    // Brand names appear in cached product output and facets — invalidate both.
+    invalidateCache(CACHE_TAGS.brands, CACHE_TAGS.products);
+
     return NextResponse.json({ brand });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update brand' }, { status: 500 });
@@ -50,6 +54,8 @@ export async function DELETE(
     await db.brand.delete({
       where: { id, ...(storeId ? { storeId } : {}) },
     });
+
+    invalidateCache(CACHE_TAGS.brands, CACHE_TAGS.products);
 
     return NextResponse.json({ success: true });
   } catch (error) {
