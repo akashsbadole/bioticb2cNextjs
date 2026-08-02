@@ -42,6 +42,10 @@ yarn-error.log*
 # uploads (user-generated images, not source code)
 public/uploads/
 
+# local database exports (contain customer data - never commit)
+/db/*.db
+/db/*.db-journal
+
 
 # typescript
 *.tsbuildinfo

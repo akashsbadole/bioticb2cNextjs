@@ -1,0 +1,75 @@
+name: wcommerce
+
+services:
+  # PostgreSQL 16 (free, runs on the VPS - no external DB dependency)
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-wcommerce}
+      POSTGRES_USER: ${POSTGRES_USER:-wcommerce}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      # Bound to localhost: reach it via an SSH tunnel (ssh -L 5432:localhost:5432 user@VPS_IP)
+      # for the one-time data import. Never publicly exposed.
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wcommerce} -d ${POSTGRES_DB:-wcommerce}"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  # One-shot: creates the schema (prisma db push) before the app starts.
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-wcommerce}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-wcommerce}?schema=public
+    command: sh -c "npx prisma db push --schema=prisma/schema.postgres.prisma --skip-generate"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Next.js app (standalone build)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+      args:
+        NEXT_PUBLIC_SITE_NAME: ${NEXT_PUBLIC_SITE_NAME:-Biotic Naturals}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+        NEXT_PUBLIC_SITE_DESCRIPTION: ${NEXT_PUBLIC_SITE_DESCRIPTION:-Authentic Ayurvedic wellness products}
+        NEXT_PUBLIC_STORE_SLUG: ${NEXT_PUBLIC_STORE_SLUG:-vedika-ayurveda}
+        NEXT_PUBLIC_PLATFORM_DOMAIN: ${NEXT_PUBLIC_PLATFORM_DOMAIN:-wcommerce.com}
+        DEFAULT_STORE_SLUG: ${DEFAULT_STORE_SLUG:-vedika-ayurveda}
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-wcommerce}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-wcommerce}?schema=public
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET in .env}
+      OTP_SECRET: ${OTP_SECRET:?set OTP_SECRET in .env}
+      CRON_SECRET: ${CRON_SECRET:?set CRON_SECRET in .env}
+      DEFAULT_STORE_SLUG: ${DEFAULT_STORE_SLUG:-vedika-ayurveda}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      PAYU_MERCHANT_KEY: ${PAYU_MERCHANT_KEY:-}
+      PAYU_MERCHANT_SALT: ${PAYU_MERCHANT_SALT:-}
+      PAYU_TEST_MODE: ${PAYU_TEST_MODE:-true}
+    volumes:
+      - uploads:/app/public/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  pgdata:
+  uploads:
