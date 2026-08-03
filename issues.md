@@ -143,14 +143,8 @@
 
 ---
 
-### ✅ IF8 — Abandoned Cart Cron Had No Scheduled Trigger
-**File:** `vercel.json`
-- Endpoint and logic existed but were never called automatically
-- **Fix applied:** Added to `vercel.json`:
-  ```json
-  "crons": [{ "path": "/api/cron/abandoned-carts", "schedule": "0 */2 * * *" }]
-  ```
-- ⚠️ **Action required:** Set `CRON_SECRET` environment variable in your Vercel project settings or the cron will return 401 on every run.
+### ❌ IF8 — Abandoned Cart Feature Completely Removed
+- Feature completely removed along with all route handlers, helpers, and dashboard interfaces at the user's request.
 
 ---
 

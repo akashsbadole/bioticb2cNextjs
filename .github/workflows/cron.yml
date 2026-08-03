@@ -2,21 +2,10 @@ name: Scheduled jobs (cron)
 
 on:
   schedule:
-    - cron: "0 */2 * * *"   # abandoned-cart reminders every 2 hours
     - cron: "0 3 * * *"     # session cleanup daily at 03:00 UTC
   workflow_dispatch:        # allow manual trigger
 
 jobs:
-  abandoned-carts:
-    runs-on: ubuntu-latest
-    name: Send abandoned-cart reminders
-    steps:
-      - name: Hit /api/cron/abandoned-carts
-        run: |
-          curl -fsS -m 120 \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            "${{ secrets.SITE_URL }}/api/cron/abandoned-carts"
-
   cleanup-sessions:
     runs-on: ubuntu-latest
     name: Purge expired sessions

@@ -157,7 +157,6 @@ const openApiDoc = {
     '/api/flash-sales': { get: { summary: 'List active flash sales', responses: { 200: { description: 'Flash sales' } } }, post: { summary: 'Create flash sale (admin)', security: [{ bearerAuth: [] }], responses: { 201: { description: 'Created' } } } },
     '/api/bundles': { get: { summary: 'List product bundles', responses: { 200: { description: 'Bundles' } } } },
     '/api/redirects/check': { get: { summary: 'Resolve a redirect by path', responses: { 200: { description: 'Redirect or none' } } } },
-    '/api/cron/abandoned-carts': { post: { summary: 'Cron: email abandoned carts (CRON_SECRET protected)', responses: { 200: { description: 'Done' } } } },
     '/api/cron/cleanup-sessions': { post: { summary: 'Cron: purge expired sessions (CRON_SECRET protected)', responses: { 200: { description: 'Done' } } } },
     '/api/stock-notifications': { post: { summary: 'Subscribe to back-in-stock notification for a product', responses: { 201: { description: 'Subscribed' }, 400: { $ref: '#/components/schemas/Error' } } } },
   },

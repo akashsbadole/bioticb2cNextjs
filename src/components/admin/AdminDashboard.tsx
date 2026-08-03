@@ -114,10 +114,6 @@ const AdminNewsletter = lazyNamed(
   () => import("@/components/admin/AdminNewsletter"),
   "AdminNewsletter",
 );
-const AdminAbandonedCarts = lazyNamed(
-  () => import("@/components/admin/AdminAbandonedCarts"),
-  "AdminAbandonedCarts",
-);
 const AdminPopups = lazyNamed(
   () => import("@/components/admin/AdminPopups"),
   "AdminPopups",
@@ -202,7 +198,6 @@ const sidebarItems = [
   { id: "data-export", label: "Data Export", icon: Download },
   { id: "blog", label: "Blog", icon: BookOpen },
   { id: "orders", label: "Orders", icon: ShoppingBag },
-  { id: "abandoned-carts", label: "Abandoned Carts", icon: ShoppingCart },
   { id: "coupons", label: "Coupons", icon: Ticket },
   { id: "reviews", label: "Reviews", icon: Star },
   { id: "media", label: "Media", icon: ImageIcon },
@@ -453,8 +448,6 @@ export function AdminDashboard({
         return <AdminDataExport />;
       case "orders":
         return <AdminOrders />;
-      case "abandoned-carts":
-        return <AdminAbandonedCarts />;
       case "coupons":
         return <AdminCoupons />;
       case "reviews":
