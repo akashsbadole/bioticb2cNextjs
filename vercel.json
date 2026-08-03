@@ -3,10 +3,6 @@
   "buildCommand": "prisma generate --schema=prisma/schema.postgres.prisma && next build",
   "crons": [
     {
-      "path": "/api/cron/abandoned-carts",
-      "schedule": "0 */2 * * *"
-    },
-    {
       "path": "/api/cron/cleanup-sessions",
       "schedule": "0 3 * * *"
     }
